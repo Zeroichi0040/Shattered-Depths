@@ -260,12 +260,21 @@
     <div class="class-card selected" id="card-warrior" onclick="selectClass('warrior')">
       <span class="class-icon">⚔️</span>
       <div class="class-name">WARRIOR</div>
-      <div class="class-desc">Mighty fighter who excels in raw combat.</div>
+      <div class="class-desc">Mighty fighter with a simple sword.</div>
       <div class="class-stats">
-        <div class="stat-row"><span>Base HP</span><span>20</span></div>
+        <div class="stat-row"><span>CON</span><span>30</span></div>
+        <div class="stat-row"><span>STR</span><span>20</span></div>
+        <div class="stat-row"><span>DEX</span><span>10</span></div>
+      </div>
+    </div>
+    <div class="class-card" id="card-rogue" onclick="selectClass('rogue')">
+      <span class="class-icon">🗡️</span>
+      <div class="class-name">ROGUE</div>
+      <div class="class-desc">Swift rogue with a simple dagger.</div>
+      <div class="class-stats">
+        <div class="stat-row"><span>CON</span><span>20</span></div>
         <div class="stat-row"><span>STR</span><span>10</span></div>
-        <div class="stat-row"><span>CON</span><span>8</span></div>
-        <div class="stat-row"><span>Damage scales off</span><span>STR</span></div>
+        <div class="stat-row"><span>DEX</span><span>15</span></div>
       </div>
     </div>
   </div>
@@ -342,7 +351,7 @@
       <button class="panel-tab" id="tab-char" onclick="switchTab('char')">CHAR<span class="tab-dot" id="char-tab-dot"></span></button>
     </div>
     <div class="panel-body" id="body-hero">
-      <div class="hero-portrait">⚔️</div>
+      <div class="hero-portrait" id="hero-portrait">⚔️</div>
       <div class="hero-name" id="hero-name">WARRIOR</div>
       <div class="level-badge" id="level-badge">LVL 1</div>
       <div class="stat-section">
@@ -368,8 +377,9 @@
     <div class="panel-body hidden" id="body-char">
       <div class="stat-section">
         <div class="stat-section-title">BASE ATTRIBUTES</div>
-        <div class="mini-stat"><span class="label">STR</span><span class="val" id="stat-str">—</span></div>
         <div class="mini-stat"><span class="label">CON</span><span class="val" id="stat-con">—</span></div>
+        <div class="mini-stat"><span class="label">STR</span><span class="val" id="stat-str">—</span></div>
+        <div class="mini-stat"><span class="label">DEX</span><span class="val" id="stat-dex">—</span></div>
         <div class="mini-stat"><span class="label">DMG</span><span class="val" id="char-stat-dmg">—</span></div>
         <div class="mini-stat"><span class="label">MaxHP</span><span class="val" id="char-stat-maxhp">—</span></div>
       </div>
@@ -401,8 +411,8 @@
       <canvas id="game-canvas"></canvas>
       <div id="target-panel"></div>
       <div id="autonav-panel" style="position:absolute;top:8px;right:8px;display:none;flex-direction:column;gap:4px;z-index:15;">
-        <canvas id="autonav-down-canvas" width="40" height="40" class="autonav-icon" title="Auto-walk to down stairs" onclick="autoNavTo('down')"></canvas>
         <canvas id="autonav-up-canvas"   width="40" height="40" class="autonav-icon" title="Auto-walk to up stairs"   onclick="autoNavTo('up')"></canvas>
+        <canvas id="autonav-down-canvas" width="40" height="40" class="autonav-icon" title="Auto-walk to down stairs" onclick="autoNavTo('down')"></canvas>
         <canvas id="autonav-bonfire-canvas" width="40" height="40" class="autonav-icon" title="Auto-walk to bonfire" onclick="autoNavTo('bonfire')" style="display:none;"></canvas>
       </div>
     </div>
@@ -411,13 +421,13 @@
   <div id="dpad">
     <div id="dpad-grid">
       <div class="dp dp-ul"    id="dp-ul">↖</div>
-      <div class="dp dp-up"    id="dp-up">▲</div>
+      <div class="dp dp-up"    id="dp-up">↑</div>
       <div class="dp dp-ur"    id="dp-ur">↗</div>
-      <div class="dp dp-left"  id="dp-left">◀</div>
+      <div class="dp dp-left"  id="dp-left">←</div>
       <div class="dp dp-center"id="dp-center">○</div>
-      <div class="dp dp-right" id="dp-right">▶</div>
+      <div class="dp dp-right" id="dp-right">→</div>
       <div class="dp dp-dl"    id="dp-dl">↙</div>
-      <div class="dp dp-down"  id="dp-down">▼</div>
+      <div class="dp dp-down"  id="dp-down">↓</div>
       <div class="dp dp-dr"    id="dp-dr">↘</div>
     </div>
   </div>
@@ -441,7 +451,8 @@
     <div class="modal-title">⭐ LEVEL UP! ⭐</div>
     <div class="modal-subtitle" id="levelup-msg">You reached Level 2!</div>
     <div style="margin-bottom:14px;font-size:14px;color:var(--dim);text-align:center;">
-      Allocate <span id="lu-points" style="color:var(--gold2);font-family:'Press Start 2P',monospace;">3</span> stat points. Unspent points save to CHAR tab.
+      All <span id="lu-base-stats">CON+5, STR+1, DEX+1</span>.<br>
+      Plus <span id="lu-points" style="color:var(--gold2);font-family:'Press Start 2P',monospace;">3</span> stat points to spend.
     </div>
     <div id="lu-alloc-rows"></div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;">
@@ -578,12 +589,13 @@ function selectClass(cls){
 // ═══════════════════════════════════════════
 //  STAT ALLOC
 // ═══════════════════════════════════════════
-let allocPoints=5,allocValues={STR:0,CON:0};
+let allocPoints=5,allocValues={CON:0,STR:0,DEX:0};
 const STAT_DEFS=[
-  {key:'STR',label:'STR',effect:'+0.2 damage per point'},
   {key:'CON',label:'CON',effect:'+1 Max HP per point'},
+  {key:'STR',label:'STR',effect:'+0.25 sword / +0.1 dagger damage per point'},
+  {key:'DEX',label:'DEX',effect:'+0.1 sword / +0.2 dagger damage per point'},
 ];
-function showStatAlloc(){allocPoints=5;allocValues={STR:0,CON:0};renderAllocRows();showScreen('stat-screen');}
+function showStatAlloc(){allocPoints=5;allocValues={CON:0,STR:0,DEX:0};renderAllocRows();showScreen('stat-screen');}
 function renderAllocRows(){
   const c=document.getElementById('alloc-rows');c.innerHTML='';
   STAT_DEFS.forEach(d=>{
@@ -619,11 +631,11 @@ const DIFF_DESCS={
   hard:'More, tougher enemies. Higher damage.',
 };
 
-// Difficulty multipliers: {hpMult, atkMult, countMult, playerHpMult, playerDmgMult}
+// Difficulty multipliers: only affect enemies – hpMult, countMult, statMult
 const DIFF_MODS={
-  easy:  {hpMult:0.7, atkMult:0.7, countMult:0.6, playerHpMult:1.2, playerDmgMult:1.1},
-  normal:{hpMult:1.0, atkMult:1.0, countMult:1.0, playerHpMult:1.0, playerDmgMult:1.0},
-  hard:  {hpMult:1.4, atkMult:1.3, countMult:1.4, playerHpMult:0.9, playerDmgMult:0.95},
+  easy:  {hpMult:0.7, countMult:0.6, statMult:0.7},
+  normal:{hpMult:1.0, countMult:1.0, statMult:1.0},
+  hard:  {hpMult:1.4, countMult:1.4, statMult:1.4},
 };
 
 // Floor size dims (W×H) for normal floors
@@ -660,26 +672,43 @@ function setFloorSize(sz){
   document.getElementById('size-'+sz)?.classList.add('active');
 }
 
-
+// CLASS TEMPLATES
 const CLASS_TEMPLATES={
-  warrior:{icon:'⚔️',name:'Warrior',baseSTR:10,baseCON:8,baseHP:20,baseDMG:3},
+  warrior:{icon:'⚔️',name:'Warrior',baseCON:30,baseSTR:20,baseDEX:10, weaponType:'sword'},
+  rogue:{icon:'🗡️',name:'Rogue',baseCON:20,baseSTR:10,baseDEX:15, weaponType:'dagger'},
 };
+
+// Weapon scaling multipliers
+const WEAPON_SCALING={
+  sword: {str:0.25, dex:0.1},
+  dagger:{str:0.1, dex:0.2}
+};
+
 let G={};
 let camX=0,camY=0;
 
 function startGame(){
   const tmpl=CLASS_TEMPLATES[selectedClass];
-  const diff=DIFF_MODS[RUN_CONFIG.difficulty];
-  const str=tmpl.baseSTR+(allocValues.STR||0);
-  const con=tmpl.baseCON+(allocValues.CON||0);
-  const maxHP=Math.round((tmpl.baseHP+con)*diff.playerHpMult);
-  const baseDmg=parseFloat(((tmpl.baseDMG+str*0.2)*diff.playerDmgMult).toFixed(2));
+  
+  // Base stats with starting allocation
+  const con = tmpl.baseCON + (allocValues.CON||0);
+  const str = tmpl.baseSTR + (allocValues.STR||0);
+  const dex = tmpl.baseDEX + (allocValues.DEX||0);
+  
+  // Max HP = CON (1 CON = 1 HP) – no difficulty multiplier
+  const maxHP = con;
+  
+  // Damage = pure stat scaling based on weapon type
+  const scaler = WEAPON_SCALING[tmpl.weaponType];
+  const baseDmg = parseFloat(((str * scaler.str) + (dex * scaler.dex)).toFixed(2));
+  
   G={
     class:selectedClass,icon:tmpl.icon,name:tmpl.name,
+    weaponType:tmpl.weaponType,
     level:1,xp:0,xpNeeded:10,
-    hp:maxHP,maxHP,
-    str,con,
-    baseDmg:parseFloat(baseDmg.toFixed(2)),
+    hp:maxHP, maxHP,
+    con, str, dex,
+    baseDmg,
     kills:0,turn:1,depth:1,zone:'upper',
     enemyRespawn:RUN_CONFIG.enemyRespawn,
     pendingLevelUps:0,
@@ -693,7 +722,13 @@ function startGame(){
     player:{x:0,y:0},
     enemies:[],
     fov:new Set(),seen:new Set(),
+    // Bonfire tracking – number of normal floors cleared in current cycle (0–5)
+    normalFloorCount:0,
   };
+  
+  // Update hero portrait
+  document.getElementById('hero-portrait').textContent = G.icon;
+  
   camX=0;camY=0;
   turnPhase='player';priorityTargetId=null;floatNums=[];playerHpFlash=0;_queuedAction=null;_panelDirty=true;_clearedBanner=0;_floorNotifier={text:'',life:0,maxLife:0};_autoWalkOnArrival=null;heldKeys.clear();stopMoveLoop();
   // Clear persistent floor cache for new run
@@ -718,17 +753,12 @@ function startGame(){
 // ═══════════════════════════════════════════
 //  DEPTH / ZONE HELPERS
 // ═══════════════════════════════════════════
-function checkIsBonfireFloor(){
-  if(G.zone==='upper') return G.depth===4;           // upper floors: bonfire after floor 3
-  return G.zone==='normal' && G.depth%5===0;          // normal floors: bonfire every 5
-}
-
 function depthLabel(){
-  if(G.zone==='upper'){
-    if(checkIsBonfireFloor()) return 'UPPER — BONFIRE';
-    return `UPPER  ${G.depth}`;
+  if (G.zone === 'upper') {
+    if (G.isBonfireFloor) return 'UPPER FLOORS — BONFIRE';
+    return `UPPER FLOOR ${G.depth}`;
   }
-  if(checkIsBonfireFloor()) return `DEPTH ${G.depth} — BONFIRE`;
+  if (G.isBonfireFloor) return `DEPTH ${G.depth} — BONFIRE`;
   return `DEPTH ${G.depth}`;
 }
 
@@ -736,89 +766,106 @@ function depthLabel(){
 //  DUNGEON GENERATION
 // ═══════════════════════════════════════════
 function generateDungeon(){
-  G.isBonfireFloor=checkIsBonfireFloor();
-  if(G.isBonfireFloor){generateBonfireFloor();return;}
+  if (G.isBonfireFloor) { generateBonfireFloor(); return; }
 
-  const isUpper=(G.zone==='upper');
-  const diff=DIFF_MODS[RUN_CONFIG.difficulty];
+  const isUpper = (G.zone === 'upper');
+  const diff = DIFF_MODS[RUN_CONFIG.difficulty];
 
   // ── Map dimensions ──
-  if(isUpper){
-    // Upper floors: fixed exact sizes
-    if(G.depth===1)     { G.mapW=10; G.mapH=10; } // tiny
-    else if(G.depth===2){ G.mapW=13; G.mapH=12; } // XS
-    else                { G.mapW=15; G.mapH=15; } // S (U3)
+  if (isUpper) {
+    if (G.depth === 1)     { G.mapW = 10; G.mapH = 10; }
+    else if (G.depth === 2){ G.mapW = 13; G.mapH = 12; }
+    else if (G.depth === 3){ G.mapW = 15; G.mapH = 15; }
+    else                   { G.mapW = 15; G.mapH = 15; } // upper bonfire (depth 4) uses same size
   } else {
-    const sz=FLOOR_SIZES[RUN_CONFIG.floorSize]||FLOOR_SIZES.md;
-    G.mapW=sz.w; G.mapH=sz.h;
+    const sz = FLOOR_SIZES[RUN_CONFIG.floorSize] || FLOOR_SIZES.md;
+    G.mapW = sz.w; G.mapH = sz.h;
   }
-  const W=G.mapW, H=G.mapH;
+  const W = G.mapW, H = G.mapH;
 
-  G.tiles=Array.from({length:H},()=>new Array(W).fill(0));
-  G.rooms=[];G.enemies=[];G.bonfire=null;
+  G.tiles = Array.from({length:H}, () => new Array(W).fill(0));
+  G.rooms = []; G.enemies = []; G.bonfire = null;
 
   // ── Room generation ──
-  const attempts=Math.floor((W*H)/12);
-  const rwRange=isUpper?[3,6]:[5,13];
-  const rhRange=isUpper?[2,5]:[4,10];
+  const attempts = Math.floor((W*H)/12);
+  const rwRange = isUpper ? [3,6] : [5,13];
+  const rhRange = isUpper ? [2,5] : [4,10];
 
-  for(let i=0;i<attempts;i++){
-    const rw=randInt(rwRange[0],Math.min(rwRange[1],W-3));
-    const rh=randInt(rhRange[0],Math.min(rhRange[1],H-3));
-    if(rw<2||rh<2)continue;
-    const rx=randInt(1,W-rw-1),ry=randInt(1,H-rh-1);
-    if(!overlapsRoom(rx,ry,rw,rh)){
+  for (let i = 0; i < attempts; i++) {
+    const rw = randInt(rwRange[0], Math.min(rwRange[1], W-3));
+    const rh = randInt(rhRange[0], Math.min(rhRange[1], H-3));
+    if (rw < 2 || rh < 2) continue;
+    const rx = randInt(1, W-rw-1), ry = randInt(1, H-rh-1);
+    if (!overlapsRoom(rx,ry,rw,rh)) {
       G.rooms.push({x:rx,y:ry,w:rw,h:rh});
-      for(let cy=ry;cy<ry+rh;cy++) for(let cx=rx;cx<rx+rw;cx++) G.tiles[cy][cx]=1;
+      for (let cy = ry; cy < ry+rh; cy++)
+        for (let cx = rx; cx < rx+rw; cx++)
+          G.tiles[cy][cx] = 1;
     }
   }
-  if(G.rooms.length<2){
-    // Fallback: force 2 rooms if generation failed
-    const r1={x:1,y:1,w:Math.max(3,Math.floor(W/3)),h:Math.max(3,Math.floor(H/3))};
-    const r2={x:W-r1.w-2,y:H-r1.h-2,w:r1.w,h:r1.h};
-    G.rooms=[r1,r2];
-    [r1,r2].forEach(r=>{for(let cy=r.y;cy<r.y+r.h;cy++)for(let cx=r.x;cx<r.x+r.w;cx++)G.tiles[cy][cx]=1;});
+  if (G.rooms.length < 2) {
+    const r1 = {x:1,y:1,w:Math.max(3,Math.floor(W/3)), h:Math.max(3,Math.floor(H/3))};
+    const r2 = {x:W-r1.w-2, y:H-r1.h-2, w:r1.w, h:r1.h};
+    G.rooms = [r1, r2];
+    [r1,r2].forEach(r => {
+      for (let cy = r.y; cy < r.y+r.h; cy++)
+        for (let cx = r.x; cx < r.x+r.w; cx++)
+          G.tiles[cy][cx] = 1;
+    });
   }
-  for(let i=0;i<G.rooms.length-1;i++) carveCorridor(roomCenter(G.rooms[i]),roomCenter(G.rooms[i+1]));
+  for (let i = 0; i < G.rooms.length-1; i++)
+    carveCorridor(roomCenter(G.rooms[i]), roomCenter(G.rooms[i+1]));
 
-  const startC=roomCenter(G.rooms[0]);
-  G.player={x:startC.x,y:startC.y};
-  const lastC=roomCenter(G.rooms[G.rooms.length-1]);
-  G.stairsDown={x:lastC.x,y:lastC.y};
-  G.stairsUp=(G.depth>1||G.zone==='normal')?{x:startC.x+1,y:startC.y}:null;
+  const startC = roomCenter(G.rooms[0]);
+  G.player = {x:startC.x, y:startC.y};
+  const lastC = roomCenter(G.rooms[G.rooms.length-1]);
+  G.stairsDown = {x:lastC.x, y:lastC.y};
+  G.stairsUp = (G.depth > 1 || G.zone === 'normal') ? {x:startC.x+1, y:startC.y} : null;
 
   // ── Enemy spawning ──
-  // Upper floors: fixed total counts; normal floors: per-room with diff multiplier
-  const hpRange=isUpper?[3,6]:[5,10];
-  const atkRange=isUpper?[1,1]:[1,2];
+  const baseRatStats = {con:10, str:10, dex:5};
+  const hpRange = isUpper ? [3,6] : [5,10];
 
-  if(isUpper){
-    // Fixed total enemies per upper floor, placed in non-starting rooms
-    const totalEnemies=G.depth===1?1:G.depth===2?1:2;
-    let placed=0;
-    const nonStartRooms=G.rooms.slice(1);
-    // Shuffle rooms for varied placement
-    for(let i=nonStartRooms.length-1;i>0;i--){const j=randInt(0,i);[nonStartRooms[i],nonStartRooms[j]]=[nonStartRooms[j],nonStartRooms[i]];}
-    for(const room of nonStartRooms){
-      if(placed>=totalEnemies)break;
-      const pos=randomInRoom(room);
-      if(!enemyAt(pos.x,pos.y)){
-        const hp=Math.max(1,Math.round(randInt(hpRange[0],hpRange[1])*diff.hpMult));
-        const atk=Math.max(1,Math.round(randInt(atkRange[0],atkRange[1])*diff.atkMult));
-        G.enemies.push({id:++G._eid,type:'rat',x:pos.x,y:pos.y,hp,maxHP:hp,atk,xp:randInt(1,2),isFloorEnemy:true});
+  if (isUpper) {
+    const totalEnemies = G.depth===1 ? 1 : G.depth===2 ? 1 : 2;
+    let placed = 0;
+    const nonStartRooms = G.rooms.slice(1);
+    for (let i = nonStartRooms.length-1; i>0; i--) {
+      const j = randInt(0,i);
+      [nonStartRooms[i], nonStartRooms[j]] = [nonStartRooms[j], nonStartRooms[i]];
+    }
+    for (const room of nonStartRooms) {
+      if (placed >= totalEnemies) break;
+      const pos = randomInRoom(room);
+      if (!enemyAt(pos.x, pos.y)) {
+        const con = Math.max(1, Math.round(baseRatStats.con * randFloat(0.7, 1.3) * diff.statMult));
+        const str = Math.max(1, Math.round(baseRatStats.str * randFloat(0.7, 1.3) * diff.statMult));
+        const dex = Math.max(1, Math.round(baseRatStats.dex * randFloat(0.7, 1.3) * diff.statMult));
+        const hp = Math.max(1, Math.round(con * diff.hpMult));
+        G.enemies.push({
+          id: ++G._eid, type:'rat', x:pos.x, y:pos.y,
+          con, str, dex, hp, maxHP:hp,
+          xp: randInt(1,2), isFloorEnemy: true
+        });
         placed++;
       }
     }
   } else {
-    const maxPerRoom=Math.max(1,Math.round(3*diff.countMult));
-    for(let i=1;i<G.rooms.length;i++){
-      const count=randInt(1,maxPerRoom);
-      for(let j=0;j<count;j++){
-        const pos=randomInRoom(G.rooms[i]);
-        if(!enemyAt(pos.x,pos.y)&&!(pos.x===G.player.x&&pos.y===G.player.y)){
-          const hp=Math.max(1,Math.round(randInt(hpRange[0],hpRange[1])*diff.hpMult));
-          const atk=Math.max(1,Math.round(randInt(atkRange[0],atkRange[1])*diff.atkMult));
-          G.enemies.push({id:++G._eid,type:'rat',x:pos.x,y:pos.y,hp,maxHP:hp,atk,xp:randInt(1,2),isFloorEnemy:true});
+    const maxPerRoom = Math.max(1, Math.round(3 * diff.countMult));
+    for (let i = 1; i < G.rooms.length; i++) {
+      const count = randInt(1, maxPerRoom);
+      for (let j = 0; j < count; j++) {
+        const pos = randomInRoom(G.rooms[i]);
+        if (!enemyAt(pos.x, pos.y) && !(pos.x === G.player.x && pos.y === G.player.y)) {
+          const con = Math.max(1, Math.round(baseRatStats.con * randFloat(0.7, 1.3) * diff.statMult));
+          const str = Math.max(1, Math.round(baseRatStats.str * randFloat(0.7, 1.3) * diff.statMult));
+          const dex = Math.max(1, Math.round(baseRatStats.dex * randFloat(0.7, 1.3) * diff.statMult));
+          const hp = Math.max(1, Math.round(con * diff.hpMult));
+          G.enemies.push({
+            id: ++G._eid, type:'rat', x:pos.x, y:pos.y,
+            con, str, dex, hp, maxHP:hp,
+            xp: randInt(1,2), isFloorEnemy: true
+          });
         }
       }
     }
@@ -829,65 +876,67 @@ function generateDungeon(){
 
 function generateBonfireFloor(){
   // Bonfire room size same regardless of zone
-  G.mapW=42; G.mapH=32;
-  const W=G.mapW,H=G.mapH;
-  G.tiles=Array.from({length:H},()=>new Array(W).fill(0));
-  G.rooms=[];G.enemies=[];
-  const rw=15,rh=11;
-  const rx=Math.floor((W-rw)/2),ry=Math.floor((H-rh)/2);
-  G.rooms.push({x:rx,y:ry,w:rw,h:rh});
-  for(let cy=ry;cy<ry+rh;cy++) for(let cx=rx;cx<rx+rw;cx++) G.tiles[cy][cx]=1;
-  const cx=Math.floor(rx+rw/2),cy=Math.floor(ry+rh/2);
-  // Stairs up top-left area, stairs down bottom-right area, bonfire center
-  G.stairsUp={x:rx+2,y:ry+2};
-  G.stairsDown={x:rx+rw-3,y:ry+rh-3};
-  G.bonfire={x:cx,y:cy};
-  // Default entry near stairsUp (descending into bonfire from above)
-  // regenMap will override player pos based on dir
-  G.player={x:rx+2,y:ry+3};
+  G.mapW = 42; G.mapH = 32;
+  const W = G.mapW, H = G.mapH;
+  G.tiles = Array.from({length:H}, () => new Array(W).fill(0));
+  G.rooms = []; G.enemies = [];
+  const rw = 15, rh = 11;
+  const rx = Math.floor((W - rw) / 2), ry = Math.floor((H - rh) / 2);
+  G.rooms.push({x:rx, y:ry, w:rw, h:rh});
+  for (let cy = ry; cy < ry+rh; cy++)
+    for (let cx = rx; cx < rx+rw; cx++)
+      G.tiles[cy][cx] = 1;
+  const cx = Math.floor(rx + rw/2), cy = Math.floor(ry + rh/2);
+  G.stairsUp = {x:rx+2, y:ry+2};
+  G.stairsDown = {x:rx+rw-3, y:ry+rh-3};
+  G.bonfire = {x:cx, y:cy};
+  G.player = {x:rx+2, y:ry+3}; // entry near stairsUp
   computeFOV();
 }
 
 function carveCorridor(a,b){
-  let x=a.x;const sx=b.x>a.x?1:-1;
-  while(x!==b.x){G.tiles[a.y][x]=1;x+=sx;}
-  let y=a.y;const sy=b.y>a.y?1:-1;
-  while(y!==b.y){G.tiles[y][b.x]=1;y+=sy;}
-  G.tiles[b.y][b.x]=1;
+  let x = a.x; const sx = b.x > a.x ? 1 : -1;
+  while (x !== b.x) { G.tiles[a.y][x] = 1; x += sx; }
+  let y = a.y; const sy = b.y > a.y ? 1 : -1;
+  while (y !== b.y) { G.tiles[y][b.x] = 1; y += sy; }
+  G.tiles[b.y][b.x] = 1;
 }
 
-function overlapsRoom(rx,ry,rw,rh){for(const r of G.rooms)if(rx<r.x+r.w+1&&rx+rw+1>r.x&&ry<r.y+r.h+1&&ry+rh+1>r.y)return true;return false;}
-function roomCenter(r){return{x:Math.floor(r.x+r.w/2),y:Math.floor(r.y+r.h/2)};}
-function randomInRoom(r){return{x:randInt(r.x+1,r.x+r.w-2),y:randInt(r.y+1,r.y+r.h-2)};}
-function enemyAt(x,y){return G.enemies.find(e=>e.x===x&&e.y===y&&e.hp>0);}
-function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function randFloat(a,b){return Math.random()*(b-a)+a;}
+function overlapsRoom(rx,ry,rw,rh){
+  for (const r of G.rooms)
+    if (rx < r.x+r.w+1 && rx+rw+1 > r.x && ry < r.y+r.h+1 && ry+rh+1 > r.y) return true;
+  return false;
+}
+function roomCenter(r){ return {x: Math.floor(r.x + r.w/2), y: Math.floor(r.y + r.h/2)}; }
+function randomInRoom(r){ return {x: randInt(r.x+1, r.x+r.w-2), y: randInt(r.y+1, r.y+r.h-2)}; }
+function enemyAt(x,y){ return G.enemies.find(e => e.x === x && e.y === y && e.hp > 0); }
+function randInt(a,b){ return Math.floor(Math.random() * (b - a + 1)) + a; }
+function randFloat(a,b){ return Math.random() * (b - a) + a; }
 
 // ═══════════════════════════════════════════
 //  FOV
 // ═══════════════════════════════════════════
 function computeFOV(){
-  // No-respawn cleared floor: entire floor is always visible — skip raycast
-  if(G.floorCleared && !floorHasRespawn()){
-    G.fov=new Set(G.seen); // seen was already fully revealed on clear
+  if (G.floorCleared && !floorHasRespawn()) {
+    G.fov = new Set(G.seen);
     return;
   }
-  G.fov=new Set();
-  const px=G.player.x,py=G.player.y,R=SETTINGS.fovRadius;
-  for(let ang=0;ang<360;ang+=1.5){
-    const rad=ang*Math.PI/180;
-    let rx=px+0.5,ry=py+0.5;
-    const dx=Math.cos(rad)*0.35,dy=Math.sin(rad)*0.35;
-    for(let s=0;s<R/0.35;s++){
-      const tx=Math.floor(rx),ty=Math.floor(ry);
-      if(tx<0||ty<0||tx>=G.mapW||ty>=G.mapH)break;
-      const key=`${tx},${ty}`;
-      G.fov.add(key);G.seen.add(key);
-      if(G.tiles[ty][tx]===0)break;
-      rx+=dx;ry+=dy;
+  G.fov = new Set();
+  const px = G.player.x, py = G.player.y, R = SETTINGS.fovRadius;
+  for (let ang = 0; ang < 360; ang += 1.5) {
+    const rad = ang * Math.PI / 180;
+    let rx = px + 0.5, ry = py + 0.5;
+    const dx = Math.cos(rad) * 0.35, dy = Math.sin(rad) * 0.35;
+    for (let s = 0; s < R / 0.35; s++) {
+      const tx = Math.floor(rx), ty = Math.floor(ry);
+      if (tx < 0 || ty < 0 || tx >= G.mapW || ty >= G.mapH) break;
+      const key = `${tx},${ty}`;
+      G.fov.add(key); G.seen.add(key);
+      if (G.tiles[ty][tx] === 0) break;
+      rx += dx; ry += dy;
     }
   }
-  G.fov.add(`${px},${py}`);G.seen.add(`${px},${py}`);
+  G.fov.add(`${px},${py}`); G.seen.add(`${px},${py}`);
 }
 
 // ═══════════════════════════════════════════
@@ -895,138 +944,118 @@ function computeFOV(){
 // ═══════════════════════════════════════════
 let canvas,ctx;
 function setupCanvas(){
-  canvas=document.getElementById('game-canvas');
-  ctx=canvas.getContext('2d');
-  const cont=document.getElementById('canvas-container');
-  canvas.width=cont.clientWidth;canvas.height=cont.clientHeight;
-  canvas.removeEventListener('click',onCanvasClick);
-  canvas.addEventListener('click',onCanvasClick);
+  canvas = document.getElementById('game-canvas');
+  ctx = canvas.getContext('2d');
+  const cont = document.getElementById('canvas-container');
+  canvas.width = cont.clientWidth; canvas.height = cont.clientHeight;
+  canvas.removeEventListener('click', onCanvasClick);
+  canvas.addEventListener('click', onCanvasClick);
 }
 
-let smoothRunning=false;
+let smoothRunning = false;
 function smoothCamLoop(){
-  if(!SETTINGS.smoothCam||!document.getElementById('game-screen').classList.contains('active')){smoothRunning=false;return;}
-  smoothRunning=true;
-  if(!SETTINGS.smoothEntities) renderCanvas();
+  if (!SETTINGS.smoothCam || !document.getElementById('game-screen').classList.contains('active')){ smoothRunning = false; return; }
+  smoothRunning = true;
+  if (!SETTINGS.smoothEntities) renderCanvas();
   requestAnimationFrame(smoothCamLoop);
 }
 function snapVizToLogical(){
-  vizPlayer={x:G.player.x,y:G.player.y};
-  vizEnemies={};
-  G.enemies.forEach(e=>{vizEnemies[e.id]={x:e.x,y:e.y};});
+  vizPlayer = {x:G.player.x, y:G.player.y};
+  vizEnemies = {};
+  G.enemies.forEach(e => { vizEnemies[e.id] = {x:e.x, y:e.y}; });
 }
-function startEntityLoop(){if(animRAF)return;entityLoop();}
-function stopEntityLoop(){if(animRAF){cancelAnimationFrame(animRAF);animRAF=null;}}
+function startEntityLoop(){ if (animRAF) return; entityLoop(); }
+function stopEntityLoop(){ if (animRAF) { cancelAnimationFrame(animRAF); animRAF = null; } }
 function entityLoop(){
-  if(!SETTINGS.smoothEntities||!document.getElementById('game-screen').classList.contains('active')){animRAF=null;return;}
-  vizPlayer.x+=(G.player.x-vizPlayer.x)*LERP;
-  vizPlayer.y+=(G.player.y-vizPlayer.y)*LERP;
-  G.enemies.forEach(e=>{
-    if(!vizEnemies[e.id]) vizEnemies[e.id]={x:e.x,y:e.y};
-    if(e.hp<=0){vizEnemies[e.id]={x:e.x,y:e.y};return;}
-    vizEnemies[e.id].x+=(e.x-vizEnemies[e.id].x)*LERP;
-    vizEnemies[e.id].y+=(e.y-vizEnemies[e.id].y)*LERP;
+  if (!SETTINGS.smoothEntities || !document.getElementById('game-screen').classList.contains('active')){ animRAF = null; return; }
+  vizPlayer.x += (G.player.x - vizPlayer.x) * LERP;
+  vizPlayer.y += (G.player.y - vizPlayer.y) * LERP;
+  G.enemies.forEach(e => {
+    if (!vizEnemies[e.id]) vizEnemies[e.id] = {x:e.x, y:e.y};
+    if (e.hp <= 0) { vizEnemies[e.id] = {x:e.x, y:e.y}; return; }
+    vizEnemies[e.id].x += (e.x - vizEnemies[e.id].x) * LERP;
+    vizEnemies[e.id].y += (e.y - vizEnemies[e.id].y) * LERP;
   });
-  const liveIds=new Set(G.enemies.map(e=>e.id));
-  Object.keys(vizEnemies).forEach(id=>{if(!liveIds.has(Number(id)))delete vizEnemies[id];});
+  const liveIds = new Set(G.enemies.map(e => e.id));
+  Object.keys(vizEnemies).forEach(id => { if (!liveIds.has(Number(id))) delete vizEnemies[id]; });
   renderCanvas();
-  animRAF=requestAnimationFrame(entityLoop);
+  animRAF = requestAnimationFrame(entityLoop);
 }
 
 // ═══════════════════════════════════════════
 //  FLOATING DAMAGE NUMBERS
 // ═══════════════════════════════════════════
-let floatNums=[];  // {x,y,text,color,life,maxLife,rise}
+let floatNums = [];
 function spawnFloat(wx,wy,text,color){
   floatNums.push({wx,wy,text,color,life:50,maxLife:50,dy:-0.04});
 }
 function tickFloats(){
-  floatNums=floatNums.filter(f=>{
-    f.wy-=f.dy; f.life--;
-    return f.life>0;
-  });
+  floatNums = floatNums.filter(f => { f.wy -= f.dy; f.life--; return f.life > 0; });
 }
 
-// ═══════════════════════════════════════════
-//  PLAYER HP DISPLAY (show when not full)
-// ═══════════════════════════════════════════
-let playerHpFlash=0; // frames to show player HP
-function triggerPlayerHpFlash(){playerHpFlash=120;}
+let playerHpFlash = 0;
+function triggerPlayerHpFlash(){ playerHpFlash = 120; }
 
-// ═══════════════════════════════════════════
-//  TURN SEQUENCING (player moves first, then enemies animate)
-// ═══════════════════════════════════════════
-// Phase: 'player' | 'anim_player' | 'anim_enemy'
-let turnPhase='player';
-
-// ═══════════════════════════════════════════
-//  TARGET / COMBAT PANEL
-// ═══════════════════════════════════════════
-let priorityTargetId=null;
-const ATTACK_RANGE=1; // Chebyshev 1 = adjacent including diagonals
+let turnPhase = 'player';
+let priorityTargetId = null;
+const ATTACK_RANGE = 1;
 
 function getVisibleEnemies(){
-  return G.enemies.filter(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`));
+  return G.enemies.filter(e => e.hp > 0 && G.fov.has(`${e.x},${e.y}`));
 }
 function inAttackRange(e){
-  return Math.max(Math.abs(e.x-G.player.x),Math.abs(e.y-G.player.y))<=ATTACK_RANGE;
+  return Math.max(Math.abs(e.x - G.player.x), Math.abs(e.y - G.player.y)) <= ATTACK_RANGE;
 }
 function getPriorityTarget(){
-  const vis=getVisibleEnemies().filter(inAttackRange);
-  if(!vis.length)return null;
-  // If current priority target is still valid, return it
-  if(priorityTargetId!=null){
-    const t=vis.find(e=>e.id===priorityTargetId);
-    if(t)return t;
+  const vis = getVisibleEnemies().filter(inAttackRange);
+  if (!vis.length) return null;
+  if (priorityTargetId != null){
+    const t = vis.find(e => e.id === priorityTargetId);
+    if (t) return t;
   }
-  // Otherwise pick closest
-  const px=G.player.x,py=G.player.y;
-  vis.sort((a,b)=>Math.max(Math.abs(a.x-px),Math.abs(a.y-py))-Math.max(Math.abs(b.x-px),Math.abs(b.y-py)));
-  priorityTargetId=vis[0].id;
+  const px = G.player.x, py = G.player.y;
+  vis.sort((a,b) => Math.max(Math.abs(a.x-px), Math.abs(a.y-py)) - Math.max(Math.abs(b.x-px), Math.abs(b.y-py)));
+  priorityTargetId = vis[0].id;
   return vis[0];
 }
 function attackPriorityTarget(){
-  const t=getPriorityTarget();
-  if(!t){addLog('No target in range.','info');return;}
+  const t = getPriorityTarget();
+  if (!t) { addLog('No target in range.','info'); return; }
   doAttackEnemy(t);
   endTurn();
 }
-function setTarget(id){
-  priorityTargetId=id;
-}
-let _panelDirty=true;
-function markPanelDirty(){_panelDirty=true;}
+function setTarget(id){ priorityTargetId = id; }
+let _panelDirty = true;
+function markPanelDirty(){ _panelDirty = true; }
 
 function updateTargetPanel(){
-  const panel=document.getElementById('target-panel');
-  if(!panel)return;
-  const vis=getVisibleEnemies().filter(inAttackRange);
-  if(!vis.length){
-    if(panel.style.display!=='none'){panel.style.display='none';_panelDirty=true;}
+  const panel = document.getElementById('target-panel');
+  if (!panel) return;
+  const vis = getVisibleEnemies().filter(inAttackRange);
+  if (!vis.length){
+    if (panel.style.display !== 'none'){ panel.style.display = 'none'; _panelDirty = true; }
     return;
   }
-  if(!_panelDirty)return; // skip full rebuild — only update HP bars
-  _panelDirty=false;
-
-  const pt=getPriorityTarget();
-  const others=vis.filter(e=>e!==pt);
-  const ordered=[...others,pt];
-
-  panel.style.display='flex';
-  panel.innerHTML='';
-  ordered.forEach((e)=>{
-    const isPriority=(e===pt);
-    const card=document.createElement('div');
-    card.className='target-card'+(isPriority?' target-priority':'');
-    const hpPct=Math.max(0,e.hp/e.maxHP*100).toFixed(0);
-    card.innerHTML=`<span class="target-icon">🐀</span>
+  if (!_panelDirty) return;
+  _panelDirty = false;
+  const pt = getPriorityTarget();
+  const others = vis.filter(e => e !== pt);
+  const ordered = [...others, pt];
+  panel.style.display = 'flex';
+  panel.innerHTML = '';
+  ordered.forEach(e => {
+    const isPriority = (e === pt);
+    const card = document.createElement('div');
+    card.className = 'target-card' + (isPriority ? ' target-priority' : '');
+    const hpPct = Math.max(0, e.hp / e.maxHP * 100).toFixed(0);
+    card.innerHTML = `<span class="target-icon">🐀</span>
       <div class="target-info">
         <div class="target-hpbar-bg"><div class="target-hpbar-fill" style="width:${hpPct}%"></div></div>
         <div class="target-hp-text">${Math.max(0,e.hp).toFixed(1)}/${e.maxHP}</div>
       </div>`;
-    card.addEventListener('click',ev=>{
+    card.addEventListener('click', ev => {
       ev.stopPropagation();
-      if(turnPhase!=='player')return;
+      if (turnPhase !== 'player') return;
       setTarget(e.id);
       doAttackEnemy(e);
       endTurn();
@@ -1035,243 +1064,227 @@ function updateTargetPanel(){
   });
 }
 
-// Animated bonfire flicker state
-let bfFlicker=0;
+let bfFlicker = 0;
 
 function renderCanvas(){
-  if(!canvas)return;
-  bfFlicker=(bfFlicker+0.07)%(Math.PI*2);
+  if (!canvas) return;
+  bfFlicker = (bfFlicker + 0.07) % (Math.PI*2);
   tickFloats();
   tickFlash();
-  const TILE=SETTINGS.tileSize;
-  const camTX=SETTINGS.smoothEntities?vizPlayer.x:G.player.x;
-  const camTY=SETTINGS.smoothEntities?vizPlayer.y:G.player.y;
-  const targetX=Math.floor(camTX*TILE-canvas.width/2+TILE/2);
-  const targetY=Math.floor(camTY*TILE-canvas.height/2+TILE/2);
-  if(SETTINGS.smoothCam){camX=Math.round(camX+(targetX-camX)*0.2);camY=Math.round(camY+(targetY-camY)*0.2);}
-  else{camX=targetX;camY=targetY;}
+  const TILE = SETTINGS.tileSize;
+  const camTX = SETTINGS.smoothEntities ? vizPlayer.x : G.player.x;
+  const camTY = SETTINGS.smoothEntities ? vizPlayer.y : G.player.y;
+  const targetX = Math.floor(camTX * TILE - canvas.width/2 + TILE/2);
+  const targetY = Math.floor(camTY * TILE - canvas.height/2 + TILE/2);
+  if (SETTINGS.smoothCam) { camX = Math.round(camX + (targetX - camX)*0.2); camY = Math.round(camY + (targetY - camY)*0.2); }
+  else { camX = targetX; camY = targetY; }
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#040408';ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#040408'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  for(let ty=0;ty<G.mapH;ty++){
-    for(let tx=0;tx<G.mapW;tx++){
-      const sx=tx*TILE-camX,sy=ty*TILE-camY;
-      if(sx<-TILE||sx>canvas.width+TILE||sy<-TILE||sy>canvas.height+TILE)continue;
-      const key=`${tx},${ty}`;
-      const inFOV=G.fov.has(key),seen=G.seen.has(key);
-      if(!seen)continue;
-      ctx.globalAlpha=inFOV?1:0.28;
-      if(G.tiles[ty][tx]===1){
-        ctx.fillStyle=G.isBonfireFloor?(inFOV?'#221a10':'#150e08'):'#1c1c2c';
+  for (let ty = 0; ty < G.mapH; ty++) {
+    for (let tx = 0; tx < G.mapW; tx++) {
+      const sx = tx*TILE - camX, sy = ty*TILE - camY;
+      if (sx < -TILE || sx > canvas.width + TILE || sy < -TILE || sy > canvas.height + TILE) continue;
+      const key = `${tx},${ty}`;
+      const inFOV = G.fov.has(key), seen = G.seen.has(key);
+      if (!seen) continue;
+      ctx.globalAlpha = inFOV ? 1 : 0.28;
+      if (G.tiles[ty][tx] === 1) {
+        ctx.fillStyle = G.isBonfireFloor ? (inFOV ? '#221a10' : '#150e08') : '#1c1c2c';
         ctx.fillRect(sx,sy,TILE,TILE);
-        if(SETTINGS.showGrid){ctx.strokeStyle='#242436';ctx.lineWidth=0.5;ctx.strokeRect(sx+.5,sy+.5,TILE-1,TILE-1);}
-        if(G.stairsDown&&G.stairsDown.x===tx&&G.stairsDown.y===ty){
-          ctx.fillStyle=inFOV?'#9070d0':'#504070';
-          ctx.font=`${TILE-4}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-          ctx.fillText('▾',sx+TILE/2,sy+TILE/2+1);
-          if(inFOV){ctx.strokeStyle='#6040a0';ctx.lineWidth=1;ctx.strokeRect(sx+2,sy+2,TILE-4,TILE-4);}
+        if (SETTINGS.showGrid) { ctx.strokeStyle = '#242436'; ctx.lineWidth = 0.5; ctx.strokeRect(sx+0.5,sy+0.5,TILE-1,TILE-1); }
+        if (G.stairsDown && G.stairsDown.x === tx && G.stairsDown.y === ty) {
+          ctx.fillStyle = inFOV ? '#9070d0' : '#504070';
+          ctx.font = `${TILE-4}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('▾', sx+TILE/2, sy+TILE/2+1);
+          if (inFOV) { ctx.strokeStyle = '#6040a0'; ctx.lineWidth = 1; ctx.strokeRect(sx+2,sy+2,TILE-4,TILE-4); }
         }
-        if(G.stairsUp&&G.stairsUp.x===tx&&G.stairsUp.y===ty){
-          ctx.fillStyle=inFOV?'#60b080':'#305040';
-          ctx.font=`${TILE-4}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-          ctx.fillText('▴',sx+TILE/2,sy+TILE/2);
-          if(inFOV){ctx.strokeStyle='#408060';ctx.lineWidth=1;ctx.strokeRect(sx+2,sy+2,TILE-4,TILE-4);}
+        if (G.stairsUp && G.stairsUp.x === tx && G.stairsUp.y === ty) {
+          ctx.fillStyle = inFOV ? '#60b080' : '#305040';
+          ctx.font = `${TILE-4}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('▴', sx+TILE/2, sy+TILE/2);
+          if (inFOV) { ctx.strokeStyle = '#408060'; ctx.lineWidth = 1; ctx.strokeRect(sx+2,sy+2,TILE-4,TILE-4); }
         }
-        if(G.bonfire&&G.bonfire.x===tx&&G.bonfire.y===ty&&inFOV){
-          const flick=0.85+Math.sin(bfFlicker)*0.15;
-          ctx.globalAlpha=flick;
-          ctx.font=`${TILE}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-          ctx.fillText('🔥',sx+TILE/2,sy+TILE/2);
-          ctx.globalAlpha=inFOV?1:0.28;
-          const glow=ctx.createRadialGradient(sx+TILE/2,sy+TILE/2,2,sx+TILE/2,sy+TILE/2,TILE*2);
-          glow.addColorStop(0,'#ff820044');glow.addColorStop(1,'transparent');
-          ctx.fillStyle=glow;ctx.fillRect(sx-TILE,sy-TILE,TILE*3,TILE*3);
+        if (G.bonfire && G.bonfire.x === tx && G.bonfire.y === ty && inFOV) {
+          const flick = 0.85 + Math.sin(bfFlicker)*0.15;
+          ctx.globalAlpha = flick;
+          ctx.font = `${TILE}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('🔥', sx+TILE/2, sy+TILE/2);
+          ctx.globalAlpha = inFOV ? 1 : 0.28;
+          const glow = ctx.createRadialGradient(sx+TILE/2, sy+TILE/2, 2, sx+TILE/2, sy+TILE/2, TILE*2);
+          glow.addColorStop(0, '#ff820044'); glow.addColorStop(1, 'transparent');
+          ctx.fillStyle = glow; ctx.fillRect(sx-TILE, sy-TILE, TILE*3, TILE*3);
         }
       } else {
-        ctx.fillStyle='#0c0c18';ctx.fillRect(sx,sy,TILE,TILE);
-        ctx.strokeStyle='#181828';ctx.lineWidth=1;ctx.strokeRect(sx+.5,sy+.5,TILE-1,TILE-1);
-        if((tx+ty)%3===0){ctx.fillStyle='#141420';ctx.fillRect(sx+4,sy+4,TILE-8,TILE-8);}
+        ctx.fillStyle = '#0c0c18'; ctx.fillRect(sx,sy,TILE,TILE);
+        ctx.strokeStyle = '#181828'; ctx.lineWidth = 1; ctx.strokeRect(sx+0.5,sy+0.5,TILE-1,TILE-1);
+        if ((tx+ty) % 3 === 0) { ctx.fillStyle = '#141420'; ctx.fillRect(sx+4,sy+4,TILE-8,TILE-8); }
       }
-      ctx.globalAlpha=1;
+      ctx.globalAlpha = 1;
     }
   }
 
-  // Enemies frozen during player's animation phase, free during their own phase
-  const freezeEnemies=(turnPhase==='anim_player'&&SETTINGS.smoothEntities);
-
-  // Enemies — draw at logical pos when frozen, viz pos otherwise
-  G.enemies.filter(e=>e.hp>0).forEach(e=>{
-    if(!G.fov.has(`${e.x},${e.y}`))return;
-    const viz=(SETTINGS.smoothEntities&&!freezeEnemies&&vizEnemies[e.id])?vizEnemies[e.id]:e;
-    const sx=viz.x*TILE-camX,sy=viz.y*TILE-camY;
-    // Highlight priority target
-    const isPriority=e.id===priorityTargetId&&getVisibleEnemies().filter(inAttackRange).length>0;
-    if(isPriority){
-      ctx.strokeStyle='#f0d060';ctx.lineWidth=1.5;
-      ctx.strokeRect(sx+1,sy+1,TILE-2,TILE-2);
+  const freezeEnemies = (turnPhase === 'anim_player' && SETTINGS.smoothEntities);
+  G.enemies.filter(e => e.hp > 0).forEach(e => {
+    if (!G.fov.has(`${e.x},${e.y}`)) return;
+    const viz = (SETTINGS.smoothEntities && !freezeEnemies && vizEnemies[e.id]) ? vizEnemies[e.id] : e;
+    const sx = viz.x * TILE - camX, sy = viz.y * TILE - camY;
+    const isPriority = e.id === priorityTargetId && getVisibleEnemies().filter(inAttackRange).length > 0;
+    if (isPriority) {
+      ctx.strokeStyle = '#f0d060'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(sx+1, sy+1, TILE-2, TILE-2);
     }
-    ctx.font=`${TILE-4}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('🐀',sx+TILE/2,sy+TILE/2);
-    // HP bar
-    ctx.fillStyle='#400000';ctx.fillRect(sx+2,sy,TILE-4,3);
-    ctx.fillStyle='#c84040';ctx.fillRect(sx+2,sy,Math.max(0,(TILE-4)*(e.hp/e.maxHP)),3);
+    ctx.font = `${TILE-4}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🐀', sx+TILE/2, sy+TILE/2);
+    ctx.fillStyle = '#400000'; ctx.fillRect(sx+2, sy, TILE-4, 3);
+    ctx.fillStyle = '#c84040'; ctx.fillRect(sx+2, sy, Math.max(0, (TILE-4)*(e.hp/e.maxHP)), 3);
   });
 
-  // Player — always at viz pos
-  const vpx=SETTINGS.smoothEntities?vizPlayer.x:G.player.x;
-  const vpy=SETTINGS.smoothEntities?vizPlayer.y:G.player.y;
-  const px=vpx*TILE-camX,py=vpy*TILE-camY;
-  ctx.font=`${TILE-2}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(G.icon,px+TILE/2,py+TILE/2);
-  const grd=ctx.createRadialGradient(px+TILE/2,py+TILE/2,2,px+TILE/2,py+TILE/2,TILE*1.2);
-  grd.addColorStop(0,'#c8a84b22');grd.addColorStop(1,'transparent');
-  ctx.fillStyle=grd;ctx.fillRect(px-TILE,py-TILE,TILE*3,TILE*3);
+  const vpx = SETTINGS.smoothEntities ? vizPlayer.x : G.player.x;
+  const vpy = SETTINGS.smoothEntities ? vizPlayer.y : G.player.y;
+  const px = vpx * TILE - camX, py = vpy * TILE - camY;
+  ctx.font = `${TILE-2}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(G.icon, px+TILE/2, py+TILE/2);
+  const grd = ctx.createRadialGradient(px+TILE/2, py+TILE/2, 2, px+TILE/2, py+TILE/2, TILE*1.2);
+  grd.addColorStop(0, '#c8a84b22'); grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd; ctx.fillRect(px-TILE, py-TILE, TILE*3, TILE*3);
 
-  // Player HP bar above player (only when not full)
-  if(playerHpFlash>0||G.hp<G.maxHP){
-    if(playerHpFlash>0)playerHpFlash--;
-    const barW=TILE-4,barH=3;
-    const bx=px+2,by=py-5;
-    ctx.fillStyle='#002200';ctx.fillRect(bx,by,barW,barH);
-    ctx.fillStyle='#40c870';
-    const fillW=Math.max(0,barW*(Math.max(0,G.hp)/G.maxHP));
-    ctx.fillRect(bx,by,fillW,barH);
-    // HP text if recently damaged
-    if(playerHpFlash>0){
-      ctx.fillStyle='rgba(0,0,0,.6)';
-      ctx.font='9px "Press Start 2P",monospace';ctx.textAlign='center';ctx.textBaseline='bottom';
-      ctx.fillText(`${Math.max(0,Math.ceil(G.hp))}/${G.maxHP}`,px+TILE/2,by-1);
+  if (playerHpFlash > 0 || G.hp < G.maxHP) {
+    if (playerHpFlash > 0) playerHpFlash--;
+    const barW = TILE-4, barH = 3;
+    const bx = px+2, by = py-5;
+    ctx.fillStyle = '#002200'; ctx.fillRect(bx, by, barW, barH);
+    ctx.fillStyle = '#40c870';
+    const fillW = Math.max(0, barW * (Math.max(0,G.hp) / G.maxHP));
+    ctx.fillRect(bx, by, fillW, barH);
+    if (playerHpFlash > 0) {
+      ctx.fillStyle = 'rgba(0,0,0,.6)';
+      ctx.font = '9px "Press Start 2P",monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(`${Math.max(0,Math.ceil(G.hp))}/${G.maxHP}`, px+TILE/2, by-1);
     }
   }
 
-  // Screen flash overlay (damage taken = red, heal = gold)
   drawFlash();
-
-  // Floor cleared banner
   drawClearedBanner();
-
-  // Floor entry notifier
   drawFloorNotifier();
 
-  // Floating damage numbers
-  floatNums.forEach(f=>{
-    const sx2=f.wx*TILE-camX+TILE/2;
-    const sy2=f.wy*TILE-camY;
-    const alpha=Math.min(1,f.life/15);
-    ctx.globalAlpha=alpha;
-    const fsize=Math.max(7,Math.floor((TILE-6)/2));
-    ctx.font=`bold ${fsize}px "Press Start 2P",monospace`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#000';ctx.fillText(f.text,sx2+1,sy2+1);
-    ctx.fillStyle=f.color;ctx.fillText(f.text,sx2,sy2);
-    ctx.globalAlpha=1;
+  floatNums.forEach(f => {
+    const sx2 = f.wx * TILE - camX + TILE/2;
+    const sy2 = f.wy * TILE - camY;
+    const alpha = Math.min(1, f.life / 15);
+    ctx.globalAlpha = alpha;
+    const fsize = Math.max(7, Math.floor((TILE-6)/2));
+    ctx.font = `bold ${fsize}px "Press Start 2P",monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000'; ctx.fillText(f.text, sx2+1, sy2+1);
+    ctx.fillStyle = f.color; ctx.fillText(f.text, sx2, sy2);
+    ctx.globalAlpha = 1;
   });
 
-  // Context prompts
-  const {x:plx,y:ply}=G.player;
-  let promptText=null,promptColor=null;
-  if(G.stairsDown&&G.stairsDown.x===plx&&G.stairsDown.y===ply){promptText='SPACE — descend';promptColor='#9070d0';}
-  else if(G.stairsUp&&G.stairsUp.x===plx&&G.stairsUp.y===ply){promptText='SPACE — ascend';promptColor='#60b080';}
-  if(!promptText&&G.bonfire){
-    const bx=G.bonfire.x,by=G.bonfire.y;
-    if(Math.abs(plx-bx)<=1&&Math.abs(ply-by)<=1&&!(plx===bx&&ply===by)){
-      promptText='SPACE — rest at bonfire';promptColor='#ff9040';
+  const {x:plx, y:ply} = G.player;
+  let promptText = null, promptColor = null;
+  if (G.stairsDown && G.stairsDown.x === plx && G.stairsDown.y === ply) { promptText = 'SPACE — descend'; promptColor = '#9070d0'; }
+  else if (G.stairsUp && G.stairsUp.x === plx && G.stairsUp.y === ply) { promptText = 'SPACE — ascend'; promptColor = '#60b080'; }
+  if (!promptText && G.bonfire) {
+    const bx = G.bonfire.x, by = G.bonfire.y;
+    if (Math.abs(plx-bx) <= 1 && Math.abs(ply-by) <= 1 && !(plx === bx && ply === by)) {
+      promptText = 'SPACE — rest at bonfire'; promptColor = '#ff9040';
     }
   }
-  if(promptText){
-    const pw=Math.min(canvas.width-20,280),ph=22;
-    ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(canvas.width/2-pw/2,canvas.height-ph-6,pw,ph);
-    ctx.fillStyle=promptColor;ctx.font='10px "Press Start 2P",monospace';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(promptText,canvas.width/2,canvas.height-ph/2-6);
+  if (promptText) {
+    const pw = Math.min(canvas.width-20, 280), ph = 22;
+    ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(canvas.width/2 - pw/2, canvas.height - ph - 6, pw, ph);
+    ctx.fillStyle = promptColor; ctx.font = '10px "Press Start 2P",monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(promptText, canvas.width/2, canvas.height - ph/2 - 6);
   }
 
-  if(SETTINGS.showCoords){
-    ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(4,canvas.height-20,130,16);
-    ctx.fillStyle='#c8a84b';ctx.font='11px monospace';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText(`x:${G.player.x} y:${G.player.y} d:${G.depth}`,6,canvas.height-19);
+  if (SETTINGS.showCoords) {
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(4, canvas.height-20, 130, 16);
+    ctx.fillStyle = '#c8a84b'; ctx.font = '11px monospace'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(`x:${G.player.x} y:${G.player.y} d:${G.depth}`, 6, canvas.height-19);
   }
 
   updateTargetPanel();
 }
 
 // ═══════════════════════════════════════════
-//  HELD KEY — continuous movement bypass OS repeat delay
+//  HELD KEY — continuous movement
 // ═══════════════════════════════════════════
-const heldKeys=new Set();
-let moveInterval=null;
-const MOVE_INTERVAL_MS=110; // ms between steps when holding a key
+const heldKeys = new Set();
+let moveInterval = null;
+const MOVE_INTERVAL_MS = 110;
 
-const DIR_MAP={ArrowUp:{dx:0,dy:-1},w:{dx:0,dy:-1},W:{dx:0,dy:-1},
-               ArrowDown:{dx:0,dy:1},s:{dx:0,dy:1},S:{dx:0,dy:1},
-               ArrowLeft:{dx:-1,dy:0},a:{dx:-1,dy:0},A:{dx:-1,dy:0},
-               ArrowRight:{dx:1,dy:0},d:{dx:1,dy:0},D:{dx:1,dy:0}};
+const DIR_MAP = {
+  ArrowUp: {dx:0,dy:-1}, w:{dx:0,dy:-1}, W:{dx:0,dy:-1},
+  ArrowDown: {dx:0,dy:1}, s:{dx:0,dy:1}, S:{dx:0,dy:1},
+  ArrowLeft: {dx:-1,dy:0}, a:{dx:-1,dy:0}, A:{dx:-1,dy:0},
+  ArrowRight: {dx:1,dy:0}, d:{dx:1,dy:0}, D:{dx:1,dy:0}
+};
 
 function getHeldDir(){
-  // Priority: last pressed wins (iterate in insertion order, take last dir key)
-  let last=null;
-  for(const k of heldKeys){ if(DIR_MAP[k])last=DIR_MAP[k]; }
+  let last = null;
+  for (const k of heldKeys) { if (DIR_MAP[k]) last = DIR_MAP[k]; }
   return last;
 }
 
 function startMoveLoop(){
-  if(moveInterval)return;
-  moveInterval=setInterval(()=>{
-    if(!document.getElementById('game-screen').classList.contains('active')){stopMoveLoop();return;}
-    if(document.getElementById('levelup-modal').classList.contains('active'))return;
-    if(document.getElementById('settings-modal').classList.contains('active'))return;
-    const dir=getHeldDir();
-    if(dir) queueOrRun(()=>tryMove(dir.dx,dir.dy));
-  },MOVE_INTERVAL_MS);
+  if (moveInterval) return;
+  moveInterval = setInterval(() => {
+    if (!document.getElementById('game-screen').classList.contains('active')) { stopMoveLoop(); return; }
+    if (document.getElementById('levelup-modal').classList.contains('active')) return;
+    if (document.getElementById('settings-modal').classList.contains('active')) return;
+    const dir = getHeldDir();
+    if (dir) queueOrRun(() => tryMove(dir.dx, dir.dy));
+  }, MOVE_INTERVAL_MS);
 }
 function stopMoveLoop(){
-  if(moveInterval){clearInterval(moveInterval);moveInterval=null;}
+  if (moveInterval) { clearInterval(moveInterval); moveInterval = null; }
 }
 
-document.addEventListener('keydown',e=>{
-  if(!document.getElementById('game-screen').classList.contains('active'))return;
-  if(document.getElementById('levelup-modal').classList.contains('active'))return;
-  if(document.getElementById('settings-modal').classList.contains('active'))return;
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('game-screen').classList.contains('active')) return;
+  if (document.getElementById('levelup-modal').classList.contains('active')) return;
+  if (document.getElementById('settings-modal').classList.contains('active')) return;
   cancelAutoWalk();
 
-  const dir=DIR_MAP[e.key];
-  if(dir){
+  const dir = DIR_MAP[e.key];
+  if (dir) {
     e.preventDefault();
-    // Fire immediately on first press, loop handles repeats
-    if(!heldKeys.has(e.key)){
+    if (!heldKeys.has(e.key)) {
       heldKeys.add(e.key);
-      queueOrRun(()=>tryMove(dir.dx,dir.dy));
+      queueOrRun(() => tryMove(dir.dx, dir.dy));
       startMoveLoop();
     }
     return;
   }
-  if(e.key===' '){ e.preventDefault(); queueOrRun(doSpaceAction); return; }
-  if(e.key==='Tab'||e.key==='f'||e.key==='F'){ e.preventDefault(); queueOrRun(attackPriorityTarget); }
+  if (e.key === ' ') { e.preventDefault(); queueOrRun(doSpaceAction); return; }
+  if (e.key === 'Tab' || e.key === 'f' || e.key === 'F') { e.preventDefault(); queueOrRun(attackPriorityTarget); }
 });
 
-document.addEventListener('keyup',e=>{
+document.addEventListener('keyup', e => {
   heldKeys.delete(e.key);
-  if(heldKeys.size===0||!getHeldDir()) stopMoveLoop();
+  if (heldKeys.size === 0 || !getHeldDir()) stopMoveLoop();
 });
 
 function onCanvasClick(ev){
-  if(document.getElementById('levelup-modal').classList.contains('active'))return;
-  const TILE=SETTINGS.tileSize;
-  const rect=canvas.getBoundingClientRect();
-  const mx=ev.clientX-rect.left,my=ev.clientY-rect.top;
-  const tx=Math.floor((mx+camX)/TILE),ty=Math.floor((my+camY)/TILE);
-  const dx=tx-G.player.x,dy=ty-G.player.y;
-  if(dx===0&&dy===0){ queueOrRun(doSpaceAction); return; }
-  const clicked=enemyAt(tx,ty);
-  if(clicked&&G.fov.has(`${tx},${ty}`)&&inAttackRange(clicked)){
-    queueOrRun(()=>{ setTarget(clicked.id); doAttackEnemy(clicked); endTurn(); });
+  if (document.getElementById('levelup-modal').classList.contains('active')) return;
+  const TILE = SETTINGS.tileSize;
+  const rect = canvas.getBoundingClientRect();
+  const mx = ev.clientX - rect.left, my = ev.clientY - rect.top;
+  const tx = Math.floor((mx + camX) / TILE), ty = Math.floor((my + camY) / TILE);
+  const dx = tx - G.player.x, dy = ty - G.player.y;
+  if (dx === 0 && dy === 0) { queueOrRun(doSpaceAction); return; }
+  const clicked = enemyAt(tx, ty);
+  if (clicked && G.fov.has(`${tx},${ty}`) && inAttackRange(clicked)) {
+    queueOrRun(() => { setTarget(clicked.id); doAttackEnemy(clicked); endTurn(); });
     return;
   }
-  if(Math.abs(dx)<=1&&Math.abs(dy)<=1){ queueOrRun(()=>tryMove(dx,dy)); }
-  else{
-    const sx=Math.sign(dx),sy=Math.sign(dy);
-    if(sx!==0&&sy!==0) queueOrRun(()=>{ if(!tryMove(sx,0))tryMove(0,sy); });
-    else queueOrRun(()=>tryMove(sx,sy));
+  if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) { queueOrRun(() => tryMove(dx, dy)); }
+  else {
+    const sx = Math.sign(dx), sy = Math.sign(dy);
+    if (sx !== 0 && sy !== 0) queueOrRun(() => { if (!tryMove(sx,0)) tryMove(0,sy); });
+    else queueOrRun(() => tryMove(sx, sy));
   }
 }
 
@@ -1279,22 +1292,22 @@ function onCanvasClick(ev){
 //  SPACE ACTION
 // ═══════════════════════════════════════════
 function doSpaceAction(){
-  const {x,y}=G.player;
-  if(G.stairsDown&&G.stairsDown.x===x&&G.stairsDown.y===y){descend();return;}
-  if(G.stairsUp&&G.stairsUp.x===x&&G.stairsUp.y===y){ascend();return;}
-  if(G.bonfire){
-    const bx=G.bonfire.x,by=G.bonfire.y;
-    if(Math.abs(x-bx)<=1&&Math.abs(y-by)<=1&&!(x===bx&&y===by)){useBonfire();return;}
+  const {x,y} = G.player;
+  if (G.stairsDown && G.stairsDown.x === x && G.stairsDown.y === y) { descend(); return; }
+  if (G.stairsUp && G.stairsUp.x === x && G.stairsUp.y === y) { ascend(); return; }
+  if (G.bonfire) {
+    const bx = G.bonfire.x, by = G.bonfire.y;
+    if (Math.abs(x-bx) <= 1 && Math.abs(y-by) <= 1 && !(x === bx && y === by)) { useBonfire(); return; }
   }
   addLog('You wait...','info');
   endTurn();
 }
 
 function useBonfire(){
-  const healed=parseFloat((G.maxHP-G.hp).toFixed(1));
-  G.hp=G.maxHP;
+  const healed = parseFloat((G.maxHP - G.hp).toFixed(1));
+  G.hp = G.maxHP;
   addLog(`You rest at the bonfire and recover ${healed} HP.`,'heal');
-  spawnFloat(G.player.x,G.player.y-0.5,`+${healed.toFixed(0)}HP`,'#40c870');
+  spawnFloat(G.player.x, G.player.y-0.5, `+${healed.toFixed(0)}HP`, '#40c870');
   flashCanvas('gold');
   triggerPlayerHpFlash();
   endTurn();
@@ -1303,90 +1316,86 @@ function useBonfire(){
 // ═══════════════════════════════════════════
 //  MOVEMENT & COMBAT
 // ═══════════════════════════════════════════
-function tryMove(dx,dy){
-  const nx=G.player.x+dx,ny=G.player.y+dy;
-  if(nx<0||ny<0||nx>=G.mapW||ny>=G.mapH)return false;
-  if(G.tiles[ny][nx]===0)return false;
-  // Block bonfire tile — must interact with Space
-  if(G.bonfire&&G.bonfire.x===nx&&G.bonfire.y===ny)return false;
-  const enemy=enemyAt(nx,ny);
-  if(enemy){doAttackEnemy(enemy);endTurn();return true;}
-  G.player.x=nx;G.player.y=ny;computeFOV();endTurn();return true;
+function tryMove(dx, dy){
+  const nx = G.player.x + dx, ny = G.player.y + dy;
+  if (nx < 0 || ny < 0 || nx >= G.mapW || ny >= G.mapH) return false;
+  if (G.tiles[ny][nx] === 0) return false;
+  if (G.bonfire && G.bonfire.x === nx && G.bonfire.y === ny) return false;
+  const enemy = enemyAt(nx, ny);
+  if (enemy) { doAttackEnemy(enemy); endTurn(); return true; }
+  G.player.x = nx; G.player.y = ny; computeFOV(); endTurn(); return true;
 }
 
 function doAttackEnemy(enemy){
-  const spread=G.baseDmg*0.4;
-  const dmg=parseFloat(Math.max(0.1,randFloat(G.baseDmg-spread,G.baseDmg+spread)).toFixed(1));
-  enemy.hp=parseFloat((enemy.hp-dmg).toFixed(1));
-  addLog(`You hit the ${enemy.type} for ${dmg}!`,'damage');
-  spawnFloat(enemy.x,enemy.y-0.3,dmg.toFixed(1),'#ff6060');
-  // No screen flash when YOU attack — the damage number is the feedback
-  if(enemy.hp<=0){
-    addLog(`The ${enemy.type} dies!`,'damage');
-    G.kills++;gainXP(enemy.xp);
-    if(priorityTargetId===enemy.id)priorityTargetId=null;
+  const scaler = WEAPON_SCALING[G.weaponType];
+  const baseDmg = (G.str * scaler.str) + (G.dex * scaler.dex);
+  const spread = baseDmg * 0.4;
+  const dmg = parseFloat(Math.max(0.1, randFloat(baseDmg - spread, baseDmg + spread)).toFixed(1));
+  enemy.hp = parseFloat((enemy.hp - dmg).toFixed(1));
+  addLog(`You hit the ${enemy.type} for ${dmg}!`, 'damage');
+  spawnFloat(enemy.x, enemy.y-0.3, dmg.toFixed(1), '#ff6060');
+  if (enemy.hp <= 0) {
+    addLog(`The ${enemy.type} dies!`, 'damage');
+    G.kills++;
+    gainXP(enemy.xp);
+    if (priorityTargetId === enemy.id) priorityTargetId = null;
   }
 }
 
-// Legacy wrapper (for compatibility)
-function attackEnemy(enemy){doAttackEnemy(enemy);}
-
 function enemyTurn(){
-  G.enemies.filter(e=>e.hp>0).forEach(enemy=>{
-    if(!G.fov.has(`${enemy.x},${enemy.y}`))return;
-    const dx=G.player.x-enemy.x,dy=G.player.y-enemy.y;
-    // Chebyshev distance = max(|dx|,|dy|) — attack if adjacent (dist ≤1 including diagonals)
-    const cheb=Math.max(Math.abs(dx),Math.abs(dy));
-    if(cheb<=1){
-      const spread=enemy.atk*0.3;
-      const dmg=parseFloat(Math.max(0.1,randFloat(enemy.atk-spread,enemy.atk+spread)).toFixed(1));
-      G.hp=parseFloat((G.hp-dmg).toFixed(1));
-      addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
-      spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
+  G.enemies.filter(e => e.hp > 0).forEach(enemy => {
+    if (!G.fov.has(`${enemy.x},${enemy.y}`)) return;
+    const dx = G.player.x - enemy.x, dy = G.player.y - enemy.y;
+    const cheb = Math.max(Math.abs(dx), Math.abs(dy));
+    if (cheb <= 1) {
+      const baseDmg = (enemy.str * 0.2) + (enemy.dex * 0.1);
+      const spread = baseDmg * 0.3;
+      const dmg = parseFloat(Math.max(0.1, randFloat(baseDmg - spread, baseDmg + spread)).toFixed(1));
+      G.hp = parseFloat((G.hp - dmg).toFixed(1));
+      addLog(`The ${enemy.type} bites you for ${dmg}!`, 'damage');
+      spawnFloat(G.player.x, G.player.y-0.5, `-${dmg}`, '#ff4444');
       flashCanvas('red');
       triggerPlayerHpFlash();
-      if(G.hp<=0){G.hp=0;updateHUD();die();return;}
-    } else if(cheb<=7){
-      const ndx=dx!==0?Math.sign(dx):0,ndy=dy!==0?Math.sign(dy):0;
-      const nx=enemy.x+ndx,ny=enemy.y+ndy;
-      if(nx>=0&&ny>=0&&nx<G.mapW&&ny<G.mapH&&G.tiles[ny][nx]===1
-         &&!enemyAt(nx,ny)&&!(nx===G.player.x&&ny===G.player.y)){
-        enemy.x=nx;enemy.y=ny;
+      if (G.hp <= 0) { G.hp = 0; updateHUD(); die(); return; }
+    } else if (cheb <= 7) {
+      const ndx = dx !== 0 ? Math.sign(dx) : 0, ndy = dy !== 0 ? Math.sign(dy) : 0;
+      const nx = enemy.x + ndx, ny = enemy.y + ndy;
+      if (nx >= 0 && ny >= 0 && nx < G.mapW && ny < G.mapH && G.tiles[ny][nx] === 1
+          && !enemyAt(nx, ny) && !(nx === G.player.x && ny === G.player.y)) {
+        enemy.x = nx; enemy.y = ny;
       }
     }
   });
 }
 
-const PLAYER_ANIM_MS=25;
-const ENEMY_ANIM_MS=25;
+const PLAYER_ANIM_MS = 25;
+const ENEMY_ANIM_MS = 25;
 
-// Input queue: store one pending action so holding a key feels instant
-let _queuedAction=null;
+let _queuedAction = null;
 
 function queueOrRun(fn){
-  if(turnPhase==='player'){ fn(); }
-  else { _queuedAction=fn; } // overwrite — only keep latest
+  if (turnPhase === 'player') { fn(); }
+  else { _queuedAction = fn; }
 }
 
 function endTurn(){
   G.turn++;
-  document.getElementById('turn-label').textContent=`Turn ${G.turn}`;
-  document.getElementById('turn-label-left').textContent=G.turn;
+  document.getElementById('turn-label').textContent = `Turn ${G.turn}`;
+  document.getElementById('turn-label-left').textContent = G.turn;
 
-  if(SETTINGS.smoothEntities){
-    turnPhase='anim_player';
-    setTimeout(()=>{
+  if (SETTINGS.smoothEntities) {
+    turnPhase = 'anim_player';
+    setTimeout(() => {
       enemyTurn();
       tryRespawnEnemies();
       updateHUD();
       checkFloorCleared();
-      turnPhase='anim_enemy';
-      setTimeout(()=>{
-        turnPhase='player';
+      turnPhase = 'anim_enemy';
+      setTimeout(() => {
+        turnPhase = 'player';
         markPanelDirty();
-        if(G.pendingLevelUps>0){ showLevelUpModal(); return; }
-        // Drain queue
-        if(_queuedAction){ const a=_queuedAction; _queuedAction=null; a(); }
+        if (G.pendingLevelUps > 0) { showLevelUpModal(); return; }
+        if (_queuedAction) { const a = _queuedAction; _queuedAction = null; a(); }
       }, ENEMY_ANIM_MS);
     }, PLAYER_ANIM_MS);
   } else {
@@ -1394,167 +1403,158 @@ function endTurn(){
     tryRespawnEnemies();
     updateHUD();
     checkFloorCleared();
-    turnPhase='player';
+    turnPhase = 'player';
     markPanelDirty();
     renderCanvas();
-    if(G.pendingLevelUps>0) setTimeout(showLevelUpModal,80);
+    if (G.pendingLevelUps > 0) setTimeout(showLevelUpModal, 80);
   }
 }
 
 // ═══════════════════════════════════════════
 //  FLOOR CACHE (persistent floors)
 // ═══════════════════════════════════════════
-const FLOOR_CACHE_MAX=20;
-const floorCache={};       // key → floor data
-const floorCacheOrder=[];  // LRU order, index 0 = least recently used
+const FLOOR_CACHE_MAX = 20;
+const floorCache = {};
+const floorCacheOrder = [];
 
 function _lruTouch(key){
-  const i=floorCacheOrder.indexOf(key);
-  if(i!==-1) floorCacheOrder.splice(i,1);
-  floorCacheOrder.push(key); // move to most-recently-used end
+  const i = floorCacheOrder.indexOf(key);
+  if (i !== -1) floorCacheOrder.splice(i, 1);
+  floorCacheOrder.push(key);
 }
 function _lruEvictIfNeeded(){
-  while(floorCacheOrder.length>FLOOR_CACHE_MAX){
-    const evict=floorCacheOrder.shift(); // remove least recently used
+  while (floorCacheOrder.length > FLOOR_CACHE_MAX) {
+    const evict = floorCacheOrder.shift();
     delete floorCache[evict];
   }
 }
 
-function floorKey(){ return `${G.zone}:${G.depth}`; }
+function floorKey(){ return `${G.zone}:${G.depth}${G.isBonfireFloor ? '-bonfire' : ''}`; }
 
 function saveFloor(){
-  if(G.isBonfireFloor) return;
-  const key=floorKey();
-  floorCache[key]={
-    tiles:G.tiles.map(r=>[...r]),
-    rooms:JSON.parse(JSON.stringify(G.rooms)),
-    enemies:JSON.parse(JSON.stringify(G.enemies.filter(e=>e.hp>0))),
-    stairsDown:G.stairsDown?{...G.stairsDown}:null,
-    stairsUp:G.stairsUp?{...G.stairsUp}:null,
-    bonfire:G.bonfire?{...G.bonfire}:null,
-    seen:new Set(G.seen),
-    mapW:G.mapW, mapH:G.mapH,
-    savedTurn:G.turn,
-    cleared:G.floorCleared||false,
+  if (G.isBonfireFloor) return; // don't cache bonfire floors (they are always regenerated)
+  const key = floorKey();
+  floorCache[key] = {
+    tiles: G.tiles.map(r => [...r]),
+    rooms: JSON.parse(JSON.stringify(G.rooms)),
+    enemies: JSON.parse(JSON.stringify(G.enemies.filter(e => e.hp > 0))),
+    stairsDown: G.stairsDown ? {...G.stairsDown} : null,
+    stairsUp: G.stairsUp ? {...G.stairsUp} : null,
+    bonfire: G.bonfire ? {...G.bonfire} : null,
+    seen: new Set(G.seen),
+    mapW: G.mapW, mapH: G.mapH,
+    savedTurn: G.turn,
+    cleared: G.floorCleared || false,
+    normalFloorCount: G.normalFloorCount,
   };
   _lruTouch(key);
   _lruEvictIfNeeded();
 }
 
-function tickSavedEnemies(enemies,turnsDelta,tiles,mapW,mapH){
-  // Each enemy takes up to min(turnsDelta, 20) random walk steps
-  const steps=Math.min(turnsDelta,20);
-  const DIRS=[{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0},
-              {dx:-1,dy:-1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:1,dy:1}];
-  enemies.forEach(e=>{
-    for(let s=0;s<steps;s++){
-      const d=DIRS[randInt(0,DIRS.length-1)];
-      const nx=e.x+d.dx, ny=e.y+d.dy;
-      if(nx>=0&&ny>=0&&nx<mapW&&ny<mapH&&tiles[ny]&&tiles[ny][nx]===1
-         &&!enemies.find(o=>o!==e&&o.hp>0&&o.x===nx&&o.y===ny)){
-        e.x=nx; e.y=ny;
+function tickSavedEnemies(enemies, turnsDelta, tiles, mapW, mapH){
+  const steps = Math.min(turnsDelta, 20);
+  const DIRS = [{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0},
+                {dx:-1,dy:-1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:1,dy:1}];
+  enemies.forEach(e => {
+    for (let s = 0; s < steps; s++) {
+      const d = DIRS[randInt(0, DIRS.length-1)];
+      const nx = e.x + d.dx, ny = e.y + d.dy;
+      if (nx >= 0 && ny >= 0 && nx < mapW && ny < mapH && tiles[ny] && tiles[ny][nx] === 1
+          && !enemies.find(o => o !== e && o.hp > 0 && o.x === nx && o.y === ny)) {
+        e.x = nx; e.y = ny;
       }
     }
   });
 }
 
 function restoreFloor(key){
-  const f=floorCache[key];
-  if(!f) return false;
-  _lruTouch(key); // mark as recently used so it's last to be evicted
-  const turnsDelta=G.turn-f.savedTurn;
-  G.mapW=f.mapW; G.mapH=f.mapH;
-  G.tiles=f.tiles.map(r=>[...r]);
-  G.rooms=JSON.parse(JSON.stringify(f.rooms));
-  G.enemies=JSON.parse(JSON.stringify(f.enemies));
-  G.stairsDown=f.stairsDown?{...f.stairsDown}:null;
-  G.stairsUp=f.stairsUp?{...f.stairsUp}:null;
-  G.bonfire=f.bonfire?{...f.bonfire}:null;
-  G.seen=new Set(f.seen);
-  G.isBonfireFloor=false;
-  G.floorCleared=f.cleared;
-  // Tick enemies forward so they've moved while player was away
-  if(turnsDelta>0) tickSavedEnemies(G.enemies,turnsDelta,G.tiles,G.mapW,G.mapH);
+  const f = floorCache[key];
+  if (!f) return false;
+  _lruTouch(key);
+  const turnsDelta = G.turn - f.savedTurn;
+  G.mapW = f.mapW; G.mapH = f.mapH;
+  G.tiles = f.tiles.map(r => [...r]);
+  G.rooms = JSON.parse(JSON.stringify(f.rooms));
+  G.enemies = JSON.parse(JSON.stringify(f.enemies));
+  G.stairsDown = f.stairsDown ? {...f.stairsDown} : null;
+  G.stairsUp = f.stairsUp ? {...f.stairsUp} : null;
+  G.bonfire = f.bonfire ? {...f.bonfire} : null;
+  G.seen = new Set(f.seen);
+  G.isBonfireFloor = false;
+  G.floorCleared = f.cleared;
+  G.normalFloorCount = f.normalFloorCount || 0;
+  if (turnsDelta > 0) tickSavedEnemies(G.enemies, turnsDelta, G.tiles, G.mapW, G.mapH);
   return true;
 }
 
 // ═══════════════════════════════════════════
 //  FLOOR ENTRY NOTIFIER
 // ═══════════════════════════════════════════
-let _floorNotifier={text:'',life:0,maxLife:0};
-const NOTIFIER_HOLD=120;  // frames to hold before drifting up
-const NOTIFIER_RISE=50;   // frames for the rise+fade out phase
+let _floorNotifier = {text:'', life:0, maxLife:0};
+const NOTIFIER_HOLD = 120;
+const NOTIFIER_RISE = 50;
 
 function showFloorNotifier(text){
-  _floorNotifier={text,life:NOTIFIER_HOLD+NOTIFIER_RISE,maxLife:NOTIFIER_HOLD+NOTIFIER_RISE};
+  _floorNotifier = {text, life: NOTIFIER_HOLD + NOTIFIER_RISE, maxLife: NOTIFIER_HOLD + NOTIFIER_RISE};
 }
 
 function drawFloorNotifier(){
-  if(_floorNotifier.life<=0) return;
+  if (_floorNotifier.life <= 0) return;
   _floorNotifier.life--;
-  const l=_floorNotifier.life;
-  const total=_floorNotifier.maxLife;
-
-  // Fade in over first 15 frames
-  const fadeIn=Math.min(1,(total-l)/15);
-  // Fade out over last NOTIFIER_RISE frames
-  const fadeOut=Math.min(1,l/NOTIFIER_RISE);
-  const alpha=Math.min(fadeIn,fadeOut);
-
-  // Rise: only during the fade-out phase
-  const riseProgress=l<NOTIFIER_RISE?(NOTIFIER_RISE-l)/NOTIFIER_RISE:0;
-  const baseY=canvas.height*0.14;
-  const y=baseY - riseProgress*28;
+  const l = _floorNotifier.life;
+  const total = _floorNotifier.maxLife;
+  const fadeIn = Math.min(1, (total - l) / 15);
+  const fadeOut = Math.min(1, l / NOTIFIER_RISE);
+  const alpha = Math.min(fadeIn, fadeOut);
+  const riseProgress = l < NOTIFIER_RISE ? (NOTIFIER_RISE - l) / NOTIFIER_RISE : 0;
+  const baseY = canvas.height * 0.14;
+  const y = baseY - riseProgress * 28;
 
   ctx.save();
-  ctx.globalAlpha=alpha;
-  ctx.font='11px "Press Start 2P",monospace';
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle='#e8d88a';
-  ctx.shadowColor='#c8a84b';
-  ctx.shadowBlur=10;
+  ctx.globalAlpha = alpha;
+  ctx.font = '11px "Press Start 2P",monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#e8d88a';
+  ctx.shadowColor = '#c8a84b';
+  ctx.shadowBlur = 10;
   ctx.fillText(_floorNotifier.text, canvas.width/2, y);
-  ctx.shadowBlur=0;
+  ctx.shadowBlur = 0;
   ctx.restore();
 }
-let _clearedBanner=0;
 
-// Floor respawn check — upper floors never respawn
+let _clearedBanner = 0;
+
 function floorHasRespawn(){
-  return G.zone==='normal' && G.enemyRespawn;
+  return G.zone === 'normal' && G.enemyRespawn;
 }
 
 function revealEntireFloor(){
-  // Mark every walkable tile as seen
-  for(let ty=0;ty<G.mapH;ty++)
-    for(let tx=0;tx<G.mapW;tx++)
-      if(G.tiles[ty][tx]===1) G.seen.add(`${tx},${ty}`);
-  // Also add wall tiles adjacent to any floor tile so borders render
-  for(let ty=0;ty<G.mapH;ty++)
-    for(let tx=0;tx<G.mapW;tx++)
-      if(G.tiles[ty][tx]===0){
-        outer: for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
-          const nx=tx+dx,ny=ty+dy;
-          if(nx>=0&&ny>=0&&nx<G.mapW&&ny<G.mapH&&G.tiles[ny][nx]===1){
-            G.seen.add(`${tx},${ty}`); break outer;
+  for (let ty = 0; ty < G.mapH; ty++)
+    for (let tx = 0; tx < G.mapW; tx++)
+      if (G.tiles[ty][tx] === 1) G.seen.add(`${tx},${ty}`);
+  for (let ty = 0; ty < G.mapH; ty++)
+    for (let tx = 0; tx < G.mapW; tx++)
+      if (G.tiles[ty][tx] === 0) {
+        outer: for (let dy = -1; dy <= 1; dy++)
+          for (let dx = -1; dx <= 1; dx++) {
+            const nx = tx+dx, ny = ty+dy;
+            if (nx >= 0 && ny >= 0 && nx < G.mapW && ny < G.mapH && G.tiles[ny][nx] === 1) {
+              G.seen.add(`${tx},${ty}`); break outer;
+            }
           }
-        }
       }
 }
 
 function checkFloorCleared(){
-  if(G.isBonfireFloor) return;
-  if(G.floorCleared) return;
-  // Only floor-spawned enemies count — respawned enemies don't block clearing
-  if(G.enemies.filter(e=>e.hp>0&&e.isFloorEnemy).length>0) return;
-  G.floorCleared=true;
-  _clearedBanner=150;
+  if (G.isBonfireFloor) return;
+  if (G.floorCleared) return;
+  if (G.enemies.filter(e => e.hp > 0 && e.isFloorEnemy).length > 0) return;
+  G.floorCleared = true;
+  _clearedBanner = 150;
   flashCanvas('gold');
-  // Always reveal full seen map on clear (floor + adjacent walls)
   revealEntireFloor();
-  // No-respawn: also expand FOV to entire revealed area (computeFOV will maintain this)
-  if(!floorHasRespawn()){
-    G.fov=new Set(G.seen);
+  if (!floorHasRespawn()) {
+    G.fov = new Set(G.seen);
   }
   updateAutonav();
   updateClearedBadge();
@@ -1563,302 +1563,363 @@ function checkFloorCleared(){
 // ═══════════════════════════════════════════
 //  ENEMY RESPAWN
 // ═══════════════════════════════════════════
-const RESPAWN_INTERVAL=30;   // turns between spawn attempts
-const RESPAWN_BASE=0.6;      // base probability: 0 alive→60%, 1→36%, 2→21.6%, n→0.6^(n+1)
+const RESPAWN_INTERVAL = 30;
+const RESPAWN_BASE = 0.6;
 
 function tryRespawnEnemies(){
-  if(!floorHasRespawn()) return;
-  if(G.isBonfireFloor) return;
-  if(G.turn % RESPAWN_INTERVAL !== 0) return;
+  if (!floorHasRespawn()) return;
+  if (G.isBonfireFloor) return;
+  if (G.turn % RESPAWN_INTERVAL !== 0) return;
 
-  const alive=G.enemies.filter(e=>e.hp>0).length;
-  // Exponential decay: chance = 0.6^(alive+1), approaches 0 but never hard-caps
-  const chance=Math.pow(RESPAWN_BASE, alive+1);
-  if(Math.random()>chance) return;
+  const alive = G.enemies.filter(e => e.hp > 0).length;
+  const chance = Math.pow(RESPAWN_BASE, alive + 1);
+  if (Math.random() > chance) return;
 
-  // Find all unseen walkable tiles not occupied by player or enemies
-  const candidates=[];
-  for(let ty=0;ty<G.mapH;ty++){
-    for(let tx=0;tx<G.mapW;tx++){
-      const key=`${tx},${ty}`;
-      if(G.tiles[ty][tx]!==1) continue;
-      if(G.fov.has(key)) continue;
-      if(G.player.x===tx&&G.player.y===ty) continue;
-      if(enemyAt(tx,ty)) continue;
-      candidates.push({x:tx,y:ty});
+  const candidates = [];
+  for (let ty = 0; ty < G.mapH; ty++) {
+    for (let tx = 0; tx < G.mapW; tx++) {
+      const key = `${tx},${ty}`;
+      if (G.tiles[ty][tx] !== 1) continue;
+      if (G.fov.has(key)) continue;
+      if (G.player.x === tx && G.player.y === ty) continue;
+      if (enemyAt(tx, ty)) continue;
+      candidates.push({x:tx, y:ty});
     }
   }
-  if(candidates.length===0) return;
+  if (candidates.length === 0) return;
 
-  const pos=candidates[randInt(0,candidates.length-1)];
-  const diff=DIFF_MODS[RUN_CONFIG.difficulty];
-  const hp=Math.max(1,Math.round(randInt(5,10)*diff.hpMult));
-  const atk=Math.max(1,Math.round(randInt(1,2)*diff.atkMult));
-  G.enemies.push({id:++G._eid,type:'rat',x:pos.x,y:pos.y,hp,maxHP:hp,atk,xp:randInt(1,2)});
+  const pos = candidates[randInt(0, candidates.length-1)];
+  const diff = DIFF_MODS[RUN_CONFIG.difficulty];
+  const baseRatStats = {con:10, str:10, dex:5};
+  const con = Math.max(1, Math.round(baseRatStats.con * randFloat(0.7, 1.3) * diff.statMult));
+  const str = Math.max(1, Math.round(baseRatStats.str * randFloat(0.7, 1.3) * diff.statMult));
+  const dex = Math.max(1, Math.round(baseRatStats.dex * randFloat(0.7, 1.3) * diff.statMult));
+  const hp = Math.max(1, Math.round(con * diff.hpMult));
+  G.enemies.push({
+    id: ++G._eid, type:'rat', x:pos.x, y:pos.y,
+    con, str, dex, hp, maxHP:hp,
+    xp: randInt(1,2)
+    // isFloorEnemy omitted — respawned enemies don't block floor clearing
+  });
   markPanelDirty();
 }
-function bfsPath(sx,sy,tx,ty){
-  if(sx===tx&&sy===ty) return [];
-  const W=G.mapW,H=G.mapH;
-  const visited=new Uint8Array(W*H);
-  const prev=new Int32Array(W*H).fill(-1);
-  const queue=[sy*W+sx];
-  visited[sy*W+sx]=1;
-  const DIRS8=[0,-1,0,1,-1,0,1,0,-1,-1,1,-1,-1,1,1,1];
-  while(queue.length){
-    const cur=queue.shift();
-    const cx=cur%W,cy=Math.floor(cur/W);
-    if(cx===tx&&cy===ty){
-      // Reconstruct path
-      const path=[];
-      let c=cur;
-      while(prev[c]!==-1){path.push(c);c=prev[c];}
+
+function bfsPath(sx, sy, tx, ty){
+  if (sx === tx && sy === ty) return [];
+  const W = G.mapW, H = G.mapH;
+  const visited = new Uint8Array(W*H);
+  const prev = new Int32Array(W*H).fill(-1);
+  const queue = [sy*W + sx];
+  visited[sy*W + sx] = 1;
+  const DIRS8 = [0,-1, 0,1, -1,0, 1,0, -1,-1, 1,-1, -1,1, 1,1];
+  while (queue.length) {
+    const cur = queue.shift();
+    const cx = cur % W, cy = Math.floor(cur / W);
+    if (cx === tx && cy === ty) {
+      const path = [];
+      let c = cur;
+      while (prev[c] !== -1) { path.push(c); c = prev[c]; }
       path.reverse();
-      return path.map(i=>({x:i%W,y:Math.floor(i/W)}));
+      return path.map(i => ({x: i%W, y: Math.floor(i/W)}));
     }
-    for(let d=0;d<8;d++){
-      const nx=cx+DIRS8[d*2],ny=cy+DIRS8[d*2+1];
-      if(nx<0||ny<0||nx>=W||ny>=H)continue;
-      const ni=ny*W+nx;
-      if(visited[ni]||G.tiles[ny][nx]!==1)continue;
-      visited[ni]=1;prev[ni]=cur;queue.push(ni);
+    for (let d = 0; d < 8; d++) {
+      const nx = cx + DIRS8[d*2], ny = cy + DIRS8[d*2+1];
+      if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+      const ni = ny*W + nx;
+      if (visited[ni] || G.tiles[ny][nx] !== 1) continue;
+      visited[ni] = 1; prev[ni] = cur; queue.push(ni);
     }
   }
-  return null; // no path
+  return null;
 }
 
 // ── Auto-walk ──
-let _autoWalkPath=null;
-let _autoWalkInterval=null;
+let _autoWalkPath = null;
+let _autoWalkInterval = null;
 
 function autoNavTo(dir){
-  if(turnPhase!=='player') return;
-  let target=null;
-  if(dir==='down')         target=G.stairsDown;
-  else if(dir==='up')      target=G.stairsUp;
-  else if(dir==='bonfire') target=G.bonfire;
-  if(!target) return;
+  if (turnPhase !== 'player') return;
+  let target = null;
+  if (dir === 'down')    target = G.stairsDown;
+  else if (dir === 'up') target = G.stairsUp;
+  else if (dir === 'bonfire') target = G.bonfire;
+  if (!target) return;
 
-  // For bonfire: BFS to the nearest adjacent walkable tile instead of the bonfire itself
-  // (bonfire tile is blocked from movement). For stairs: BFS directly onto the tile.
-  let walkTarget=target;
-  let onArrival=null;
-  if(dir==='down')    onArrival=descend;
-  else if(dir==='up') onArrival=ascend;
-  else if(dir==='bonfire'){
-    // Find closest adjacent tile to bonfire that is walkable
-    const adj=[];
-    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
-      if(dx===0&&dy===0) continue;
-      const ax=target.x+dx, ay=target.y+dy;
-      if(ax>=0&&ay>=0&&ax<G.mapW&&ay<G.mapH&&G.tiles[ay][ax]===1) adj.push({x:ax,y:ay});
-    }
-    if(!adj.length) return;
-    // Pick closest adj tile to player
-    const px=G.player.x, py=G.player.y;
-    adj.sort((a,b)=>Math.max(Math.abs(a.x-px),Math.abs(a.y-py))-Math.max(Math.abs(b.x-px),Math.abs(b.y-py)));
-    walkTarget=adj[0];
-    onArrival=useBonfire;
+  let walkTarget = target;
+  let onArrival = null;
+  if (dir === 'down')    onArrival = descend;
+  else if (dir === 'up') onArrival = ascend;
+  else if (dir === 'bonfire') {
+    const adj = [];
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        const ax = target.x + dx, ay = target.y + dy;
+        if (ax >= 0 && ay >= 0 && ax < G.mapW && ay < G.mapH && G.tiles[ay][ax] === 1)
+          adj.push({x:ax, y:ay});
+      }
+    if (!adj.length) return;
+    const px = G.player.x, py = G.player.y;
+    adj.sort((a,b) => Math.max(Math.abs(a.x-px),Math.abs(a.y-py)) - Math.max(Math.abs(b.x-px),Math.abs(b.y-py)));
+    walkTarget = adj[0];
+    onArrival = useBonfire;
   }
 
-  // Already at destination?
-  if(G.player.x===walkTarget.x&&G.player.y===walkTarget.y){ onArrival&&onArrival(); return; }
+  if (G.player.x === walkTarget.x && G.player.y === walkTarget.y) { onArrival && onArrival(); return; }
 
-  const path=bfsPath(G.player.x,G.player.y,walkTarget.x,walkTarget.y);
-  if(!path||path.length===0){
-    // No path needed — just fire action if already in range
-    onArrival&&onArrival();
+  const path = bfsPath(G.player.x, G.player.y, walkTarget.x, walkTarget.y);
+  if (!path || path.length === 0) {
+    onArrival && onArrival();
     return;
   }
-  _autoWalkPath=path;
-  _autoWalkOnArrival=onArrival;
+  _autoWalkPath = path;
+  _autoWalkOnArrival = onArrival;
   stepAutoWalk();
 }
 
-let _autoWalkOnArrival=null;
+let _autoWalkOnArrival = null;
 
 function stepAutoWalk(){
-  if(!_autoWalkPath||_autoWalkPath.length===0){
-    // Path complete — fire arrival action
-    const fn=_autoWalkOnArrival;
-    _autoWalkPath=null;
-    _autoWalkOnArrival=null;
-    if(fn) setTimeout(()=>queueOrRun(fn), 45);
+  if (!_autoWalkPath || _autoWalkPath.length === 0) {
+    const fn = _autoWalkOnArrival;
+    _autoWalkPath = null;
+    _autoWalkOnArrival = null;
+    if (fn) setTimeout(() => queueOrRun(fn), 45);
     return;
   }
-  if(turnPhase!=='player'){ _autoWalkInterval=setTimeout(stepAutoWalk,60); return; }
-  const enemyVisible=G.enemies.some(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`));
-  if(enemyVisible){
-    _autoWalkPath=null;_autoWalkOnArrival=null;
+  if (turnPhase !== 'player') { _autoWalkInterval = setTimeout(stepAutoWalk, 60); return; }
+  const enemyVisible = G.enemies.some(e => e.hp > 0 && G.fov.has(`${e.x},${e.y}`));
+  if (enemyVisible) {
+    _autoWalkPath = null; _autoWalkOnArrival = null;
     addLog('Auto-walk interrupted — enemy spotted!','info');
     return;
   }
-  const next=_autoWalkPath.shift();
-  const dx=next.x-G.player.x, dy=next.y-G.player.y;
-  tryMove(dx,dy);
-  if(_autoWalkPath.length>0) _autoWalkInterval=setTimeout(stepAutoWalk,45);
-  else stepAutoWalk(); // call immediately to fire arrival action after last step
+  const next = _autoWalkPath.shift();
+  const dx = next.x - G.player.x, dy = next.y - G.player.y;
+  tryMove(dx, dy);
+  if (_autoWalkPath.length > 0) _autoWalkInterval = setTimeout(stepAutoWalk, 45);
+  else stepAutoWalk();
 }
 
 function cancelAutoWalk(){
-  if(_autoWalkPath||_autoWalkOnArrival){
-    _autoWalkPath=null;_autoWalkOnArrival=null;
-    if(_autoWalkInterval){clearTimeout(_autoWalkInterval);_autoWalkInterval=null;}
+  if (_autoWalkPath || _autoWalkOnArrival) {
+    _autoWalkPath = null; _autoWalkOnArrival = null;
+    if (_autoWalkInterval) { clearTimeout(_autoWalkInterval); _autoWalkInterval = null; }
   }
 }
 
-function drawNavIcon(canvasEl,type){
-  if(!canvasEl)return;
-  const c=canvasEl.getContext('2d');
-  const S=40;
+function drawNavIcon(canvasEl, type){
+  if (!canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  const S = 40;
   c.clearRect(0,0,S,S);
-  c.fillStyle='#1c1c2c';
+  c.fillStyle = '#1c1c2c';
   c.fillRect(0,0,S,S);
-  c.font=`${S-6}px serif`;
-  c.textAlign='center';c.textBaseline='middle';
-  if(type==='down'){
-    c.fillStyle='#9070d0';c.fillText('▾',S/2,S/2+1);
-    c.strokeStyle='#6040a0';c.lineWidth=1.5;c.strokeRect(3,3,S-6,S-6);
-  } else if(type==='up'){
-    c.fillStyle='#60b080';c.fillText('▴',S/2,S/2);
-    c.strokeStyle='#408060';c.lineWidth=1.5;c.strokeRect(3,3,S-6,S-6);
-  } else if(type==='bonfire'){
-    c.fillText('🔥',S/2,S/2+2);
-    c.strokeStyle='#ff8200';c.lineWidth=1.5;c.strokeRect(3,3,S-6,S-6);
+  c.font = `${S-6}px serif`;
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  if (type === 'down') {
+    c.fillStyle = '#9070d0'; c.fillText('▾', S/2, S/2+1);
+    c.strokeStyle = '#6040a0'; c.lineWidth = 1.5; c.strokeRect(3,3,S-6,S-6);
+  } else if (type === 'up') {
+    c.fillStyle = '#60b080'; c.fillText('▴', S/2, S/2);
+    c.strokeStyle = '#408060'; c.lineWidth = 1.5; c.strokeRect(3,3,S-6,S-6);
+  } else if (type === 'bonfire') {
+    c.fillText('🔥', S/2, S/2+2);
+    c.strokeStyle = '#ff8200'; c.lineWidth = 1.5; c.strokeRect(3,3,S-6,S-6);
   }
 }
 
 function updateAutonav(){
-  const panel=document.getElementById('autonav-panel');
-  if(!panel) return;
-  // Show on cleared floors OR bonfire floors (always safe to navigate)
-  if(!G.floorCleared && !G.isBonfireFloor){ panel.style.display='none'; return; }
-  panel.style.display='flex';
-  const downC=document.getElementById('autonav-down-canvas');
-  const upC  =document.getElementById('autonav-up-canvas');
-  const bfC  =document.getElementById('autonav-bonfire-canvas');
-  if(downC){ downC.style.display=G.stairsDown?'block':'none'; if(G.stairsDown)drawNavIcon(downC,'down'); }
-  if(upC)  { upC.style.display=G.stairsUp?'block':'none';     if(G.stairsUp)drawNavIcon(upC,'up');       }
-  if(bfC)  { bfC.style.display=G.bonfire?'block':'none';      if(G.bonfire)drawNavIcon(bfC,'bonfire');   }
+  const panel = document.getElementById('autonav-panel');
+  if (!panel) return;
+  if (!G.floorCleared && !G.isBonfireFloor) { panel.style.display = 'none'; return; }
+  panel.style.display = 'flex';
+  const downC = document.getElementById('autonav-down-canvas');
+  const upC   = document.getElementById('autonav-up-canvas');
+  const bfC   = document.getElementById('autonav-bonfire-canvas');
+  if (downC) { downC.style.display = G.stairsDown ? 'block' : 'none'; if (G.stairsDown) drawNavIcon(downC,'down'); }
+  if (upC)   { upC.style.display   = G.stairsUp   ? 'block' : 'none'; if (G.stairsUp)   drawNavIcon(upC,'up');       }
+  if (bfC)   { bfC.style.display   = G.bonfire    ? 'block' : 'none'; if (G.bonfire)    drawNavIcon(bfC,'bonfire');   }
 }
 
 function updateClearedBadge(){
-  const badge=document.getElementById('floor-cleared-badge');
-  if(badge) badge.style.display=G.floorCleared?'inline-block':'none';
+  const badge = document.getElementById('floor-cleared-badge');
+  if (badge) badge.style.display = G.floorCleared ? 'inline-block' : 'none';
 }
 
 function drawClearedBanner(){
-  if(_clearedBanner<=0) return;
+  if (_clearedBanner <= 0) return;
   _clearedBanner--;
-
-  // Fade in over first 15 frames, hold, fade out over last 30 frames
-  const fadeIn=Math.min(1,(_clearedBanner-120)/15*-1+1); // 0→1 in frames 150→135... simpler below
-  const t=150-_clearedBanner; // t=0 at start, grows
-  const fadeInAlpha=Math.min(1,t/15);
-  const fadeOutAlpha=Math.min(1,_clearedBanner/30);
-  const alpha=Math.min(fadeInAlpha,fadeOutAlpha);
-
-  const bx=canvas.width/2, by=canvas.height*0.38;
-  const text='FLOOR CLEARED';
-
+  const fadeIn = Math.min(1, (150 - _clearedBanner) / 15);
+  const fadeOut = Math.min(1, _clearedBanner / 30);
+  const alpha = Math.min(fadeIn, fadeOut);
+  const bx = canvas.width/2, by = canvas.height * 0.38;
+  const text = 'FLOOR CLEARED';
   ctx.save();
-
-  // Full-screen dark overlay
-  ctx.globalAlpha=alpha*0.45;
-  ctx.fillStyle='#000';
+  ctx.globalAlpha = alpha * 0.45;
+  ctx.fillStyle = '#000';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // Banner background
-  ctx.font='bold 13px "Press Start 2P",monospace';
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  const tw=ctx.measureText(text).width;
-  const padX=22,padY=14;
-  const bw=tw+padX*2, bh=28+padY*2;
-
-  ctx.globalAlpha=alpha*0.88;
-  ctx.fillStyle='#0a0814';
-  ctx.fillRect(bx-bw/2, by-bh/2, bw, bh);
-
-  // Gold border
-  ctx.globalAlpha=alpha;
-  ctx.strokeStyle='#c8a84b';
-  ctx.lineWidth=1.5;
-  ctx.strokeRect(bx-bw/2+2, by-bh/2+2, bw-4, bh-4);
-
-  // Text
-  ctx.fillStyle='#f0d870';
-  ctx.shadowColor='#c8a84b';
-  ctx.shadowBlur=12;
+  ctx.font = 'bold 13px "Press Start 2P",monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const tw = ctx.measureText(text).width;
+  const padX = 22, padY = 14;
+  const bw = tw + padX*2, bh = 28 + padY*2;
+  ctx.globalAlpha = alpha * 0.88;
+  ctx.fillStyle = '#0a0814';
+  ctx.fillRect(bx - bw/2, by - bh/2, bw, bh);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#c8a84b';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(bx - bw/2 + 2, by - bh/2 + 2, bw - 4, bh - 4);
+  ctx.fillStyle = '#f0d870';
+  ctx.shadowColor = '#c8a84b';
+  ctx.shadowBlur = 12;
   ctx.fillText(text, bx, by);
-  ctx.shadowBlur=0;
-
+  ctx.shadowBlur = 0;
   ctx.restore();
 }
+
+// ═══════════════════════════════════════════
+//  TRANSITIONS (DESCEND / ASCEND)
+// ═══════════════════════════════════════════
 function descend(){
   saveFloor();
-  const wasBonfire=G.isBonfireFloor;
-  if(G.zone==='upper'&&wasBonfire){
-    G.zone='normal'; G.depth=1;
-    addLog('You descend into the dungeon depths...','stairs');
-  } else {
-    G.depth++;
-    addLog(`You descend to ${depthLabel()}.`,'stairs');
+  const wasBonfire = G.isBonfireFloor;
+
+  if (G.zone === 'upper') {
+    if (wasBonfire) {
+      // Leaving upper bonfire → go to normal depth 1
+      G.zone = 'normal';
+      G.depth = 1;
+      G.normalFloorCount = 0;
+      G.isBonfireFloor = false;
+      addLog('You descend into the dungeon depths...', 'stairs');
+    } else {
+      // Normal upper floor
+      if (G.depth < 3) {
+        G.depth++;                     // upper 1 → 2, upper 2 → 3
+      } else { // G.depth === 3
+        // After depth 3, next is upper bonfire (depth 4, but label hides number)
+        G.depth = 4;
+        G.isBonfireFloor = true;
+      }
+      addLog(`You descend to ${depthLabel()}.`, 'stairs');
+    }
+  } else { // normal zone
+    if (wasBonfire) {
+      // Leaving a normal bonfire → go to next normal floor
+      G.depth++;
+      G.normalFloorCount = 0;          // start a new cycle – no normal floors cleared yet
+      G.isBonfireFloor = false;
+      addLog(`You descend to ${depthLabel()}.`, 'stairs');
+    } else {
+      // Normal floor – we are about to leave it, so we have cleared it
+      G.normalFloorCount++;
+      if (G.normalFloorCount === 5) {
+        // After clearing the 5th normal floor, next is a bonfire at same depth
+        G.isBonfireFloor = true;
+        // depth stays the same (the bonfire floor shares the depth number)
+      } else {
+        G.depth++;
+      }
+      addLog(`You descend to ${depthLabel()}.`, 'stairs');
+    }
   }
   regenMap('down');
 }
+
 function ascend(){
   saveFloor();
-  if(G.zone==='normal'&&G.depth===1){
-    G.zone='upper'; G.depth=4;
-    addLog('You ascend back to the upper floors.','stairs');
-    regenMap('up'); return;
+  const wasBonfire = G.isBonfireFloor;
+
+  if (G.zone === 'normal' && G.depth === 1 && !wasBonfire) {
+    // At depth 1 normal, ascend back to upper bonfire
+    G.zone = 'upper';
+    G.depth = 4;
+    G.normalFloorCount = 0;
+    G.isBonfireFloor = true;   // upper bonfire
+    addLog('You ascend back to the upper floors.', 'stairs');
+    regenMap('up');
+    return;
   }
-  if(G.zone==='upper'&&G.depth<=1){addLog('You cannot go further up.','info');return;}
-  G.depth--;
-  addLog(`You ascend to ${depthLabel()}.`,'stairs');
+  if (G.zone === 'upper' && G.depth === 1) {
+    addLog('You cannot go further up.', 'info');
+    return;
+  }
+
+  if (wasBonfire) {
+    // Ascending from a bonfire: go back to the previous normal floor
+    G.isBonfireFloor = false;
+    if (G.zone === 'upper') {
+      G.depth = 3;               // from upper bonfire back to upper 3
+    } else {
+      // From a normal bonfire, we go back to the 5th normal floor (same depth)
+      G.normalFloorCount = 5;    // that floor is the 5th normal of the cycle
+      // depth stays the same
+    }
+  } else {
+    // Ascending from a normal floor
+    G.depth--;
+    if (G.zone === 'normal') {
+      // We are moving to the previous floor, which may be normal or bonfire.
+      // The counter should decrease by 1, unless we are at the first floor of a cycle.
+      if (G.normalFloorCount > 0) {
+        G.normalFloorCount--;
+      } else {
+        // This happens when ascending from depth 6 normal (first of cycle) – previous floor is depth 5 bonfire
+        // In that case we set wasBonfire to true on the next iteration, but we handle it here.
+        // We'll just set normalFloorCount to 5, and the floor we are going to will be a bonfire.
+        // However, we already set depth--, so depth becomes 5. We need to mark it as bonfire.
+        G.isBonfireFloor = true;
+        G.normalFloorCount = 5;
+      }
+    }
+    // In upper zone, no counter needed.
+  }
+  addLog(`You ascend to ${depthLabel()}.`, 'stairs');
   regenMap('up');
 }
-function regenMap(dir='down'){
+
+function regenMap(dir = 'down'){
   stopEntityLoop();
-  turnPhase='player';
-  priorityTargetId=null;
-  floatNums=[];
-  _queuedAction=null;
-  _panelDirty=true;
-  _clearedBanner=0;
-  _autoWalkOnArrival=null;
+  turnPhase = 'player';
+  priorityTargetId = null;
+  floatNums = [];
+  _queuedAction = null;
+  _panelDirty = true;
+  _clearedBanner = 0;
+  _autoWalkOnArrival = null;
   heldKeys.clear();
   stopMoveLoop();
 
-  const restored=restoreFloor(floorKey());
+  const key = floorKey();
+  const restored = restoreFloor(key);
   cancelAutoWalk();
-  const panel=document.getElementById('autonav-panel');
-  if(panel) panel.style.display='none';
-  if(restored){
-    const entry=(dir==='up')?G.stairsDown:G.stairsUp;
-    const fallback=G.stairsUp||G.stairsDown;
-    const e=entry||fallback;
-    if(e) G.player={x:e.x,y:e.y};
-    G.fov=new Set();
+  const panel = document.getElementById('autonav-panel');
+  if (panel) panel.style.display = 'none';
+
+  if (restored) {
+    const entry = (dir === 'up') ? G.stairsDown : G.stairsUp;
+    const fallback = G.stairsUp || G.stairsDown;
+    const e = entry || fallback;
+    if (e) G.player = {x:e.x, y:e.y};
+    G.fov = new Set();
     computeFOV();
-    if(G.floorCleared) setTimeout(updateAutonav,50);
+    if (G.floorCleared) setTimeout(updateAutonav, 50);
   } else {
-    G.tiles=[];G.rooms=[];G.enemies=[];G.bonfire=null;
-    G.fov=new Set();G.seen=new Set();
-    G.floorCleared=false;
+    G.tiles = []; G.rooms = []; G.enemies = []; G.bonfire = null;
+    G.fov = new Set(); G.seen = new Set();
+    G.floorCleared = false;
     generateDungeon();
-    // Override player placement based on travel direction
-    // generateDungeon always puts player at stairsUp area;
-    // if ascending (dir='up'), move to stairsDown instead
-    if(dir==='up'&&G.stairsDown){
-      G.player={x:G.stairsDown.x,y:G.stairsDown.y};
+    if (dir === 'up' && G.stairsDown) {
+      G.player = {x:G.stairsDown.x, y:G.stairsDown.y};
       computeFOV();
     }
   }
 
   snapVizToLogical();
-  if(SETTINGS.smoothEntities) startEntityLoop();
-  else if(SETTINGS.smoothCam) smoothCamLoop();
+  if (SETTINGS.smoothEntities) startEntityLoop();
+  else if (SETTINGS.smoothCam) smoothCamLoop();
   updateHUD();
   setupCanvas();
   showFloorNotifier(depthLabel());
@@ -1869,16 +1930,18 @@ function regenMap(dir='down'){
 //  XP & LEVELING
 // ═══════════════════════════════════════════
 function gainXP(amount){
-  G.xp+=amount;addLog(`+${amount} XP`,'xp');
-  while(G.xp>=G.xpNeeded){
-    G.xp-=G.xpNeeded;G.level++;G.xpNeeded=G.level*10;
+  G.xp += amount; addLog(`+${amount} XP`,'xp');
+  while (G.xp >= G.xpNeeded) {
+    G.xp -= G.xpNeeded; G.level++; G.xpNeeded = G.level * 10;
     G.pendingLevelUps++;
-    // Passive base stat increase per level: +1 STR (+0.2 dmg), +1 CON (+1 maxHP)
-    G.str+=1;
-    G.con+=1;
-    G.maxHP+=1; // from CON
-    G.hp=Math.min(G.hp+1,G.maxHP);
-    G.baseDmg=parseFloat((G.baseDmg+0.2).toFixed(2));
+    // Level up stat increases: CON+5, STR+1, DEX+1
+    G.con += 5;
+    G.str += 1;
+    G.dex += 1;
+    G.maxHP += 5;
+    G.hp = Math.min(G.hp + 5, G.maxHP);
+    const scaler = WEAPON_SCALING[G.weaponType];
+    G.baseDmg = parseFloat(((G.str * scaler.str) + (G.dex * scaler.dex)).toFixed(2));
     addLog(`LEVEL UP! You are now level ${G.level}!`,'level');
   }
 }
@@ -1886,80 +1949,99 @@ function gainXP(amount){
 // ═══════════════════════════════════════════
 //  LEVEL UP MODAL
 // ═══════════════════════════════════════════
-let luAlloc={},luPointsRemaining=0;
-const LU_STATS=[{key:'MAX_HP',label:'Max HP',effect:'+1 Max HP (CON)'},{key:'DMG',label:'Damage',effect:'+0.2 Damage (STR)'}];
+let luAlloc = {}, luPointsRemaining = 0;
+const LU_STATS = [
+  {key:'CON', label:'CON', effect:'+1 Max HP'},
+  {key:'STR', label:'STR', effect:'+0.25 sword / +0.1 dagger dmg'},
+  {key:'DEX', label:'DEX', effect:'+0.1 sword / +0.2 dagger dmg'}
+];
 
 function showLevelUpModal(){
-  if(G.pendingLevelUps<=0)return;
+  if (G.pendingLevelUps <= 0) return;
   G.pendingLevelUps--;
-  luPointsRemaining=3;luAlloc={};
+  luPointsRemaining = 3; luAlloc = {CON:0, STR:0, DEX:0};
   document.getElementById('levelup-modal').classList.add('active');
-  document.getElementById('levelup-msg').textContent=`You reached Level ${G.level}!`;
-  document.getElementById('lu-points').textContent=luPointsRemaining;
+  document.getElementById('levelup-msg').textContent = `You reached Level ${G.level}!`;
+  document.getElementById('lu-points').textContent = luPointsRemaining;
   renderLURows();
 }
 function renderLURows(){
-  const c=document.getElementById('lu-alloc-rows');c.innerHTML='';
-  LU_STATS.forEach(d=>{
-    luAlloc[d.key]=0;
-    const row=document.createElement('div');row.className='alloc-row';
-    row.innerHTML=`<div class="alloc-name">${d.label}</div><div class="alloc-effect">${d.effect}</div>
+  const c = document.getElementById('lu-alloc-rows'); c.innerHTML = '';
+  LU_STATS.forEach(d => {
+    const row = document.createElement('div'); row.className = 'alloc-row';
+    row.innerHTML = `<div class="alloc-name">${d.label}</div><div class="alloc-effect">${d.effect}</div>
     <div class="alloc-controls">
       <button class="alloc-btn" onclick="changeLU('${d.key}',-1)">−</button>
       <div class="alloc-val" id="lu-av-${d.key}">0</div>
       <button class="alloc-btn" onclick="changeLU('${d.key}',1)">+</button>
-    </div>`;c.appendChild(row);
+    </div>`;
+    c.appendChild(row);
   });
 }
-function changeLU(key,delta){
-  if(delta>0&&luPointsRemaining<=0)return;if(delta<0&&luAlloc[key]<=0)return;
-  luAlloc[key]=(luAlloc[key]||0)+delta;luPointsRemaining-=delta;
-  document.getElementById('lu-av-'+key).textContent=luAlloc[key];
-  document.getElementById('lu-points').textContent=luPointsRemaining;
+function changeLU(key, delta){
+  if (delta > 0 && luPointsRemaining <= 0) return;
+  if (delta < 0 && luAlloc[key] <= 0) return;
+  luAlloc[key] = (luAlloc[key] || 0) + delta;
+  luPointsRemaining -= delta;
+  document.getElementById('lu-av-'+key).textContent = luAlloc[key];
+  document.getElementById('lu-points').textContent = luPointsRemaining;
 }
 function confirmLevelUp(){
-  G.unspentPoints+=luPointsRemaining;
+  G.unspentPoints += luPointsRemaining;
   applyLUAlloc();
   document.getElementById('levelup-modal').classList.remove('active');
-  updateHUD();renderCharTab();
-  const banked=luPointsRemaining>0?` (${luPointsRemaining} banked)`:'';
-  addLog(`Level ${G.level} stats upgraded!${banked}`,'level');
-  luPointsRemaining=0;
-  if(G.pendingLevelUps>0) setTimeout(showLevelUpModal,200);
+  updateHUD(); renderCharTab();
+  const banked = luPointsRemaining > 0 ? ` (${luPointsRemaining} banked)` : '';
+  addLog(`Level ${G.level} stats upgraded!${banked}`, 'level');
+  luPointsRemaining = 0;
+  if (G.pendingLevelUps > 0) setTimeout(showLevelUpModal, 200);
 }
 function applyLUAlloc(){
-  if(luAlloc.MAX_HP){G.maxHP+=luAlloc.MAX_HP;G.hp=Math.min(G.hp+luAlloc.MAX_HP,G.maxHP);G.con+=luAlloc.MAX_HP;}
-  if(luAlloc.DMG){G.baseDmg=parseFloat((G.baseDmg+luAlloc.DMG*0.2).toFixed(2));G.str+=luAlloc.DMG;}
+  if (luAlloc.CON) {
+    G.con += luAlloc.CON;
+    G.maxHP += luAlloc.CON;
+    G.hp = Math.min(G.hp + luAlloc.CON, G.maxHP);
+  }
+  if (luAlloc.STR) G.str += luAlloc.STR;
+  if (luAlloc.DEX) G.dex += luAlloc.DEX;
+  const scaler = WEAPON_SCALING[G.weaponType];
+  G.baseDmg = parseFloat(((G.str * scaler.str) + (G.dex * scaler.dex)).toFixed(2));
 }
 
 // ═══════════════════════════════════════════
 //  CHAR TAB
 // ═══════════════════════════════════════════
-let charAlloc={STR:0,CON:0};
+let charAlloc = {CON:0, STR:0, DEX:0};
 function switchTab(tab){
-  document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.panel-body').forEach(b=>b.classList.add('hidden'));
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel-body').forEach(b => b.classList.add('hidden'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('body-'+tab).classList.remove('hidden');
-  if(tab==='char')renderCharTab();
+  if (tab === 'char') renderCharTab();
 }
 function renderCharTab(){
-  charAlloc={STR:0,CON:0};
-  const unspent=G.unspentPoints||0;
-  document.getElementById('stat-str').textContent=G.str;
-  document.getElementById('stat-con').textContent=G.con;
-  document.getElementById('char-stat-dmg').textContent=G.baseDmg.toFixed(1);
-  document.getElementById('char-stat-maxhp').textContent=G.maxHP;
-  document.getElementById('char-unspent').textContent=unspent;
-  document.getElementById('char-level').textContent=G.level;
-  document.getElementById('char-xp').textContent=`${G.xp}/${G.xpNeeded}`;
-  document.getElementById('char-depth').textContent=G.depth;
-  document.getElementById('char-tab-dot').classList.toggle('show',unspent>0);
-  const CDEFS=[{key:'STR',label:'STR',base:G.str},{key:'CON',label:'CON',base:G.con}];
-  const c=document.getElementById('char-alloc-rows');c.innerHTML='';
-  CDEFS.forEach(d=>{
-    const row=document.createElement('div');row.className='char-alloc-row';
-    row.innerHTML=`
+  charAlloc = {CON:0, STR:0, DEX:0};
+  const unspent = G.unspentPoints || 0;
+  document.getElementById('stat-con').textContent = G.con;
+  document.getElementById('stat-str').textContent = G.str;
+  document.getElementById('stat-dex').textContent = G.dex;
+  document.getElementById('char-stat-dmg').textContent = G.baseDmg.toFixed(1);
+  document.getElementById('char-stat-maxhp').textContent = G.maxHP;
+  document.getElementById('char-unspent').textContent = unspent;
+  document.getElementById('char-level').textContent = G.level;
+  document.getElementById('char-xp').textContent = `${G.xp}/${G.xpNeeded}`;
+  document.getElementById('char-depth').textContent = G.depth;
+  document.getElementById('char-tab-dot').classList.toggle('show', unspent > 0);
+
+  const CDEFS = [
+    {key:'CON', label:'CON', base:G.con},
+    {key:'STR', label:'STR', base:G.str},
+    {key:'DEX', label:'DEX', base:G.dex}
+  ];
+  const c = document.getElementById('char-alloc-rows'); c.innerHTML = '';
+  CDEFS.forEach(d => {
+    const row = document.createElement('div'); row.className = 'char-alloc-row';
+    row.innerHTML = `
       <div class="char-alloc-name">${d.label}</div>
       <div class="char-alloc-controls">
         <button class="char-btn" onclick="changeCharAlloc('${d.key}',-1)">−</button>
@@ -1969,70 +2051,77 @@ function renderCharTab(){
       <span class="char-alloc-delta" id="ca-d-${d.key}"></span>`;
     c.appendChild(row);
   });
-  document.getElementById('char-confirm-btn').disabled=unspent<=0;
+  document.getElementById('char-confirm-btn').disabled = unspent <= 0;
 }
-function changeCharAlloc(key,delta){
-  const totalSpent=Object.values(charAlloc).reduce((a,b)=>a+b,0);
-  if(delta>0&&totalSpent>=(G.unspentPoints||0))return;
-  if(delta<0&&(charAlloc[key]||0)<=0)return;
-  charAlloc[key]=(charAlloc[key]||0)+delta;
-  const base=key==='STR'?G.str:G.con;
-  document.getElementById('ca-cur-'+key).textContent=base+charAlloc[key];
-  document.getElementById('ca-d-'+key).textContent=charAlloc[key]>0?`+${charAlloc[key]}`:'';
-  const spent=Object.values(charAlloc).reduce((a,b)=>a+b,0);
-  document.getElementById('char-unspent').textContent=(G.unspentPoints||0)-spent;
-  document.getElementById('char-confirm-btn').disabled=spent<=0;
+function changeCharAlloc(key, delta){
+  const totalSpent = Object.values(charAlloc).reduce((a,b) => a+b, 0);
+  if (delta > 0 && totalSpent >= (G.unspentPoints || 0)) return;
+  if (delta < 0 && (charAlloc[key] || 0) <= 0) return;
+  charAlloc[key] = (charAlloc[key] || 0) + delta;
+  const base = key === 'CON' ? G.con : key === 'STR' ? G.str : G.dex;
+  document.getElementById('ca-cur-'+key).textContent = base + charAlloc[key];
+  document.getElementById('ca-d-'+key).textContent = charAlloc[key] > 0 ? `+${charAlloc[key]}` : '';
+  const spent = Object.values(charAlloc).reduce((a,b) => a+b, 0);
+  document.getElementById('char-unspent').textContent = (G.unspentPoints || 0) - spent;
+  document.getElementById('char-confirm-btn').disabled = spent <= 0;
 }
 function applyCharAlloc(){
-  const spent=Object.values(charAlloc).reduce((a,b)=>a+b,0);
-  if(spent<=0)return;
-  if(charAlloc.STR){G.str+=charAlloc.STR;G.baseDmg=parseFloat((G.baseDmg+charAlloc.STR*0.2).toFixed(2));}
-  if(charAlloc.CON){G.con+=charAlloc.CON;G.maxHP+=charAlloc.CON;G.hp=Math.min(G.hp+charAlloc.CON,G.maxHP);}
-  G.unspentPoints-=spent;
-  addLog(`Applied ${spent} pt${spent>1?'s':''}. STR:${G.str} CON:${G.con}`,'level');
-  updateHUD();renderCharTab();
-  if(!SETTINGS.smoothEntities)renderCanvas();
+  const spent = Object.values(charAlloc).reduce((a,b) => a+b, 0);
+  if (spent <= 0) return;
+  if (charAlloc.CON) {
+    G.con += charAlloc.CON;
+    G.maxHP += charAlloc.CON;
+    G.hp = Math.min(G.hp + charAlloc.CON, G.maxHP);
+  }
+  if (charAlloc.STR) G.str += charAlloc.STR;
+  if (charAlloc.DEX) G.dex += charAlloc.DEX;
+  const scaler = WEAPON_SCALING[G.weaponType];
+  G.baseDmg = parseFloat(((G.str * scaler.str) + (G.dex * scaler.dex)).toFixed(2));
+  G.unspentPoints -= spent;
+  addLog(`Applied ${spent} pt${spent>1?'s':''}. CON:${G.con} STR:${G.str} DEX:${G.dex}`, 'level');
+  updateHUD(); renderCharTab();
+  if (!SETTINGS.smoothEntities) renderCanvas();
 }
 
 // ═══════════════════════════════════════════
 //  HUD
 // ═══════════════════════════════════════════
 function updateHUD(){
-  if(!G.maxHP)return;
-  document.getElementById('hp-text').textContent=`${Math.max(0,G.hp).toFixed(1)}/${G.maxHP}`;
-  document.getElementById('hp-bar').style.width=`${(Math.max(0,G.hp)/G.maxHP)*100}%`;
-  document.getElementById('xp-text').textContent=`${G.xp}/${G.xpNeeded}`;
-  document.getElementById('xp-bar').style.width=`${(G.xp/G.xpNeeded)*100}%`;
-  document.getElementById('level-badge').textContent=`LVL ${G.level}`;
-  document.getElementById('stat-dmg').textContent=G.baseDmg.toFixed(1);
-  document.getElementById('stat-maxhp').textContent=G.maxHP;
-  document.getElementById('kill-count').textContent=G.kills;
-  document.getElementById('stat-depth').textContent=G.zone==='upper'?`U${G.depth}`:G.depth;
-  document.getElementById('depth-label').textContent=depthLabel();
-  document.getElementById('char-tab-dot').classList.toggle('show',(G.unspentPoints||0)>0);
+  if (!G.maxHP) return;
+  document.getElementById('hp-text').textContent = `${Math.max(0,G.hp).toFixed(1)}/${G.maxHP}`;
+  document.getElementById('hp-bar').style.width = `${(Math.max(0,G.hp)/G.maxHP)*100}%`;
+  document.getElementById('xp-text').textContent = `${G.xp}/${G.xpNeeded}`;
+  document.getElementById('xp-bar').style.width = `${(G.xp/G.xpNeeded)*100}%`;
+  document.getElementById('level-badge').textContent = `LVL ${G.level}`;
+  document.getElementById('stat-dmg').textContent = G.baseDmg.toFixed(1);
+  document.getElementById('stat-maxhp').textContent = G.maxHP;
+  document.getElementById('kill-count').textContent = G.kills;
+  document.getElementById('stat-depth').textContent = G.zone === 'upper' ? `U${G.depth}` : G.depth;
+  document.getElementById('depth-label').textContent = depthLabel();
+  document.getElementById('char-tab-dot').classList.toggle('show', (G.unspentPoints || 0) > 0);
   updateClearedBadge();
   updateAutonav();
-  if(!document.getElementById('body-char').classList.contains('hidden'))renderCharTab();
+  if (!document.getElementById('body-char').classList.contains('hidden')) renderCharTab();
 }
 
 // ═══════════════════════════════════════════
 //  LOG
 // ═══════════════════════════════════════════
-function addLog(msg,type='info'){
-  if(!SETTINGS.showLog)return;
-  const log=document.getElementById('log');
-  const e=document.createElement('div');e.className=`log-entry ${type}`;e.textContent=msg;
+function addLog(msg, type = 'info'){
+  if (!SETTINGS.showLog) return;
+  const log = document.getElementById('log');
+  const e = document.createElement('div'); e.className = `log-entry ${type}`; e.textContent = msg;
   log.prepend(e);
-  while(log.children.length>80)log.removeChild(log.lastChild);
+  while (log.children.length > 80) log.removeChild(log.lastChild);
 }
 
 // ═══════════════════════════════════════════
 //  DEATH / QUIT
 // ═══════════════════════════════════════════
 function die(){
-  addLog('YOU HAVE DIED.','death');
-  setTimeout(()=>{
-    document.getElementById('death-stats').innerHTML=`
+  addLog('YOU HAVE DIED.', 'death');
+  setTimeout(() => {
+    document.getElementById('death-stats').innerHTML = `
       <div class="death-stat-row"><span class="label">Hero</span><span class="val">${G.name}</span></div>
       <div class="death-stat-row"><span class="label">Level</span><span class="val">${G.level}</span></div>
       <div class="death-stat-row"><span class="label">Depth Reached</span><span class="val">${depthLabel()}</span></div>
@@ -2040,101 +2129,93 @@ function die(){
       <div class="death-stat-row"><span class="label">Turns Survived</span><span class="val">${G.turn}</span></div>
     `;
     showScreen('death-screen');
-  },900);
+  }, 900);
 }
-function confirmQuit(){if(confirm('Abandon your run?'))showScreen('title-screen');}
+function confirmQuit(){ if (confirm('Abandon your run?')) showScreen('title-screen'); }
 
-// Canvas color overlay flash — drawn directly on canvas, independent of tile colors
-let _flashColor=null, _flashAlpha=0, _flashDecay=0;
+let _flashColor = null, _flashAlpha = 0, _flashDecay = 0;
 function flashCanvas(color){
-  if(color==='red'){  _flashColor='#cc2020'; _flashAlpha=0.38; _flashDecay=0.045; }
-  else{               _flashColor='#c8a020'; _flashAlpha=0.32; _flashDecay=0.035; }
+  if (color === 'red') { _flashColor = '#cc2020'; _flashAlpha = 0.38; _flashDecay = 0.045; }
+  else                { _flashColor = '#c8a020'; _flashAlpha = 0.32; _flashDecay = 0.035; }
 }
 function tickFlash(){
-  if(_flashAlpha<=0)return;
-  _flashAlpha=Math.max(0,_flashAlpha-_flashDecay);
+  if (_flashAlpha <= 0) return;
+  _flashAlpha = Math.max(0, _flashAlpha - _flashDecay);
 }
 function drawFlash(){
-  if(!_flashAlpha||!canvas)return;
+  if (!_flashAlpha || !canvas) return;
   ctx.save();
-  ctx.globalAlpha=_flashAlpha;
-  ctx.fillStyle=_flashColor;
+  ctx.globalAlpha = _flashAlpha;
+  ctx.fillStyle = _flashColor;
   ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.restore();
 }
 
-window.addEventListener('resize',()=>{
-  if(document.getElementById('game-screen').classList.contains('active')){setupCanvas();renderCanvas();}
+window.addEventListener('resize', () => {
+  if (document.getElementById('game-screen').classList.contains('active')) { setupCanvas(); renderCanvas(); }
 });
 
 // ═══════════════════════════════════════════
 //  MOBILE / D-PAD
 // ═══════════════════════════════════════════
-const isMobile=()=>/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||navigator.maxTouchPoints>1;
+const isMobile = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1;
 
 function initDpad(){
-  const dpad=document.getElementById('dpad');
-  if(!dpad)return;
+  const dpad = document.getElementById('dpad');
+  if (!dpad) return;
 
-  if(isMobile()) dpad.classList.add('visible');
+  if (isMobile()) dpad.classList.add('visible');
 
-  // Attempt to lock to landscape on mobile
-  if(isMobile() && screen.orientation && screen.orientation.lock){
-    screen.orientation.lock('landscape').catch(()=>{});
+  if (isMobile() && screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(() => {});
   }
 
-  // Map button id → action
-  const btnActions={
-    'dp-up':    ()=>queueOrRun(()=>tryMove(0,-1)),
-    'dp-down':  ()=>queueOrRun(()=>tryMove(0,1)),
-    'dp-left':  ()=>queueOrRun(()=>tryMove(-1,0)),
-    'dp-right': ()=>queueOrRun(()=>tryMove(1,0)),
-    'dp-ul':    ()=>queueOrRun(()=>tryMove(-1,-1)),
-    'dp-ur':    ()=>queueOrRun(()=>tryMove(1,-1)),
-    'dp-dl':    ()=>queueOrRun(()=>tryMove(-1,1)),
-    'dp-dr':    ()=>queueOrRun(()=>tryMove(1,1)),
-    'dp-center':()=>queueOrRun(doSpaceAction),
+  const btnActions = {
+    'dp-up':    () => queueOrRun(() => tryMove(0,-1)),
+    'dp-down':  () => queueOrRun(() => tryMove(0,1)),
+    'dp-left':  () => queueOrRun(() => tryMove(-1,0)),
+    'dp-right': () => queueOrRun(() => tryMove(1,0)),
+    'dp-ul':    () => queueOrRun(() => tryMove(-1,-1)),
+    'dp-ur':    () => queueOrRun(() => tryMove(1,-1)),
+    'dp-dl':    () => queueOrRun(() => tryMove(-1,1)),
+    'dp-dr':    () => queueOrRun(() => tryMove(1,1)),
+    'dp-center':() => queueOrRun(doSpaceAction),
   };
 
-  // Held-direction for D-pad (mirrors keyboard held-key logic)
-  let dpHeld=null;
-  let dpInterval=null;
+  let dpHeld = null;
+  let dpInterval = null;
 
   function dpStart(id){
-    const fn=btnActions[id];
-    if(!fn)return;
+    const fn = btnActions[id];
+    if (!fn) return;
     document.getElementById(id)?.classList.add('pressed');
-    fn(); // fire immediately
-    if(id==='dp-center')return; // center doesn't repeat
-    dpHeld=fn;
-    if(!dpInterval) dpInterval=setInterval(()=>{ if(dpHeld)dpHeld(); },MOVE_INTERVAL_MS);
+    fn();
+    if (id === 'dp-center') return;
+    dpHeld = fn;
+    if (!dpInterval) dpInterval = setInterval(() => { if (dpHeld) dpHeld(); }, MOVE_INTERVAL_MS);
   }
   function dpStop(id){
     document.getElementById(id)?.classList.remove('pressed');
-    dpHeld=null;
-    if(dpInterval){clearInterval(dpInterval);dpInterval=null;}
+    dpHeld = null;
+    if (dpInterval) { clearInterval(dpInterval); dpInterval = null; }
   }
 
-  Object.keys(btnActions).forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    // Touch
-    el.addEventListener('touchstart',e=>{e.preventDefault();dpStart(id);},{passive:false});
-    el.addEventListener('touchend',  e=>{e.preventDefault();dpStop(id); },{passive:false});
-    el.addEventListener('touchcancel',e=>{e.preventDefault();dpStop(id);},{passive:false});
-    // Mouse fallback (for desktop testing)
-    el.addEventListener('mousedown',e=>{e.preventDefault();dpStart(id);});
-    el.addEventListener('mouseup',  e=>{e.preventDefault();dpStop(id); });
-    el.addEventListener('mouseleave',e=>{if(dpHeld)dpStop(id);});
+  Object.keys(btnActions).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('touchstart', e => { e.preventDefault(); dpStart(id); }, {passive:false});
+    el.addEventListener('touchend',   e => { e.preventDefault(); dpStop(id); }, {passive:false});
+    el.addEventListener('touchcancel',e => { e.preventDefault(); dpStop(id); }, {passive:false});
+    el.addEventListener('mousedown', e => { e.preventDefault(); dpStart(id); });
+    el.addEventListener('mouseup',   e => { e.preventDefault(); dpStop(id); });
+    el.addEventListener('mouseleave',e => { if (dpHeld) dpStop(id); });
   });
 
-  // Prevent pinch-zoom on canvas
-  document.getElementById('canvas-container')?.addEventListener('touchmove',e=>{
-    if(e.touches.length>1)e.preventDefault();
-  },{passive:false});
+  document.getElementById('canvas-container')?.addEventListener('touchmove', e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, {passive:false});
 }
 
-// Init after DOM is ready
 document.addEventListener('DOMContentLoaded', initDpad);
 
 </script>
