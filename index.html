@@ -159,19 +159,22 @@
   .config-lhs{flex:1;}
   .config-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--text);}
   .config-desc{font-size:16px;color:var(--dim);margin-top:3px;}
-  .diff-btns{display:flex;gap:7px;}
-  .diff-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:7px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
+  .diff-btns{display:flex;gap:5px;flex-wrap:wrap;}
+  /* match size button dimensions so difficulty buttons aren’t so massive */
+  .diff-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 8px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
   .diff-btn:hover{border-color:var(--gold);color:var(--gold);}
   .diff-btn.active-easy{border-color:#40c870;color:#40c870;background:rgba(64,200,112,.12);}
   .diff-btn.active-normal{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,.12);}
   .diff-btn.active-hard{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
+.diff-btn.active-extra-easy{border-color:#40c870;color:#40c870;background:rgba(64,200,112,.08);}
+.diff-btn.active-extra-hard{border-color:#c84040;color:#c84040;background:rgba(200,64,64,.20);}
   .size-btns{display:flex;gap:5px;flex-wrap:wrap;}
   .size-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 8px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
   .size-btn:hover{border-color:var(--blue);color:#80c0f0;}
   .size-btn.active{border-color:var(--blue);color:#80c0f0;background:rgba(64,128,200,.15);}
-  .respawn-toggle{font-family:'Press Start 2P',monospace;font-size:8px;padding:7px 14px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;min-width:72px;text-align:center;}
-  .respawn-toggle.on{border-color:var(--green);color:var(--green);background:rgba(64,200,112,.12);}
-  .respawn-toggle.off{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
+  .spawn-toggle{font-family:'Press Start 2P',monospace;font-size:8px;padding:7px 14px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;min-width:72px;text-align:center;}
+  .spawn-toggle.on{border-color:var(--green);color:var(--green);background:rgba(64,200,112,.12);}
+  .spawn-toggle.off{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
 
   #dpad{display:none;z-index:20;user-select:none;-webkit-user-select:none;touch-action:none;background:var(--bg2);border-left:1px solid var(--border);padding:8px;justify-content:center;align-items:center;flex-shrink:0;width:auto;}
   #dpad.visible{display:flex;}
@@ -184,17 +187,16 @@
   .dp.dp-ul:active,.dp.dp-ul.pressed,.dp.dp-ur:active,.dp.dp-ur.pressed,
   .dp.dp-dl:active,.dp.dp-dl.pressed,.dp.dp-dr:active,.dp.dp-dr.pressed{background:rgba(200,168,75,.18);border-color:rgba(200,168,75,.6);}
 
-  /* ── INVENTORY OVERLAY – ENLARGED 20% more ── */
+  /* INVENTORY OVERLAY */
   #inv-overlay{display:none;position:fixed;inset:0;background:rgba(4,4,8,.86);z-index:200;align-items:center;justify-content:center;}
   #inv-overlay.open{display:flex;}
-  #inv-win{display:flex;flex-direction:column;width:min(1040px,97vw);height:min(720px,94vh);background:var(--panel);border:2px solid var(--border);animation:inv-pop .1s ease-out;}
+  #inv-win{display:flex;flex-direction:column;width:min(1040px,97vw);height:min(640px,90vh);background:var(--panel);border:2px solid var(--border);animation:inv-pop .1s ease-out;}
   @keyframes inv-pop{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
-  #inv-tabs{display:flex;background:var(--bg2);border-bottom:2px solid var(--border);flex-shrink:0;position:relative;}
+  #inv-tabs{display:flex;background:var(--bg2);border-bottom:2px solid var(--border);flex-shrink:0;}
   .inv-tab{font-family:'Press Start 2P',monospace;font-size:9px;padding:12px 20px;cursor:pointer;border:none;background:transparent;color:var(--dim);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .1s;}
   .inv-tab:hover{color:var(--text);}
   .inv-tab.on{color:var(--gold);border-bottom-color:var(--gold);}
-  #inv-xbtn{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'Press Start 2P',monospace;font-size:10px;width:32px;height:32px;border:1px solid #402020;background:transparent;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;}
-  #inv-xbtn:hover{background:var(--red);color:#fff;}
+  #inv-footer-bar{padding:8px;border-top:2px solid var(--border);background:var(--bg2);text-align:center;flex-shrink:0;}
   .inv-page{display:none;flex:1;overflow:hidden;}
   .inv-page.on{display:flex;}
 
@@ -226,7 +228,6 @@
   #inv-slots-wrap{flex:1;overflow-y:auto;padding:8px;}
   #inv-slots-wrap::-webkit-scrollbar{width:3px;}
   #inv-slots-wrap::-webkit-scrollbar-thumb{background:var(--border);}
-  /* Slots — 7px outer border + 3px lighter inner border via box-shadow */
   #inv-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
   .icell{aspect-ratio:1;border:7px solid #4a4a72;box-shadow:inset 0 0 0 3px #6a6a9a;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;transition:border-color .1s,background .1s;min-height:58px;}
   .icell:hover{border-color:var(--gold);box-shadow:inset 0 0 0 3px #e0c870;background:#1f1f2e;}
@@ -296,16 +297,47 @@
   .icp-cfmbtn:hover:not(:disabled){background:var(--green);color:var(--bg);}
   .icp-cfmbtn:disabled{opacity:.3;cursor:not-allowed;}
   /* inv header btn – enlarged */
-  #inv-hdr-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:5px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .12s;}
-  #inv-hdr-btn:hover{border-color:var(--gold);color:var(--gold);}
-
   /* TUTORIAL HINTS */
   #tutorial-panel{display:none;background:var(--bg2);border:1px solid var(--border);padding:8px 9px;flex-direction:column;gap:5px;}
   #tutorial-panel .tut-title{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--dim);letter-spacing:1px;margin-bottom:3px;}
   .tut-item{font-family:'VT323',monospace;font-size:15px;color:var(--gold);line-height:1.3;transition:color .3s;}
   .tut-item.done{color:#4a4a4a;text-decoration:line-through;text-decoration-color:#505050;}
 
-  /* Mobile support removed */
+  /* GAME MENU */
+  #game-menu-modal .modal-box{width:min(300px,90vw);border-color:var(--border);box-shadow:none;}
+  #game-menu-modal .modal-title{color:var(--text);font-size:9px;margin-bottom:14px;}
+  .gmenu-btn{display:block;width:100%;font-family:'Press Start 2P',monospace;font-size:8px;padding:12px 14px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;transition:all .15s;margin-bottom:8px;letter-spacing:.5px;box-sizing:border-box;}
+  .gmenu-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .gmenu-btn.danger{border-color:#402020;color:#804040;margin-bottom:0;}
+  .gmenu-btn.danger:hover{border-color:var(--red);color:var(--red);}
+
+  /* SAVE SLOTS */
+  #saves-modal .modal-box{width:min(580px,95vw);border-color:var(--blue);box-shadow:0 0 40px #4080c833;}
+  #saves-modal .modal-title{color:#80c0f0;text-shadow:none;}
+  .save-slots{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;}
+  .save-slots::-webkit-scrollbar{width:3px;}
+  .save-slots::-webkit-scrollbar-thumb{background:var(--border);}
+  .save-slot{display:flex;align-items:center;gap:10px;background:var(--bg2);border:2px solid var(--border);padding:10px 12px;transition:all .15s;}
+  .save-slot:hover{border-color:var(--gold);}
+  .save-slot.empty{opacity:.45;}
+  .save-slot-info{flex:1;}
+  .save-slot-name{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);}
+  .save-slot-meta{font-size:16px;color:var(--dim);margin-top:3px;}
+  .save-slot-date{font-size:14px;color:#504848;margin-top:2px;}
+  .save-slot-acts{display:flex;gap:6px;flex-shrink:0;}
+  .save-act{font-family:'Press Start 2P',monospace;font-size:6px;padding:5px 8px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;transition:all .12s;}
+  .save-act:hover{border-color:var(--gold);color:var(--gold);}
+  .save-act.del{border-color:#402020;color:#804040;}
+  .save-act.del:hover{border-color:var(--red);color:var(--red);}
+  .save-io{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:4px;}
+  .save-io-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:7px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
+  .save-io-btn:hover{border-color:var(--blue);color:#80c0f0;}
+  .save-io-btn.active{border-color:#80c0f0;color:#80c0f0;background:#0a101a;}
+  #import-paste-area{display:none;margin-top:10px;}
+  #import-paste-area textarea{width:100%;height:64px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'VT323',monospace;font-size:16px;padding:6px 8px;resize:none;outline:none;box-sizing:border-box;}
+  #import-paste-area textarea:focus{border-color:var(--blue);}
+  #import-paste-area .import-btns{display:flex;gap:8px;margin-top:6px;justify-content:flex-end;}
+
 </style>
 </head>
 <body>
@@ -326,8 +358,9 @@
  ╚═══════════════════════╝</pre>
   </div>
   <div class="title-btns">
-    <button class="btn" onclick="showScreen('config-screen')">▶ NEW GAME</button>
-    <button class="btn secondary" onclick="openSettings()">⚙ SETTINGS</button>
+    <button class="btn" onclick="showScreen('config-screen')">NEW GAME</button>
+    <button class="btn" id="load-game-btn" onclick="openSavesModal('load')" style="display:none;">LOAD GAME</button>
+    <button class="btn secondary" onclick="openSettings()">SETTINGS</button>
   </div>
   <div style="font-size:13px;color:var(--dim);text-align:center;letter-spacing:1px;">Made by Zeroichi</div>
 </div>
@@ -350,7 +383,7 @@
     <div class="class-card" id="card-rogue" onclick="selectClass('rogue')">
       <span class="class-icon">🗡️</span>
       <div class="class-name">ROGUE</div>
-      <div class="class-desc">Fast and Agile.</div>
+      <div class="class-desc">Agile and dexterous.</div>
       <div class="class-stats">
         <div class="stat-row"><span>CON</span><span>20</span></div>
         <div class="stat-row"><span>STR</span><span>10</span></div>
@@ -389,23 +422,25 @@
         <div class="config-desc" id="diff-desc">Normal enemy stats and pacing.</div>
       </div>
       <div class="diff-btns">
-        <button class="diff-btn" id="diff-easy"   onclick="setDifficulty('easy')">EASY</button>
+        <button class="diff-btn" id="diff-extra-easy" onclick="setDifficulty('extra-easy')">EXTRA EASY</button>
+        <button class="diff-btn" id="diff-easy"        onclick="setDifficulty('easy')">EASY</button>
         <button class="diff-btn active-normal" id="diff-normal" onclick="setDifficulty('normal')">NORMAL</button>
-        <button class="diff-btn" id="diff-hard"   onclick="setDifficulty('hard')">HARD</button>
+        <button class="diff-btn" id="diff-hard"        onclick="setDifficulty('hard')">HARD</button>
+        <button class="diff-btn" id="diff-extra-hard" onclick="setDifficulty('extra-hard')">EXTRA HARD</button>
       </div>
     </div>
     <div class="config-row">
       <div class="config-lhs">
-        <div class="config-label">ENEMY RESPAWN</div>
-        <div class="config-desc">Enemies respawn on normal floors over time.</div>
+        <div class="config-label">ENEMY SPAWNING</div>
+        <div class="config-desc">Enemies spawn on normal floors over time.</div>
       </div>
-      <button class="respawn-toggle on" id="respawn-toggle" onclick="toggleRespawn()">ON</button>
+      <button class="spawn-toggle on" id="spawn-toggle" onclick="toggleSpawn()">ON</button>
     </div>
     <div class="config-section-title" style="margin-top:8px;">FLOOR SIZE</div>
     <div class="config-row">
       <div class="config-lhs">
         <div class="config-label">NORMAL FLOOR SIZE</div>
-        <div class="config-desc">Upper floors are always fixed size.</div>
+        <div class="config-desc" id="size-desc">Upper floors are always fixed size.</div>
       </div>
       <div class="size-btns">
         <button class="size-btn" id="size-xs"  onclick="setFloorSize('xs')">XS</button>
@@ -446,7 +481,6 @@
       <div class="stat-section">
         <div class="stat-section-title">PROGRESS</div>
         <div class="mini-stat"><span class="label">Kills</span><span class="val" id="kill-count">0</span></div>
-        <div class="mini-stat"><span class="label">Depth</span><span class="val" id="stat-depth">1</span></div>
         <div class="mini-stat"><span class="label">Turn</span><span class="val" id="turn-label-left">1</span></div>
       </div>
       <div id="tutorial-panel">
@@ -456,18 +490,18 @@
         <div class="tut-item" id="tut-wait">Wait/Interact: SPACE</div>
         <div class="tut-item" id="tut-inv">Open inventory: I</div>
       </div>
-      <button class="btn danger sm" style="margin-top:auto;" onclick="confirmQuit()">QUIT</button>
+      <button class="btn secondary sm" style="margin-top:auto;" onclick="openGameMenu()">MENU</button>
     </div>
   </div>
 
   <div id="dungeon-wrap">
     <div id="dungeon-header">
-      <span class="depth" id="depth-label">DEPTH 1</span>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <span id="floor-cleared-badge" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;color:#40c870;border:1px solid #40c870;padding:3px 8px;opacity:.85;">✓ CLEARED</span>
-        <span id="turn-label" style="font-size:15px;color:var(--dim);">Turn 1</span>
-        <button id="inv-hdr-btn" onclick="openInv()">🎒 <span style="font-size:6px;border:1px solid var(--dim);padding:1px 4px;border-radius:2px;color:var(--dim);">I</span></button>
-        <button class="hdr-btn" onclick="openSettings()">⚙</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="depth" id="depth-label">DEPTH 1</span>
+        <span id="floor-cleared-badge" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;color:#40c870;border:1px solid #40c870;padding:3px 8px;opacity:.85;">CLEARED</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="hdr-btn" onclick="openGameMenu()">MENU</button>
       </div>
     </div>
     <div id="canvas-container" style="position:relative;">
@@ -480,8 +514,6 @@
       </div>
     </div>
   </div>
-
-  <!-- dpad removed: mobile support removed -->
 
   <div id="right-panel">
     <div id="right-panel-title">▓ MESSAGE LOG</div>
@@ -500,9 +532,8 @@
 <div id="inv-overlay">
   <div id="inv-win">
     <div id="inv-tabs">
-      <button class="inv-tab on" onclick="invSwitchTab('inv')">🎒 INVENTORY</button>
-      <button class="inv-tab" onclick="invSwitchTab('char')">⚔️ CHARACTER</button>
-      <button id="inv-xbtn" onclick="closeInv()">✕</button>
+      <button class="inv-tab on" onclick="invSwitchTab('inv')">INVENTORY</button>
+      <button class="inv-tab" onclick="invSwitchTab('char')">CHARACTER</button>
     </div>
     <!-- INVENTORY PAGE -->
     <div class="inv-page on" id="inv-page-inv">
@@ -527,25 +558,25 @@
       </div>
       <div id="inv-det-col">
         <div class="inv-col-hdr">ITEM DETAIL</div>
-        <div id="inv-det-body"><div class="det-empty"><span class="dei">🎒</span><span class="dem">SELECT AN<br>ITEM TO VIEW<br>DETAILS</span></div></div>
+        <div id="inv-det-body"><div class="det-empty"><span class="dem">NO ITEM<br>SELECTED</span></div></div>
       </div>
     </div>
     <!-- CHARACTER PAGE -->
     <div class="inv-page" id="inv-page-char">
       <div class="icp-col">
         <div class="icp-blk">
-          <div class="icp-blk-t">HERO</div>
+          <div class="icp-blk-t">CLASS</div>
           <div style="text-align:center;font-size:44px;margin-bottom:5px" id="icp-icon">⚔️</div>
           <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);text-align:center" id="icp-name">WARRIOR</div>
         </div>
         <div class="icp-blk">
           <div class="icp-blk-t">VITALS</div>
           <div class="icp-bwrap">
-            <div class="icp-blrow"><span>❤️ HP</span><span id="icp-hp">—</span></div>
+            <div class="icp-blrow"><span>HP</span><span id="icp-hp">—</span></div>
             <div class="icp-btrack"><div class="icp-bhp" id="icp-hpbar" style="width:100%"></div></div>
           </div>
           <div class="icp-bwrap">
-            <div class="icp-blrow"><span>✨ XP</span><span id="icp-xp">—</span></div>
+            <div class="icp-blrow"><span>XP</span><span id="icp-xp">—</span></div>
             <div class="icp-btrack"><div class="icp-bxp" id="icp-xpbar" style="width:0%"></div></div>
           </div>
         </div>
@@ -553,7 +584,7 @@
           <div class="icp-blk-t">LEVEL INFO</div>
           <div class="icpsr"><span class="il">Level</span><span class="iv gld" id="icp-lvl">1</span></div>
           <div class="icpsr"><span class="il">Kills</span><span class="iv" id="icp-kills">0</span></div>
-          <div class="icpsr"><span class="il">Depth</span><span class="iv" id="icp-depth">—</span></div>
+          <div class="icpsr"><span class="il">Lowest Depth</span><span class="iv" id="icp-depth">—</span></div>
           <div class="icpsr"><span class="il">Turn</span><span class="iv" id="icp-turn">1</span></div>
         </div>
       </div>
@@ -578,13 +609,50 @@
         </div>
       </div>
     </div>
+    <div id="inv-footer-bar">
+      <button class="btn sm secondary" onclick="closeInv()">BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME MENU MODAL -->
+<div class="modal-overlay" id="game-menu-modal">
+  <div class="modal-box">
+    <div class="modal-title">MENU</div>
+    <button class="gmenu-btn" onclick="closeGameMenu();openInvFromMenu();">INVENTORY</button>
+    <button class="gmenu-btn" onclick="closeGameMenu();openSavesModal('saveload');">SAVE / LOAD</button>
+    <button class="gmenu-btn" onclick="closeGameMenu();openSettingsFromMenu();">SETTINGS</button>
+    <hr style="border-color:var(--border);margin:10px 0 12px;">
+    <button class="gmenu-btn danger" onclick="closeGameMenu();confirmQuit();">QUIT TO TITLE</button>
+  </div>
+</div>
+
+<!-- SAVES MODAL -->
+<div class="modal-overlay" id="saves-modal">
+  <div class="modal-box">
+    <div class="modal-title" style="color:#80c0f0;text-shadow:none;" id="saves-modal-title">SAVE / LOAD</div>
+    <div class="save-slots" id="save-slots-list"></div>
+    <div class="save-io">
+      <button class="save-io-btn" id="export-btn" onclick="toggleExportMode()">EXPORT</button>
+      <button class="save-io-btn" id="import-btn" onclick="toggleImportArea()">IMPORT</button>
+    </div>
+    <div id="import-paste-area">
+      <textarea id="import-textarea" placeholder="Paste save code here..."></textarea>
+      <div class="import-btns">
+        <button class="save-act" onclick="cancelImport()">CANCEL</button>
+        <button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doImport()">IMPORT</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:14px;">
+      <button class="btn sm secondary" onclick="closeSavesModal()">BACK</button>
+    </div>
   </div>
 </div>
 
 <!-- LEVEL UP MODAL -->
 <div class="modal-overlay" id="levelup-modal">
   <div class="modal-box">
-    <div class="modal-title">⭐ LEVEL UP! ⭐</div>
+    <div class="modal-title">LEVEL UP</div>
     <div class="modal-subtitle" id="levelup-msg">You reached Level 2!</div>
     <div style="margin-bottom:14px;font-size:14px;color:var(--dim);text-align:center;">
       <span id="lu-base-stats" style="color:var(--text);">—</span><br>
@@ -629,7 +697,7 @@
       <div class="setting-lhs"><div class="setting-label">SHOW COORDINATES</div><div class="setting-desc">Display x/y on screen</div></div>
       <div class="setting-ctrl"><button class="toggle-btn" id="sett-showCoords" onclick="toggleSetting('showCoords')">OFF</button></div>
     </div>
-    <div style="text-align:center;margin-top:20px;"><button class="btn sm" onclick="closeSettings()">CLOSE</button></div>
+    <div style="text-align:center;margin-top:20px;"><button class="btn sm secondary" onclick="closeSettings()">BACK</button></div>
   </div>
 </div>
 
@@ -674,6 +742,7 @@ function toggleSetting(key){
 function applyLogVisibility(){
   document.getElementById('right-panel').classList.toggle('hidden-log', !SETTINGS.showLog);
 }
+let _settingsFromMenu=false;
 function openSettings(){
   ['tileSize'].forEach(k => document.getElementById('sett-'+k).textContent = SETTINGS[k]);
   ['smoothCam','smoothEntities','showLog','showGrid','showCoords'].forEach(k => {
@@ -683,17 +752,25 @@ function openSettings(){
   });
   document.getElementById('settings-modal').classList.add('active');
 }
-function closeSettings(){ document.getElementById('settings-modal').classList.remove('active'); }
-
-// Close settings when clicking backdrop
+function openSettingsFromMenu(){ _settingsFromMenu=true; openSettings(); }
+function closeSettings(){
+  document.getElementById('settings-modal').classList.remove('active');
+  if(_settingsFromMenu){ _settingsFromMenu=false; openGameMenu(); }
+}
 document.getElementById('settings-modal').addEventListener('click', function(e){
-  if (e.target === this) closeSettings();
+  if (e.target === this){ _settingsFromMenu=false; document.getElementById('settings-modal').classList.remove('active'); closeGameMenu(); }
 });
 
 // ==================== SCREENS ====================
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // refresh run-config descriptions when opening that screen
+  if (id === 'config-screen'){
+    setDifficulty(RUN_CONFIG.difficulty);
+    setFloorSize(RUN_CONFIG.floorSize);
+    updateSpawnBtn();
+  }
 }
 
 // ==================== CLASS SELECT ====================
@@ -714,7 +791,7 @@ function selectClass(cls){
 let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0};
 const STAT_DEFS = [
   {key:'CON', label:'CON', effect:'Last longer in fights.'},
-  {key:'STR', label:'STR', effect:'Hit harder in combat.'},
+  {key:'STR', label:'STR', effect:'Hit harder and carry more weight.'},
   {key:'DEX', label:'DEX', effect:'Move faster and strike more accurately.'},
 ];
 function showStatAlloc(){ allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0}; renderAllocRows(); showScreen('stat-screen'); }
@@ -741,39 +818,56 @@ function changeAlloc(key, delta){
 }
 
 // ==================== RUN CONFIG ====================
-const RUN_CONFIG = {difficulty:'normal', floorSize:'md', enemyRespawn:true};
+const RUN_CONFIG = {difficulty:'normal', floorSize:'md', enemySpawn:true};
 const DIFF_DESCS = {
-  easy:   'Fewer, weaker enemies.',
-  normal: 'Normal enemy stats and pacing.',
-  hard:   'More, tougher enemies.',
+  'extra-easy': 'Very few, very weak enemies.',
+  easy:        'Fewer, weaker enemies.',
+  normal:      'Normal enemy stats and pacing.',
+  hard:        'More, tougher enemies.',
+  'extra-hard':'Very Strong enemies and faster spawn rates.',
 };
 const DIFF_MODS = {
-  easy:  {statMult:0.7, countMult:0.6},
-  normal:{statMult:1.0, countMult:1.0},
-  hard:  {statMult:1.4, countMult:1.4},
+  'extra-easy': {statMult:0.5, countMult:0.4},
+  easy:         {statMult:0.7, countMult:0.6},
+  normal:       {statMult:1.0, countMult:1.0},
+  hard:         {statMult:1.4, countMult:1.4},
+  'extra-hard': {statMult:1.8, countMult:2.0},
+};
+
+// descriptions for floor sizes (placeholder text)
+const SIZE_DESCS = {
+  xs: '[Very small floor]',
+  sm: '[Small floor]',
+  md: '[Normal floor size]',
+  lg: '[Large floor]',
+  xl: '[Extra large floor]',
 };
 const FLOOR_SIZES = {
   xs:{w:22,h:16}, sm:{w:30,h:22}, md:{w:42,h:32}, lg:{w:56,h:42}, xl:{w:70,h:52},
 };
 function setDifficulty(diff){
   RUN_CONFIG.difficulty = diff;
-  ['easy','normal','hard'].forEach(d => {
-    document.getElementById('diff-'+d).className = 'diff-btn' + (d===diff ? ` active-${d}` : '');
+  ['extra-easy','easy','normal','hard','extra-hard'].forEach(d => {
+    const btn = document.getElementById('diff-'+d);
+    if (btn){ btn.className = 'diff-btn' + (d===diff ? ` active-${d}` : ''); }
   });
   document.getElementById('diff-desc').textContent = DIFF_DESCS[diff];
-  RUN_CONFIG.enemyRespawn = (diff !== 'easy');
-  updateRespawnBtn();
+  RUN_CONFIG.enemySpawn = (diff !== 'easy' && diff !== 'extra-easy');
+  updateSpawnBtn();
 }
-function toggleRespawn(){ RUN_CONFIG.enemyRespawn = !RUN_CONFIG.enemyRespawn; updateRespawnBtn(); }
-function updateRespawnBtn(){
-  const btn = document.getElementById('respawn-toggle');
-  btn.textContent = RUN_CONFIG.enemyRespawn ? 'ON' : 'OFF';
-  btn.className   = 'respawn-toggle ' + (RUN_CONFIG.enemyRespawn ? 'on' : 'off');
+function toggleSpawn(){ RUN_CONFIG.enemySpawn = !RUN_CONFIG.enemySpawn; updateSpawnBtn(); }
+function updateSpawnBtn(){
+  const btn = document.getElementById('spawn-toggle');
+  btn.textContent = RUN_CONFIG.enemySpawn ? 'ON' : 'OFF';
+  btn.className   = 'spawn-toggle ' + (RUN_CONFIG.enemySpawn ? 'on' : 'off');
 }
 function setFloorSize(sz){
   RUN_CONFIG.floorSize = sz;
   document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('size-'+sz)?.classList.add('active');
+  // update description text
+  const descEl = document.getElementById('size-desc');
+  if (descEl) descEl.textContent = SIZE_DESCS[sz] || '';
 }
 
 // ==================== CLASS & WEAPON DEFS ====================
@@ -797,8 +891,8 @@ function calcDmg(weaponType, str, dex){
   if (!w) return calcDmgFists(str,dex);
   return parseFloat((w.base + (str * w.str) + (dex * w.dex)).toFixed(2));
 }
-function calcDef(con){ return parseFloat((con*0.002).toFixed(2)); }
-function calcRegen(con){ return parseFloat((con*0.0005).toFixed(4)); }
+function calcDef(con){ return parseFloat((con*0.02).toFixed(2)); }
+function calcRegen(con){ return parseFloat((con*0.001).toFixed(4)); }
 
 // ==================== GAME STATE ====================
 let G   = {};
@@ -820,8 +914,8 @@ function startGame(){
     baseDmg: calcDmg(tmpl.weaponType, str, dex),
     def: calcDef(con),
     regen: calcRegen(con),
-    kills:0, turn:1, depth:1, zone:'upper',
-    enemyRespawn: RUN_CONFIG.enemyRespawn,
+    kills:0, turn:1, depth:1, zone:'upper', lowestDepth:0,
+    enemySpawn: RUN_CONFIG.enemySpawn,
     pendingLevelUps: 0,
     unspentPoints: allocPoints,
     _eid: 0,
@@ -1002,7 +1096,7 @@ function makeRat(pos, base, statMult, xpReward=1, spawned=false){
   const aiState = spawned ? 'roam' : 'sleep';
   return {
     id:++G._eid, type:'rat', x:pos.x, y:pos.y,
-    con, str, dex, hp, maxHP:hp, xp:xpReward, isFloorEnemy:true,
+    con, str, dex, hp, maxHP:hp, xp:xpReward, isFloorEnemy:!spawned,
     aiState,          // current behaviour state
     lastSeenX:null,   // last known player position
     lastSeenY:null,
@@ -1184,7 +1278,7 @@ function randFloat(a, b){ return Math.random() * (b-a) + a; }
 
 function computeFOV(){
   if (G.isBonfireFloor){ G.fov = new Set(G.seen); return; }
-  if (G.floorCleared && !floorHasRespawn()){ G.fov = new Set(G.seen); return; }
+  if (G.floorCleared && !floorHasSpawn()){ G.fov = new Set(G.seen); return; }
   G.fov = new Set();
   const px = G.player.x, py = G.player.y, R = SETTINGS.fovRadius;
   for (let ang = 0; ang < 360; ang += 1.5){
@@ -1255,7 +1349,11 @@ function tickFloats(){
 
 // playerHpFlash is only used for the bar fill; the text-above-head is removed
 let playerHpFlash = 0;
-function triggerPlayerHpFlash(){ playerHpFlash = 120; }
+function triggerPlayerHpFlash(){
+  playerHpFlash = 120;
+  // Damage cancels force-walk
+  if (_autoWalkForced){ cancelAutoWalk(); addLog('Force-walk cancelled — took damage!','info'); }
+}
 
 let turnPhase        = 'player';
 let priorityTargetId = null;
@@ -1511,10 +1609,15 @@ document.addEventListener('keydown', e=>{
   if (!document.getElementById('game-screen').classList.contains('active')) return;
   if (document.getElementById('levelup-modal').classList.contains('active')) return;
   if (document.getElementById('settings-modal').classList.contains('active')) return;
-  if (e.key==='i'||e.key==='I'){ e.preventDefault(); invIsOpen()?closeInv():openInv(); return; }
-  if (e.key==='Escape'&&invIsOpen()){ closeInv(); return; }
+  if (document.getElementById('game-menu-modal').classList.contains('active')) return;
+  if (e.key==='i'||e.key==='I'){ e.preventDefault(); if(invIsOpen()){ _invFromMenu=false; closeInv(); } else { openInv(); } return; }
+  if (e.key==='Escape'){
+    if (invIsOpen()){ closeInv(); return; }
+    cancelAutoWalk(); _stopMouseWalk(); return;
+  }
   if (invIsOpen()) return;
   cancelAutoWalk();
+  _stopMouseWalk();
   const dir=DIR_MAP[e.key];
   if (dir){
     e.preventDefault();
@@ -1546,19 +1649,19 @@ function _mouseWalkStep(){
   if (turnPhase!=='player'){ _mouseWalkInterval=setTimeout(_mouseWalkStep,60); return; }
   if (document.getElementById('levelup-modal').classList.contains('active')) return;
   if (invIsOpen()) return;
-  // Stop if enemy spotted
-  if (G.enemies.some(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`))){
-    addLog('Auto-walk interrupted — enemy spotted!','info');
-    _stopMouseWalk(); return;
-  }
   const {tx,ty}=_mouseMoveTarget;
   if (G.player.x===tx&&G.player.y===ty){ _stopMouseWalk(); return; }
   const path=bfsPath(G.player.x,G.player.y,tx,ty);
   if (!path||!path.length){ _stopMouseWalk(); return; }
+  // Only check enemies if destination is more than 1 step away
+  const isAdjacent = path.length === 1;
+  if (!isAdjacent && G.enemies.some(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`))){
+    addLog('Auto-walk interrupted — enemy spotted!','info');
+    _stopMouseWalk(); return;
+  }
   const next=path[0];
   tryMove(next.x-G.player.x, next.y-G.player.y);
   if (G.player.x===tx&&G.player.y===ty){ _stopMouseWalk(); return; }
-  // Continue walking; if holding, loop; if short-click walk, also loop
   _mouseWalkInterval=setTimeout(_mouseWalkStep, MOUSE_WALK_MS);
 }
 
@@ -1713,12 +1816,11 @@ function queueOrRun(fn){ if (turnPhase==='player') fn(); else _queuedAction=fn; 
 
 function endTurn(){
   G.turn++;
-  document.getElementById('turn-label').textContent     =`Turn ${G.turn}`;
   document.getElementById('turn-label-left').textContent=G.turn;
   if (SETTINGS.smoothEntities){
     turnPhase='anim_player';
     setTimeout(()=>{
-      enemyTurn(); tryRespawnEnemies();
+      enemyTurn(); trySpawnEnemies();
       // HP regen
       if (G.regen&&G.hp<G.maxHP&&G.hp>0) G.hp=parseFloat(Math.min(G.maxHP,G.hp+(G.regen||0)).toFixed(3));
       updateHUD(); checkFloorCleared();
@@ -1730,7 +1832,7 @@ function endTurn(){
       },ENEMY_ANIM_MS);
     },PLAYER_ANIM_MS);
   } else {
-    enemyTurn(); tryRespawnEnemies();
+    enemyTurn(); trySpawnEnemies();
     if (G.regen&&G.hp<G.maxHP&&G.hp>0) G.hp=parseFloat(Math.min(G.maxHP,G.hp+(G.regen||0)).toFixed(3));
     updateHUD(); checkFloorCleared();
     turnPhase='player'; markPanelDirty(); renderCanvas();
@@ -1826,7 +1928,7 @@ function drawFloorNotifier(){
 
 let _clearedBanner=0;
 
-function floorHasRespawn(){ return G.zone==='normal'&&G.enemyRespawn; }
+function floorHasSpawn(){ return G.zone==='normal'&&G.enemySpawn; }
 
 function revealEntireFloor(){
   for (let ty=0;ty<G.mapH;ty++)
@@ -1850,7 +1952,7 @@ function checkFloorCleared(){
   _clearedBanner=150;
   flashCanvas('gold');
   revealEntireFloor();
-  if (!floorHasRespawn()) G.fov=new Set(G.seen);
+  if (!floorHasSpawn()) G.fov=new Set(G.seen);
   updateAutonav(); updateClearedBadge();
   if (G.zone==='upper'&&G.depth===3){ forceLevelUp(); hideTutorial(); }
 }
@@ -1867,26 +1969,44 @@ function forceLevelUp(){
   addLog(`LEVEL UP! Upper floors cleared — you are now level ${G.level}!`,'level');
 }
 
-const RESPAWN_INTERVAL=30, RESPAWN_BASE=0.6;
-function tryRespawnEnemies(){
-  if (!floorHasRespawn()||G.isBonfireFloor) return;
-  if (G.turn%RESPAWN_INTERVAL!==0) return;
-  const alive=G.enemies.filter(e=>e.hp>0).length;
-  if (Math.random()>Math.pow(RESPAWN_BASE,alive+1)) return;
-  const candidates=[];
-  for (let ty=0;ty<G.mapH;ty++)
-    for (let tx=0;tx<G.mapW;tx++){
-      const key=`${tx},${ty}`;
-      if (G.tiles[ty][tx]!==1||G.fov.has(key)) continue;
-      if (G.player.x===tx&&G.player.y===ty) continue;
-      if (enemyAt(tx,ty)) continue;
-      candidates.push({x:tx,y:ty});
-    }
-  if (!candidates.length) return;
-  const pos=candidates[randInt(0,candidates.length-1)];
-  const diff=DIFF_MODS[RUN_CONFIG.difficulty];
-  G.enemies.push(makeRat(pos,{con:10,str:10,dex:5},diff.statMult,1,true));
-  markPanelDirty();
+const SPAWN_INTERVAL=30, SPAWN_BASE=0.6;
+const SIZE_SPAWN_PARAMS={
+  xs:{spawnMult:0.30, intervalMult:2.0, crowd:0.70},
+  sm:{spawnMult:0.60, intervalMult:1.4, crowd:0.78},
+  md:{spawnMult:1.00, intervalMult:1.0, crowd:0.85},
+  lg:{spawnMult:1.60, intervalMult:0.7, crowd:0.91},
+  xl:{spawnMult:2.50, intervalMult:0.5, crowd:0.96},
+};
+function trySpawnEnemies(){
+  if (!floorHasSpawn()||G.isBonfireFloor) return;
+  const diffMod = DIFF_MODS[RUN_CONFIG.difficulty] || {countMult:1.0, statMult:1.0};
+  const sizeMod = SIZE_SPAWN_PARAMS[RUN_CONFIG.floorSize] || SIZE_SPAWN_PARAMS.md;
+  const interval = Math.max(1, Math.floor(SPAWN_INTERVAL / diffMod.countMult / sizeMod.intervalMult));
+  if (G.turn % interval !== 0) return;
+  const alive = G.enemies.filter(e=>e.hp>0).length;
+  let remainingChance = SPAWN_BASE * diffMod.countMult * sizeMod.spawnMult * Math.pow(sizeMod.crowd, alive);
+  let spawned = 0;
+
+  while (remainingChance > 0) {
+    const roll = Math.random();
+    if (roll > Math.min(remainingChance, 1.0)) break;
+    const candidates=[];
+    for (let ty=0;ty<G.mapH;ty++)
+      for (let tx=0;tx<G.mapW;tx++){
+        const key=`${tx},${ty}`;
+        if (G.tiles[ty][tx]!==1||G.fov.has(key)) continue;
+        if (G.player.x===tx&&G.player.y===ty) continue;
+        if (enemyAt(tx,ty)) continue;
+        candidates.push({x:tx,y:ty});
+      }
+    if (!candidates.length) break;
+    const pos=candidates[randInt(0,candidates.length-1)];
+    G.enemies.push(makeRat(pos,{con:10,str:10,dex:5},diffMod.statMult,1,true));
+    spawned++;
+    remainingChance -= 1.0;
+  }
+
+  if (spawned > 0) markPanelDirty();
 }
 
 function bfsPath(sx,sy,tx,ty){
@@ -1917,7 +2037,7 @@ function bfsPath(sx,sy,tx,ty){
   return null;
 }
 
-let _autoWalkPath=null, _autoWalkInterval=null, _autoWalkOnArrival=null;
+let _autoWalkPath=null, _autoWalkInterval=null, _autoWalkOnArrival=null, _autoWalkForced=false, _autoWalkDir=null;
 
 function autoNavTo(dir){
   if (turnPhase!=='player') return;
@@ -1939,20 +2059,35 @@ function autoNavTo(dir){
     walkTarget=adj[0]; onArrival=useBonfire;
   }
   if (G.player.x===walkTarget.x&&G.player.y===walkTarget.y){ onArrival?.(); return; }
+
+  const enemyVisible = G.enemies.some(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`));
+
+  // If already walking to same destination, clicking again forces through enemies
+  if (_autoWalkPath&&_autoWalkDir===dir){
+    _autoWalkForced=true;
+    addLog('Force-walking — enemies ignored!','info');
+    return;
+  }
+
   const path=bfsPath(G.player.x,G.player.y,walkTarget.x,walkTarget.y);
   if (!path||!path.length){ onArrival?.(); return; }
-  _autoWalkPath=path; _autoWalkOnArrival=onArrival;
+  _autoWalkPath=path; _autoWalkOnArrival=onArrival; _autoWalkDir=dir;
+  // First click with enemy visible: start forced immediately
+  _autoWalkForced=enemyVisible;
+  if (enemyVisible) addLog('Force-walking — enemies ignored!','info');
   stepAutoWalk();
 }
+
 function stepAutoWalk(){
   if (!_autoWalkPath||!_autoWalkPath.length){
-    const fn=_autoWalkOnArrival; _autoWalkPath=null; _autoWalkOnArrival=null;
+    const fn=_autoWalkOnArrival; _autoWalkPath=null; _autoWalkOnArrival=null; _autoWalkDir=null; _autoWalkForced=false;
     if (fn) setTimeout(()=>queueOrRun(fn),45);
     return;
   }
   if (turnPhase!=='player'){ _autoWalkInterval=setTimeout(stepAutoWalk,60); return; }
-  if (G.enemies.some(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`))){
-    _autoWalkPath=null; _autoWalkOnArrival=null;
+  // Only check enemies if not forced
+  if (!_autoWalkForced && G.enemies.some(e=>e.hp>0&&G.fov.has(`${e.x},${e.y}`))){
+    _autoWalkPath=null; _autoWalkOnArrival=null; _autoWalkDir=null;
     addLog('Auto-walk interrupted — enemy spotted!','info');
     return;
   }
@@ -1961,9 +2096,10 @@ function stepAutoWalk(){
   if (_autoWalkPath.length>0) _autoWalkInterval=setTimeout(stepAutoWalk,45);
   else stepAutoWalk();
 }
+
 function cancelAutoWalk(){
   if (_autoWalkPath||_autoWalkOnArrival){
-    _autoWalkPath=null; _autoWalkOnArrival=null;
+    _autoWalkPath=null; _autoWalkOnArrival=null; _autoWalkDir=null; _autoWalkForced=false;
     if (_autoWalkInterval){ clearTimeout(_autoWalkInterval); _autoWalkInterval=null; }
   }
 }
@@ -2219,7 +2355,7 @@ function updateHUD(){
   document.getElementById('stat-def').textContent  =(G.def||0).toFixed(2);
   document.getElementById('stat-regen').textContent=(G.regen||0).toFixed(3);
   document.getElementById('kill-count').textContent=G.kills;
-  document.getElementById('stat-depth').textContent=G.zone==='upper'?`U${G.depth}`:G.depth;
+  if(G.zone==='normal'&&!G.isBonfireFloor&&G.depth>(G.lowestDepth||0)) G.lowestDepth=G.depth;
   document.getElementById('depth-label').textContent=depthLabel();
   updateClearedBadge(); updateAutonav(); updateTutorial();
 }
@@ -2354,17 +2490,20 @@ let invIcpAlloc = {CON:0,STR:0,DEX:0};
 
 function invIsOpen(){ return document.getElementById('inv-overlay').classList.contains('open'); }
 
+let _invFromMenu=false;
 function openInv(){
   tutMarkDone('inv');
   document.getElementById('inv-overlay').classList.add('open');
   invRenderAll();
   if (invTabCur==='char') invRenderCharPage();
 }
+function openInvFromMenu(){ _invFromMenu=true; openInv(); }
 function closeInv(){
   document.getElementById('inv-overlay').classList.remove('open');
+  if(_invFromMenu){ _invFromMenu=false; openGameMenu(); }
 }
 document.getElementById('inv-overlay').addEventListener('click', e=>{
-  if (e.target===document.getElementById('inv-overlay')) closeInv();
+  if(e.target===document.getElementById('inv-overlay')){ _invFromMenu=false; document.getElementById('inv-overlay').classList.remove('open'); closeGameMenu(); }
 });
 
 function invSwitchTab(t){
@@ -2624,7 +2763,7 @@ function invRenderCharPage(){
   document.getElementById('icp-xpbar').style.width=`${G.xp/G.xpNeeded*100}%`;
   document.getElementById('icp-lvl').textContent=G.level;
   document.getElementById('icp-kills').textContent=G.kills;
-  document.getElementById('icp-depth').textContent=depthLabel();
+  document.getElementById('icp-depth').textContent=G.lowestDepth?`Depth ${G.lowestDepth}`:'—';
   document.getElementById('icp-turn').textContent=G.turn;
   document.getElementById('icp-con').textContent=G.con;
   document.getElementById('icp-str').textContent=G.str;
@@ -2675,9 +2814,134 @@ function invApplyCharAlloc(){
   updateHUD(); invRenderCharPage();
 }
 
-document.addEventListener('DOMContentLoaded',initDpad);
+document.addEventListener('DOMContentLoaded',()=>{ initDpad(); refreshLoadButton(); });
+
+// ==================== GAME MENU ====================
+function openGameMenu(){ document.getElementById('game-menu-modal').classList.add('active'); }
+function closeGameMenu(){ document.getElementById('game-menu-modal').classList.remove('active'); }
+document.getElementById('game-menu-modal').addEventListener('click',function(e){
+  if(e.target===this) closeGameMenu();
+});
+
+// ==================== SAVE SYSTEM ====================
+const SAVE_KEY_PREFIX='sd_save_';
+function _allSaveKeys(){
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(SAVE_KEY_PREFIX))keys.push(k);}
+  keys.sort((a,b)=>parseInt(a.replace(SAVE_KEY_PREFIX,''))-parseInt(b.replace(SAVE_KEY_PREFIX,'')));
+  return keys;
+}
+function _nextSlotIndex(){
+  const keys=_allSaveKeys();if(!keys.length)return 0;
+  const idxs=keys.map(k=>parseInt(k.replace(SAVE_KEY_PREFIX,'')));
+  for(let i=0;i<=idxs[idxs.length-1]+1;i++)if(!idxs.includes(i))return i;
+  return idxs[idxs.length-1]+1;
+}
+function _saveSlotKey(idx){return SAVE_KEY_PREFIX+idx;}
+function _buildSnap(){
+  return{version:1,savedAt:Date.now(),runConfig:{...RUN_CONFIG},G:{
+    class:G.class,icon:G.icon,name:G.name,weaponType:G.weaponType,
+    level:G.level,xp:G.xp,xpNeeded:G.xpNeeded,hp:G.hp,maxHP:G.maxHP,
+    con:G.con,str:G.str,dex:G.dex,baseDmg:G.baseDmg,def:G.def,regen:G.regen,
+    kills:G.kills,turn:G.turn,depth:G.depth,zone:G.zone,lowestDepth:G.lowestDepth||0,
+    enemySpawn:G.enemySpawn,pendingLevelUps:G.pendingLevelUps,unspentPoints:G.unspentPoints,
+    _eid:G._eid,mapW:G.mapW,mapH:G.mapH,tiles:G.tiles,rooms:G.rooms,
+    stairsDown:G.stairsDown,stairsUp:G.stairsUp,bonfire:G.bonfire,
+    isBonfireFloor:G.isBonfireFloor,floorCleared:G.floorCleared,
+    player:{...G.player},enemies:G.enemies.map(e=>({...e})),
+    seen:[...G.seen],fov:[...G.fov],
+    inventory:JSON.parse(JSON.stringify(G.inventory)),
+    equipment:JSON.parse(JSON.stringify(G.equipment)),
+    tutDone:{...G.tutDone},tutHidden:G.tutHidden,
+    groundItems:JSON.parse(JSON.stringify(G.groundItems||[])),
+  }};
+}
+function saveGameToSlot(idx){
+  try{localStorage.setItem(_saveSlotKey(idx),JSON.stringify(_buildSnap()));addLog('Game saved.','info');refreshLoadButton();return true;}
+  catch(e){alert('Save failed.');return false;}
+}
+function saveGameNew(){return saveGameToSlot(_nextSlotIndex());}
+function loadGameFromSlot(idx){
+  try{
+    const raw=localStorage.getItem(_saveSlotKey(idx));if(!raw)return false;
+    const snap=JSON.parse(raw);if(!snap||!snap.G)return false;
+    const s=snap.G;if(snap.runConfig)Object.assign(RUN_CONFIG,snap.runConfig);
+    G={class:s.class,icon:s.icon,name:s.name,weaponType:s.weaponType,
+      level:s.level,xp:s.xp,xpNeeded:s.xpNeeded,hp:s.hp,maxHP:s.maxHP,
+      con:s.con,str:s.str,dex:s.dex,baseDmg:s.baseDmg,def:s.def,regen:s.regen,
+      kills:s.kills,turn:s.turn,depth:s.depth,zone:s.zone,lowestDepth:s.lowestDepth||0,
+      enemySpawn:s.enemySpawn,pendingLevelUps:s.pendingLevelUps||0,unspentPoints:s.unspentPoints||0,
+      _eid:s._eid||0,mapW:s.mapW,mapH:s.mapH,tiles:s.tiles,rooms:s.rooms,
+      stairsDown:s.stairsDown,stairsUp:s.stairsUp,bonfire:s.bonfire,
+      isBonfireFloor:s.isBonfireFloor||false,floorCleared:s.floorCleared||false,
+      player:{...s.player},enemies:s.enemies.map(e=>({...e})),
+      seen:new Set(s.seen),fov:new Set(s.fov),
+      inventory:JSON.parse(JSON.stringify(s.inventory||[])),
+      equipment:JSON.parse(JSON.stringify(s.equipment||{})),
+      tutDone:s.tutDone||{move:false,attack:false,wait:false,inv:false},
+      tutHidden:s.tutHidden||false,
+      groundItems:JSON.parse(JSON.stringify(s.groundItems||[])),
+    };
+    camX=0;camY=0;turnPhase='player';priorityTargetId=null;floatNums=[];playerHpFlash=0;
+    _queuedAction=null;_panelDirty=true;_clearedBanner=0;
+    _floorNotifier={text:'',life:0,maxLife:0};_autoWalkOnArrival=null;_autoWalkForced=false;_autoWalkPath=null;_autoWalkDir=null;
+    heldKeys.clear();stopMoveLoop();
+    Object.keys(floorCache).forEach(k=>delete floorCache[k]);floorCacheOrder.length=0;
+    document.getElementById('hero-portrait').textContent=G.icon;
+    document.getElementById('hero-name').textContent=G.name;
+    const tp=document.getElementById('tutorial-panel');if(tp)tp.style.display=G.tutHidden?'none':'flex';
+    updateTutorial();updateHUD();applyLogVisibility();showScreen('game-screen');
+    setTimeout(()=>{setupCanvas();snapVizToLogical();if(SETTINGS.smoothEntities)startEntityLoop();if(SETTINGS.smoothCam&&!SETTINGS.smoothEntities)smoothCamLoop();renderCanvas();},50);
+    addLog(`Welcome back, ${G.name}!`,'info');return true;
+  }catch(e){console.error(e);alert('Failed to load save.');return false;}
+}
+function deleteSaveSlot(idx){if(!confirm('Delete this save?'))return;localStorage.removeItem(_saveSlotKey(idx));refreshLoadButton();renderSaveSlots();}
+function getSaveSlotInfo(idx){try{const raw=localStorage.getItem(_saveSlotKey(idx));if(!raw)return null;const snap=JSON.parse(raw);return(snap&&snap.G)?snap:null;}catch(e){return null;}}
+function hasAnySave(){return _allSaveKeys().length>0;}
+function refreshLoadButton(){const btn=document.getElementById('load-game-btn');if(btn)btn.style.display=hasAnySave()?'inline-block':'none';}
+
+let _savesMode='load',_inGameSaves=false;
+function openSavesModal(mode){
+  _savesMode=mode;_inGameSaves=(mode==='saveload');_exportMode=false;cancelImport();
+  const t=document.getElementById('saves-modal-title');if(t)t.textContent=_inGameSaves?'SAVE / LOAD':'LOAD GAME';
+  renderSaveSlots();document.getElementById('saves-modal').classList.add('active');
+}
+function closeSavesModal(){
+  _exportMode=false;cancelImport();document.getElementById('saves-modal').classList.remove('active');
+  if(_inGameSaves){_inGameSaves=false;openGameMenu();}
+}
+document.getElementById('saves-modal').addEventListener('click',function(e){
+  if(e.target===this){_inGameSaves=false;document.getElementById('saves-modal').classList.remove('active');closeGameMenu();}
+});
+function renderSaveSlots(){
+  const list=document.getElementById('save-slots-list');if(!list)return;list.innerHTML='';
+  const keys=_allSaveKeys();
+  if(!keys.length&&!_inGameSaves){const el=document.createElement('div');el.style.cssText='text-align:center;padding:18px;font-size:17px;color:var(--dim);';el.textContent='No saves found.';list.appendChild(el);return;}
+  keys.forEach(key=>{
+    const idx=parseInt(key.replace(SAVE_KEY_PREFIX,''));
+    const info=getSaveSlotInfo(idx);const slot=document.createElement('div');
+    if(info){
+      const s=info.G;const dt=new Date(info.savedAt);
+      const dateStr=dt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
+      slot.className='save-slot';
+      slot.innerHTML=`<div class="save-slot-info"><div class="save-slot-name">${s.icon} ${s.name.toUpperCase()}</div><div class="save-slot-meta">Lvl ${s.level} · ${depth} · ${s.kills} kills · Turn ${s.turn}</div><div class="save-slot-date">${dateStr}</div></div><div class="save-slot-acts">${_exportMode?`<button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doExportSlot(${idx})">COPY CODE</button>`:_inGameSaves?`<button class="save-act" onclick="confirmSaveToSlot(${idx})">OVERWRITE</button><button class="save-act" style="border-color:#7050a0;color:#a070c0;" onclick="confirmLoadSlotInGame(${idx})">LOAD</button>`:`<button class="save-act" onclick="confirmLoadSlot(${idx})">LOAD</button>`}${_exportMode?'':`<button class="save-act del" onclick="deleteSaveSlot(${idx})">DEL</button>`}</div>`;
+    }else{slot.className='save-slot empty';slot.innerHTML=`<div class="save-slot-info"><div class="save-slot-name" style="color:var(--dim);">— EMPTY —</div></div>`;}
+    list.appendChild(slot);
+  });
+  if(_inGameSaves&&!_exportMode){const ns=document.createElement('div');ns.className='save-slot';ns.style.cssText='border-style:dashed;opacity:.7;cursor:pointer;justify-content:center;';ns.innerHTML=`<span style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);">+ NEW SLOT</span>`;ns.onclick=()=>{if(saveGameNew())closeSavesModal();};list.appendChild(ns);}
+}
+function confirmSaveToSlot(idx){if(!confirm('Overwrite this save?'))return;if(saveGameToSlot(idx))closeSavesModal();}
+function confirmLoadSlot(idx){if(loadGameFromSlot(idx))closeSavesModal();}
+function confirmLoadSlotInGame(idx){if(!confirm('Load this save? Your current run will be lost.'))return;if(loadGameFromSlot(idx))closeSavesModal();}
+let _exportMode=false;
+function toggleExportMode(){if(!hasAnySave())return;_exportMode=!_exportMode;cancelImport();document.getElementById('export-btn')?.classList.toggle('active',_exportMode);renderSaveSlots();}
+function doExportSlot(idx){const raw=localStorage.getItem(_saveSlotKey(idx));if(!raw){alert('Save not found.');return;}const code=btoa(unescape(encodeURIComponent(raw)));if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(()=>_showExportFeedback('COPIED!')).catch(()=>_exportFallback(code));}else{_exportFallback(code);}_exportMode=false;document.getElementById('export-btn')?.classList.remove('active');renderSaveSlots();}
+function _exportFallback(code){const area=document.getElementById('import-paste-area'),ta=document.getElementById('import-textarea');if(area&&ta){ta.value=code;area.style.display='block';ta.select();}}
+function _showExportFeedback(msg){const btn=document.getElementById('export-btn');if(!btn)return;const prev=btn.textContent;btn.textContent=msg;btn.style.color='var(--green)';btn.style.borderColor='var(--green)';setTimeout(()=>{btn.textContent=prev;btn.style.color='';btn.style.borderColor='';},1800);}
+function toggleImportArea(){const area=document.getElementById('import-paste-area');if(!area)return;_exportMode=false;document.getElementById('export-btn')?.classList.remove('active');const showing=area.style.display==='block';area.style.display=showing?'none':'block';document.getElementById('import-btn')?.classList.toggle('active',!showing);if(!showing){const ta=document.getElementById('import-textarea');if(ta){ta.value='';ta.focus();}}}
+function cancelImport(){const area=document.getElementById('import-paste-area');if(area)area.style.display='none';document.getElementById('import-btn')?.classList.remove('active');document.getElementById('export-btn')?.classList.remove('active');}
+function doImport(){const ta=document.getElementById('import-textarea');if(!ta)return;const code=ta.value.trim();if(!code){alert('Nothing to import.');return;}try{const raw=decodeURIComponent(escape(atob(code)));const snap=JSON.parse(raw);if(!snap||!snap.G)throw new Error('bad');localStorage.setItem(_saveSlotKey(_nextSlotIndex()),raw);refreshLoadButton();cancelImport();ta.value='';renderSaveSlots();_showExportFeedback('IMPORTED!');}catch(e){alert('Invalid save code.');}}
 </script>
 </body>
 </html>
-
-
