@@ -18,11 +18,18 @@
   :root{--bg:#0a0a0f;--bg2:#12121a;--panel:#1a1a26;--border:#2a2a40;--gold:#c8a84b;--gold2:#f0d070;--red:#c84040;--green:#40c870;--blue:#4080c8;--purple:#9060c8;--text:#d0c8b0;--dim:#706858;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'VT323',monospace;font-size:18px;min-height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-  /* Scale entire UI down on mobile to match desktop proportions */
+  /* Scale entire UI on mobile using transform so content fills the screen with no gaps.
+     scale() shrinks visually; we compensate width/height so the layout still fills the physical screen. */
   @media (max-width:1024px) and (pointer:coarse){
-    html{zoom:0.6;}
-    /* dpad needs to render at full physical size, so counter-scale it */
-    #dpad{zoom:calc(1/0.6);}
+    body{
+      transform: scale(0.6);
+      transform-origin: top left;
+      width: calc(100vw / 0.6);
+      height: calc(100vh / 0.6);
+      min-height: calc(100vh / 0.6);
+    }
+    /* dpad counter-scaled so touch targets stay large */
+    #dpad{ transform: scale(calc(1/0.6)); transform-origin: bottom right; }
   }
   .screen{display:none;width:100vw;height:100vh;align-items:center;justify-content:center;}
   .screen.active{display:flex;}
