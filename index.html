@@ -16,11 +16,101 @@
   .screen.active{display:flex;}
 
   /* TITLE */
-  #title-screen{flex-direction:column;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);gap:43px;}
-  .title-art h1{font-family:'Press Start 2P',monospace;font-size:clamp(22px,4.2vw,41px);color:var(--gold);text-shadow:0 0 20px #c8a84b88,0 0 40px #c8a84b44;letter-spacing:2px;text-align:center;margin-bottom:10px;}
-  .title-art .subtitle{font-size:31px;color:var(--dim);letter-spacing:6px;text-align:center;}
-  .title-dungeon-art{font-family:'VT323',monospace;font-size:22px;color:#4a4a6a;line-height:1.2;text-align:center;white-space:pre;margin:10px 0;}
-  .title-btns{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;}
+  #title-screen{flex-direction:row;align-items:stretch;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
+  .title-left{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 56px;gap:0;min-width:320px;border-right:1px solid var(--border);}
+  .title-left h1{font-family:'Press Start 2P',monospace;font-size:clamp(13px,1.6vw,22px);color:var(--gold);text-shadow:0 0 20px #c8a84b88,0 0 40px #c8a84b44;letter-spacing:2px;margin-bottom:32px;}
+  .title-menu{display:flex;flex-direction:column;gap:4px;width:100%;}
+  .title-menu-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:14px 20px;background:transparent;border:1px solid transparent;color:var(--text);cursor:pointer;text-align:left;letter-spacing:1px;transition:all .12s;}
+  .title-menu-btn:hover{color:var(--gold);border-color:var(--border);background:rgba(200,168,75,.06);}
+  .title-menu-btn.danger{color:#804040;}
+  .title-menu-btn.danger:hover{color:var(--red);border-color:#402020;}
+  .title-separator{height:1px;background:var(--border);margin:14px 0;}
+  .title-credit{font-size:13px;color:#3a3850;margin-top:auto;padding-top:28px;}
+  .title-right{flex:1;display:flex;align-items:center;justify-content:center;}
+  .title-dungeon-art{font-family:'VT323',monospace;font-size:22px;color:#3a3858;line-height:1.2;text-align:center;white-space:pre;opacity:.7;}
+
+  /* COMING SOON TOAST */
+  #coming-soon-toast{position:fixed;pointer-events:none;z-index:9999;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold2);text-shadow:0 0 12px #c8a84b88;white-space:nowrap;opacity:0;}
+  @keyframes csRise{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-54px);}}
+
+  /* PLAY SCREEN */
+  #play-screen{flex-direction:column;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);padding:0;}
+  .play-screen-inner{display:flex;flex-direction:column;width:100%;height:100vh;overflow:hidden;}
+  .play-header{padding:22px 36px 0;flex-shrink:0;}
+  .play-header h2{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--gold);letter-spacing:2px;margin-bottom:18px;}
+  .play-body{display:flex;flex:1;overflow:hidden;border-top:1px solid var(--border);}
+  .play-slots-col{flex:1;padding:18px;overflow-y:auto;border-right:1px solid var(--border);display:flex;flex-wrap:wrap;align-content:flex-start;gap:12px;}
+  .play-slots-col::-webkit-scrollbar{width:3px;}
+  .play-slots-col::-webkit-scrollbar-thumb{background:var(--border);}
+  .play-detail-col{width:260px;flex-shrink:0;padding:22px 20px;display:flex;flex-direction:column;}
+  .play-slot-card{width:100px;height:100px;border:2px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .15s;position:relative;}
+  .play-slot-card:hover,.play-slot-card.selected{border-color:var(--gold);box-shadow:0 0 14px #c8a84b33;}
+  .play-slot-card .slot-icon{font-size:26px;}
+  .play-slot-card .slot-name{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--gold);text-align:center;padding:0 4px;}
+  .play-slot-card .slot-meta{font-size:12px;color:var(--dim);text-align:center;padding:0 4px;}
+  .play-slot-add{border-style:dashed;border-color:#2a2a40;color:#404060;}
+  .play-slot-add:hover{border-color:var(--gold);color:var(--gold);}
+  .play-slot-add .plus{font-size:28px;line-height:1;color:inherit;}
+  .play-detail-name{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--gold);margin-bottom:10px;}
+  .play-detail-meta{font-size:15px;color:var(--dim);line-height:1.9;margin-bottom:auto;}
+  .play-detail-actions{display:flex;flex-direction:column;gap:7px;margin-top:18px;}
+  .play-det-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:9px 12px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;transition:all .12s;text-align:left;}
+  .play-det-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .play-det-btn.primary{border-color:var(--gold);color:var(--gold);}
+  .play-det-btn.primary:hover{background:rgba(200,168,75,.12);}
+  .play-det-btn.danger{border-color:#402020;color:#804040;}
+  .play-det-btn.danger:hover{border-color:var(--red);color:var(--red);}
+  .play-det-btn.blue{border-color:#2a3a5a;color:#6090c0;}
+  .play-det-btn.blue:hover{border-color:var(--blue);color:#80c0f0;}
+  .play-footer{padding:14px 36px;border-top:1px solid var(--border);flex-shrink:0;}
+  /* new-slot action panel (start / import) */
+  .play-new-panel{display:flex;flex-direction:column;gap:8px;}
+  .play-new-title{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);margin-bottom:8px;letter-spacing:1px;}
+  #play-import-area{display:none;margin-top:8px;}
+  #play-import-area textarea{width:100%;height:60px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'VT323',monospace;font-size:16px;padding:6px 8px;resize:none;outline:none;box-sizing:border-box;}
+  #play-import-area textarea:focus{border-color:var(--blue);}
+
+  /* MAIN MENU SETTINGS */
+  #menu-settings-screen{flex-direction:column;gap:28px;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
+  .menu-sett-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+  .menu-sett-card{width:220px;border:1px solid var(--border);background:var(--panel);padding:28px 20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:12px;transition:all .2s;}
+  .menu-sett-card:hover{border-color:var(--gold);box-shadow:0 0 16px #c8a84b22;}
+  .menu-sett-card-icon{font-size:36px;}
+  .menu-sett-card-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);text-align:center;}
+  .menu-sett-card-desc{font-size:14px;color:var(--dim);text-align:center;line-height:1.4;}
+
+  /* PROGRESS SCREEN */
+  #progress-screen{flex-direction:column;gap:28px;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
+  .progress-container{background:var(--panel);border:2px solid var(--border);padding:28px;width:min(500px,92vw);display:flex;flex-direction:column;gap:14px;}
+  .progress-row{display:flex;flex-direction:column;gap:5px;padding:14px 0;border-bottom:1px solid var(--border);}
+  .progress-row:last-child{border-bottom:none;}
+  .progress-row-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--text);}
+  .progress-row-desc{font-size:14px;color:var(--dim);}
+  .progress-row-btns{display:flex;gap:8px;margin-top:6px;}
+
+  /* CLASS SELECT — slightly smaller */
+  #class-screen{flex-direction:column;gap:22px;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
+  .class-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
+  .class-card{width:230px;border:2px solid var(--border);background:var(--panel);padding:18px;cursor:pointer;transition:all .2s;position:relative;}
+  .class-card:hover,.class-card.selected{border-color:var(--gold);box-shadow:0 0 16px #c8a84b33;}
+  .class-icon{font-size:46px;text-align:center;margin-bottom:10px;display:block;}
+  .class-name{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--gold);text-align:center;margin-bottom:7px;}
+  .class-desc{font-size:17px;color:var(--dim);text-align:center;line-height:1.3;}
+  .class-stats{margin-top:10px;font-size:16px;}
+  .stat-row{display:flex;justify-content:space-between;color:var(--text);padding:2px 0;}
+  .stat-row span:last-child{color:var(--gold);}
+  .weapon-note{font-size:14px;color:var(--gold2);font-style:italic;margin-top:8px;padding-top:6px;border-top:1px dashed var(--border);text-align:center;}
+
+  /* LEVEL UP — wider, taller, single-line descriptions */
+  #levelup-modal .modal-box{width:min(580px,95vw);padding:32px 36px;}
+  #lu-alloc-rows .alloc-row{padding:10px 0;}
+  #lu-alloc-rows .alloc-effect{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #lu-alloc-rows .alloc-name{font-size:9px;}
+  .lu-spacer{height:32px;border-bottom:1px solid var(--border);}
+
+  /* HUD badges — larger */
+  #floor-cleared-badge{font-family:'Press Start 2P',monospace;font-size:8px !important;color:#40c870;border:1px solid #40c870;padding:5px 13px !important;opacity:.9;}
+  #enemy-counter{font-family:'Press Start 2P',monospace;font-size:8px !important;color:#c84040;border:1px solid #c84040;padding:5px 13px !important;opacity:.9;}
 
   /* BUTTONS */
   .btn{font-family:'Press Start 2P',monospace;font-size:17px;padding:17px 34px;border:2px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;letter-spacing:1px;transition:all .15s;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);}
@@ -344,9 +434,18 @@
 
 <!-- TITLE -->
 <div class="screen active" id="title-screen">
-  <div class="title-art">
+  <div class="title-left">
     <h1>SHATTERED DEPTHS</h1>
-    <div class="subtitle">▓ ROGUELITE ▓</div>
+    <div class="title-menu">
+      <button class="title-menu-btn" onclick="showScreen('play-screen');renderPlaySlots()">PLAY</button>
+      <button class="title-menu-btn" onclick="showComingSoon(event)">UPGRADES</button>
+      <button class="title-menu-btn" onclick="showScreen('menu-settings-screen')">SETTINGS</button>
+      <div class="title-separator"></div>
+      <button class="title-menu-btn danger" onclick="if(confirm('Quit?'))window.close()">QUIT</button>
+    </div>
+    <div class="title-credit">Made by Zeroichi</div>
+  </div>
+  <div class="title-right">
     <pre class="title-dungeon-art">
  ╔═══════════════════════╗
  ║ ░░░░░█░░░░░░░░░░░░░░░ ║
@@ -357,15 +456,73 @@
  ║ ░░░░░░░░░░░░░░░>░░░░░ ║
  ╚═══════════════════════╝</pre>
   </div>
-  <div class="title-btns">
-    <button class="btn" onclick="showScreen('config-screen')">NEW GAME</button>
-    <button class="btn" id="load-game-btn" onclick="openSavesModal('load')" style="display:none;">LOAD GAME</button>
-    <button class="btn secondary" onclick="openSettings()">SETTINGS</button>
+</div>
+<div id="coming-soon-toast">COMING SOON</div>
+
+<!-- PLAY SCREEN -->
+<div class="screen" id="play-screen">
+  <div class="play-screen-inner">
+    <div class="play-header">
+      <h2>SELECT RUN</h2>
+    </div>
+    <div class="play-body">
+      <div class="play-slots-col" id="play-slots-col"></div>
+      <div class="play-detail-col" id="play-detail-col">
+        <!-- filled by JS -->
+      </div>
+    </div>
+    <div class="play-footer">
+      <button class="btn sm secondary" onclick="showScreen('title-screen')">◀ BACK</button>
+    </div>
   </div>
-  <div style="font-size:13px;color:var(--dim);text-align:center;letter-spacing:1px;">Made by Zeroichi</div>
 </div>
 
-<!-- CLASS SELECT -->
+<!-- MENU SETTINGS SCREEN -->
+<div class="screen" id="menu-settings-screen" onclick="showScreen('title-screen')">
+  <div class="screen-title" style="margin-bottom:0;" onclick="event.stopPropagation()">SETTINGS</div>
+  <div class="menu-sett-cards" onclick="event.stopPropagation()">
+    <div class="menu-sett-card" onclick="openSettingsFromTitle()">
+      <div class="menu-sett-card-icon">⚙️</div>
+      <div class="menu-sett-card-label">IN-GAME</div>
+      <div class="menu-sett-card-desc">Camera zoom, smooth movement, display options.</div>
+    </div>
+    <div class="menu-sett-card" onclick="showScreen('progress-screen')">
+      <div class="menu-sett-card-icon">💾</div>
+      <div class="menu-sett-card-label">PROGRESS</div>
+      <div class="menu-sett-card-desc">Import or export all save data.</div>
+    </div>
+  </div>
+  <button class="btn sm secondary" onclick="showScreen('title-screen')">◀ BACK</button>
+</div>
+
+<!-- PROGRESS SCREEN -->
+<div class="screen" id="progress-screen" onclick="showScreen('menu-settings-screen')">
+  <div class="screen-title" style="margin-bottom:0;" onclick="event.stopPropagation()">PROGRESS</div>
+  <div class="progress-container" onclick="event.stopPropagation()">
+    <div class="progress-row">
+      <div class="progress-row-label">EXPORT ALL DATA</div>
+      <div class="progress-row-desc">Copy a code containing all your save slots. Keep it safe to restore later.</div>
+      <div class="progress-row-btns">
+        <button class="save-io-btn" onclick="doExportAllProgress()">COPY CODE</button>
+      </div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-row-label">IMPORT ALL DATA</div>
+      <div class="progress-row-desc">Paste a previously exported code to restore all saves. This will overwrite existing slots.</div>
+      <div class="progress-row-btns">
+        <button class="save-io-btn" id="progress-import-toggle" onclick="toggleProgressImport()">PASTE CODE</button>
+      </div>
+      <div id="progress-import-area" style="display:none;margin-top:10px;">
+        <textarea id="progress-import-ta" style="width:100%;height:64px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'VT323',monospace;font-size:16px;padding:6px 8px;resize:none;outline:none;box-sizing:border-box;" placeholder="Paste progress code here..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:6px;justify-content:flex-end;">
+          <button class="save-act" onclick="toggleProgressImport()">CANCEL</button>
+          <button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doImportAllProgress()">IMPORT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn sm secondary" onclick="event.stopPropagation();showScreen('menu-settings-screen')">◀ BACK</button>
+</div>
 <div class="screen" id="class-screen">
   <div class="screen-title">CHOOSE A CLASS</div>
   <div class="class-cards">
@@ -630,21 +787,17 @@
 
 <!-- SAVES MODAL -->
 <div class="modal-overlay" id="saves-modal">
-  <div class="modal-box">
-    <div class="modal-title" style="color:#80c0f0;text-shadow:none;" id="saves-modal-title">SAVE / LOAD</div>
-    <div class="save-slots" id="save-slots-list"></div>
-    <div class="save-io">
-      <button class="save-io-btn" id="export-btn" onclick="toggleExportMode()">EXPORT</button>
-      <button class="save-io-btn" id="import-btn" onclick="toggleImportArea()">IMPORT</button>
-    </div>
-    <div id="import-paste-area">
-      <textarea id="import-textarea" placeholder="Paste save code here..."></textarea>
-      <div class="import-btns">
-        <button class="save-act" onclick="cancelImport()">CANCEL</button>
-        <button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doImport()">IMPORT</button>
+  <div class="modal-box" style="width:min(720px,96vw);padding:0;overflow:hidden;">
+    <div style="display:flex;height:min(480px,80vh);">
+      <!-- slot grid -->
+      <div style="flex:1;padding:16px;overflow-y:auto;display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;border-right:1px solid var(--border);">
+        <div class="modal-title" style="color:#80c0f0;text-shadow:none;width:100%;margin-bottom:4px;font-size:9px;" id="saves-modal-title">SAVE / LOAD</div>
+        <div id="save-slots-list" style="display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;width:100%;"></div>
       </div>
+      <!-- detail panel -->
+      <div id="saves-detail-panel" style="width:220px;flex-shrink:0;padding:18px 16px;display:flex;flex-direction:column;"></div>
     </div>
-    <div style="text-align:center;margin-top:14px;">
+    <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:right;">
       <button class="btn sm secondary" onclick="closeSavesModal()">BACK</button>
     </div>
   </div>
@@ -660,6 +813,7 @@
       <span id="lu-points" style="color:var(--gold2);font-family:'Press Start 2P',monospace;">3</span> stat points to spend.
     </div>
     <div id="lu-alloc-rows"></div>
+    <div class="lu-spacer"></div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;">
       <button class="btn sm" onclick="confirmLevelUp()">CONFIRM ▶</button>
     </div>
@@ -754,12 +908,19 @@ function openSettings(){
   document.getElementById('settings-modal').classList.add('active');
 }
 function openSettingsFromMenu(){ _settingsFromMenu=true; openSettings(); }
+// _settingsFromTitle: opened via main-menu → settings card (not in-game)
+let _settingsFromTitle=false;
+function openSettingsFromTitle(){ _settingsFromTitle=true; openSettings(); }
 function closeSettings(){
   document.getElementById('settings-modal').classList.remove('active');
   if(_settingsFromMenu){ _settingsFromMenu=false; openGameMenu(); }
+  else if(_settingsFromTitle){ _settingsFromTitle=false; showScreen('menu-settings-screen'); }
 }
 document.getElementById('settings-modal').addEventListener('click', function(e){
-  if (e.target === this){ _settingsFromMenu=false; document.getElementById('settings-modal').classList.remove('active'); closeGameMenu(); }
+  if(e.target!==this)return;
+  document.getElementById('settings-modal').classList.remove('active');
+  if(_settingsFromMenu){ _settingsFromMenu=false; closeGameMenu(); }
+  else if(_settingsFromTitle){ _settingsFromTitle=false; showScreen('menu-settings-screen'); }
 });
 
 // ==================== SCREENS ====================
@@ -3079,6 +3240,175 @@ function getSaveSlotInfo(idx){try{const raw=localStorage.getItem(_saveSlotKey(id
 function hasAnySave(){return _allSaveKeys().length>0;}
 function refreshLoadButton(){const btn=document.getElementById('load-game-btn');if(btn)btn.style.display=hasAnySave()?'inline-block':'none';}
 
+// ==================== COMING SOON TOAST ====================
+function showComingSoon(e){
+  const toast=document.getElementById('coming-soon-toast');
+  if(!toast)return;
+  // Position near the button clicked
+  const r=e.currentTarget.getBoundingClientRect();
+  toast.style.left=(r.left+r.width/2)+'px';
+  toast.style.top=(r.top-10)+'px';
+  toast.style.transform='translateX(-50%)';
+  // Kill any running animation so spam-click restarts it cleanly
+  toast.style.animation='none';
+  toast.offsetHeight; // reflow
+  toast.style.animation='csRise 0.9s ease-out forwards';
+}
+
+// ==================== PLAY SCREEN ====================
+let _selectedSlotIdx=null; // null = add-new slot selected
+
+function renderPlaySlots(){
+  const col=document.getElementById('play-slots-col');
+  if(!col)return;
+  col.innerHTML='';
+  _selectedSlotIdx=null;
+
+  // Existing save slots
+  const keys=_allSaveKeys();
+  keys.forEach(key=>{
+    const idx=parseInt(key.replace(SAVE_KEY_PREFIX,''));
+    const info=getSaveSlotInfo(idx);
+    if(!info)return;
+    const s=info.G||info;
+    const card=document.createElement('div');
+    card.className='play-slot-card';
+    card.dataset.idx=idx;
+    const icon=s.icon||'⚔️';
+    const name=(s.name||'UNKNOWN').toUpperCase();
+    const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
+    card.innerHTML=`<div class="slot-icon">${icon}</div><div class="slot-name">${name}</div><div class="slot-meta">Lvl ${s.level||1} · ${depth}</div>`;
+    card.onclick=()=>selectPlaySlot(idx,card);
+    col.appendChild(card);
+  });
+
+  // Add-new card
+  const addCard=document.createElement('div');
+  addCard.className='play-slot-card play-slot-add';
+  addCard.id='play-add-card';
+  addCard.innerHTML=`<div class="plus">+</div>`;
+  addCard.onclick=()=>selectPlaySlotNew(addCard);
+  col.appendChild(addCard);
+
+  // Clear detail panel
+  _renderPlayDetail(null);
+}
+
+function selectPlaySlot(idx,cardEl){
+  _selectedSlotIdx=idx;
+  document.querySelectorAll('.play-slot-card').forEach(c=>c.classList.remove('selected'));
+  cardEl.classList.add('selected');
+  const info=getSaveSlotInfo(idx);
+  if(!info)return;
+  const s=info.G||info;
+  const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
+  const date=info.savedAt?new Date(info.savedAt).toLocaleDateString():'—';
+  _renderPlayDetail({
+    title:(s.icon||'⚔️')+' '+(s.name||'?').toUpperCase(),
+    lines:[`Class: ${(s.class||'?').toUpperCase()}`,`Level: ${s.level||1}`,`Depth: ${depth}`,`Kills: ${s.kills||0}`,`Turn: ${s.turn||1}`,`Saved: ${date}`],
+    actions:[
+      {label:'▶ CONTINUE', cls:'primary', fn:`confirmLoadSlotPlay(${idx})`},
+      {label:'EXPORT SAVE', cls:'blue', fn:`doExportSlot(${idx})`},
+      {label:'DELETE', cls:'danger', fn:`deleteSaveSlotPlay(${idx})`},
+    ]
+  });
+}
+
+function selectPlaySlotNew(cardEl){
+  _selectedSlotIdx=null;
+  document.querySelectorAll('.play-slot-card').forEach(c=>c.classList.remove('selected'));
+  cardEl.classList.add('selected');
+  _renderPlayDetail('new');
+}
+
+function _renderPlayDetail(data){
+  const col=document.getElementById('play-detail-col');
+  if(!col)return;
+  if(!data){col.innerHTML='';return;}
+  if(data==='new'){
+    col.innerHTML=`<div class="play-new-panel">
+      <div class="play-new-title">NEW RUN</div>
+      <button class="play-det-btn primary" onclick="showScreen('config-screen')">▶ START NEW RUN</button>
+      <button class="play-det-btn blue" onclick="togglePlayImport()">IMPORT SAVE</button>
+      <div id="play-import-area">
+        <textarea id="play-import-ta" placeholder="Paste save code here..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:6px;justify-content:flex-end;">
+          <button class="save-act" onclick="togglePlayImport()">CANCEL</button>
+          <button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doPlayImport()">IMPORT</button>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+  const lines=data.lines.map(l=>`<div>${l}</div>`).join('');
+  const btns=data.actions.map(a=>`<button class="play-det-btn ${a.cls}" onclick="${a.fn}">${a.label}</button>`).join('');
+  col.innerHTML=`<div class="play-detail-name">${data.title}</div><div class="play-detail-meta">${lines}</div><div class="play-detail-actions">${btns}</div>`;
+}
+
+function confirmLoadSlotPlay(idx){
+  if(loadGameFromSlot(idx)) showScreen('game-screen');
+}
+function deleteSaveSlotPlay(idx){
+  if(!confirm('Delete this save?'))return;
+  localStorage.removeItem(_saveSlotKey(idx));
+  renderPlaySlots();
+}
+function togglePlayImport(){
+  const area=document.getElementById('play-import-area');
+  if(!area)return;
+  const showing=area.style.display==='block';
+  area.style.display=showing?'none':'block';
+  if(!showing){const ta=document.getElementById('play-import-ta');if(ta){ta.value='';ta.focus();}}
+}
+function doPlayImport(){
+  const ta=document.getElementById('play-import-ta');
+  if(!ta)return;
+  const code=ta.value.trim();
+  if(!code){alert('Nothing to import.');return;}
+  try{
+    const raw=decodeURIComponent(escape(atob(code)));
+    const snap=JSON.parse(raw);
+    if(!snap||!snap.G)throw new Error('bad');
+    localStorage.setItem(_saveSlotKey(_nextSlotIndex()),raw);
+    renderPlaySlots();
+    _showExportFeedback('IMPORTED!');
+  }catch(e){alert('Invalid save code.');}
+}
+
+// ==================== PROGRESS EXPORT/IMPORT ====================
+function doExportAllProgress(){
+  const keys=_allSaveKeys();
+  if(!keys.length){alert('No saves to export.');return;}
+  const all={};
+  keys.forEach(k=>{const v=localStorage.getItem(k);if(v)all[k]=v;});
+  const code=btoa(unescape(encodeURIComponent(JSON.stringify(all))));
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(()=>_showExportFeedback('ALL COPIED!')).catch(()=>{prompt('Copy this code:',code);});
+  }else{prompt('Copy this code:',code);}
+}
+function toggleProgressImport(){
+  const area=document.getElementById('progress-import-area');
+  if(!area)return;
+  const showing=area.style.display==='block';
+  area.style.display=showing?'none':'block';
+  if(!showing){const ta=document.getElementById('progress-import-ta');if(ta){ta.value='';ta.focus();}}
+}
+function doImportAllProgress(){
+  const ta=document.getElementById('progress-import-ta');
+  if(!ta)return;
+  const code=ta.value.trim();
+  if(!code){alert('Nothing to import.');return;}
+  try{
+    const raw=decodeURIComponent(escape(atob(code)));
+    const all=JSON.parse(raw);
+    if(typeof all!=='object')throw new Error('bad');
+    if(!confirm('This will overwrite all existing saves. Continue?'))return;
+    Object.entries(all).forEach(([k,v])=>localStorage.setItem(k,v));
+    toggleProgressImport();
+    _showExportFeedback('ALL IMPORTED!');
+  }catch(e){alert('Invalid progress code.');}
+}
+
 let _savesMode='load',_inGameSaves=false;
 function openSavesModal(mode){
   _savesMode=mode;_inGameSaves=(mode==='saveload');_exportMode=false;cancelImport();
@@ -3094,21 +3424,69 @@ document.getElementById('saves-modal').addEventListener('click',function(e){
 });
 function renderSaveSlots(){
   const list=document.getElementById('save-slots-list');if(!list)return;list.innerHTML='';
+  _renderSavesDetail(null); // clear detail panel
   const keys=_allSaveKeys();
-  if(!keys.length&&!_inGameSaves){const el=document.createElement('div');el.style.cssText='text-align:center;padding:18px;font-size:17px;color:var(--dim);';el.textContent='No saves found.';list.appendChild(el);return;}
+
   keys.forEach(key=>{
     const idx=parseInt(key.replace(SAVE_KEY_PREFIX,''));
-    const info=getSaveSlotInfo(idx);const slot=document.createElement('div');
-    if(info){
-      const s=info.G;const dt=new Date(info.savedAt);
-      const dateStr=dt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-      const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
-      slot.className='save-slot';
-      slot.innerHTML=`<div class="save-slot-info"><div class="save-slot-name">${s.icon} ${s.name.toUpperCase()}</div><div class="save-slot-meta">Lvl ${s.level} · ${depth} · ${s.kills} kills · Turn ${s.turn}</div><div class="save-slot-date">${dateStr}</div></div><div class="save-slot-acts">${_exportMode?`<button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doExportSlot(${idx})">COPY CODE</button>`:_inGameSaves?`<button class="save-act" onclick="confirmSaveToSlot(${idx})">OVERWRITE</button><button class="save-act" style="border-color:#7050a0;color:#a070c0;" onclick="confirmLoadSlotInGame(${idx})">LOAD</button>`:`<button class="save-act" onclick="confirmLoadSlot(${idx})">LOAD</button>`}${_exportMode?'':`<button class="save-act del" onclick="deleteSaveSlot(${idx})">DEL</button>`}</div>`;
-    }else{slot.className='save-slot empty';slot.innerHTML=`<div class="save-slot-info"><div class="save-slot-name" style="color:var(--dim);">— EMPTY —</div></div>`;}
-    list.appendChild(slot);
+    const info=getSaveSlotInfo(idx);
+    if(!info)return;
+    const s=info.G;
+    const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
+    const card=document.createElement('div');
+    card.className='play-slot-card';
+    card.dataset.idx=idx;
+    card.innerHTML=`<div class="slot-icon">${s.icon||'⚔️'}</div><div class="slot-name">${(s.name||'?').toUpperCase()}</div><div class="slot-meta">Lvl ${s.level||1} · ${depth}</div>`;
+    card.onclick=()=>{
+      document.querySelectorAll('#save-slots-list .play-slot-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      _renderSavesDetail(idx,info);
+    };
+    list.appendChild(card);
   });
-  if(_inGameSaves&&!_exportMode){const ns=document.createElement('div');ns.className='save-slot';ns.style.cssText='border-style:dashed;opacity:.7;cursor:pointer;justify-content:center;';ns.innerHTML=`<span style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);">+ NEW SLOT</span>`;ns.onclick=()=>{if(saveGameNew())closeSavesModal();};list.appendChild(ns);}
+
+  // New slot card (in-game only: save current run to a new slot)
+  if(_inGameSaves){
+    const addCard=document.createElement('div');
+    addCard.className='play-slot-card play-slot-add';
+    addCard.innerHTML=`<div class="plus">+</div><div class="slot-name">NEW SLOT</div>`;
+    addCard.onclick=()=>{if(saveGameNew())closeSavesModal();};
+    list.appendChild(addCard);
+  }
+}
+
+function _renderSavesDetail(idx, info){
+  const panel=document.getElementById('saves-detail-panel');
+  if(!panel)return;
+  if(idx===null||!info){panel.innerHTML='';return;}
+  const s=info.G;
+  const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
+  const dt=new Date(info.savedAt);
+  const dateStr=dt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+  const overwriteBtn=_inGameSaves?`<button class="play-det-btn primary" onclick="confirmSaveToSlot(${idx})">OVERWRITE</button>`:'';
+  const loadLabel=_inGameSaves?'LOAD (LOSE RUN)':'▶ LOAD';
+  const loadFn=_inGameSaves?`confirmLoadSlotInGame(${idx})`:`confirmLoadSlot(${idx})`;
+  panel.innerHTML=`
+    <div class="play-detail-name">${s.icon||'⚔️'} ${(s.name||'?').toUpperCase()}</div>
+    <div class="play-detail-meta" style="font-size:13px;">
+      <div>Class: ${(s.class||'?').toUpperCase()}</div>
+      <div>Level: ${s.level||1}</div>
+      <div>Depth: ${depth}</div>
+      <div>Kills: ${s.kills||0}</div>
+      <div>Turn: ${s.turn||1}</div>
+      <div style="margin-top:6px;font-size:11px;color:#504848;">${dateStr}</div>
+    </div>
+    <div class="play-detail-actions">
+      <button class="play-det-btn primary" onclick="${loadFn}">${loadLabel}</button>
+      ${overwriteBtn}
+      <button class="play-det-btn danger" onclick="deleteSaveSlotModal(${idx})">DELETE</button>
+    </div>`;
+}
+function deleteSaveSlotModal(idx){
+  if(!confirm('Delete this save?'))return;
+  localStorage.removeItem(_saveSlotKey(idx));
+  refreshLoadButton();
+  renderSaveSlots();
 }
 function confirmSaveToSlot(idx){if(!confirm('Overwrite this save?'))return;if(saveGameToSlot(idx))closeSavesModal();}
 function confirmLoadSlot(idx){if(loadGameFromSlot(idx))closeSavesModal();}
