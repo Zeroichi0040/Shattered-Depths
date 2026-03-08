@@ -499,6 +499,7 @@
       <div style="display:flex;align-items:center;gap:10px;">
         <span class="depth" id="depth-label">DEPTH 1</span>
         <span id="floor-cleared-badge" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;color:#40c870;border:1px solid #40c870;padding:3px 8px;opacity:.85;">CLEARED</span>
+        <span id="enemy-counter" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;color:#c84040;border:1px solid #c84040;padding:3px 8px;opacity:.85;">🐀 0</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="hdr-btn" onclick="openGameMenu()">MENU</button>
@@ -1599,7 +1600,9 @@ function renderCanvas(){
     ctx.globalAlpha=1;
 
     ctx.fillStyle='#400000'; ctx.fillRect(sx+2,sy,TILE-4,3);
-    ctx.fillStyle='#c84040'; ctx.fillRect(sx+2,sy,Math.max(0,(TILE-4)*(e.hp/e.maxHP)),3);
+    // Floor enemies: red bar. Spawned enemies: amber bar — easy visual tell.
+    ctx.fillStyle=e.isFloorEnemy?'#c84040':'#c87820';
+    ctx.fillRect(sx+2,sy,Math.max(0,(TILE-4)*(e.hp/e.maxHP)),3);
 
     // ── State indicators ──────────────────────────────────────
     // ZZZ: sleeping — three small z's drifting slowly upward, low float height
@@ -2110,7 +2113,7 @@ function checkFloorCleared(){
   flashCanvas('gold');
   revealEntireFloor();
   if (!floorHasSpawn()) G.fov=new Set(G.seen);
-  updateAutonav(); updateClearedBadge();
+  updateAutonav(); updateClearedBadge(); updateEnemyCounter();
   if (G.zone==='upper'&&G.depth===3){ forceLevelUp(); hideTutorial(); }
 }
 
@@ -2294,6 +2297,16 @@ function updateAutonav(){
 function updateClearedBadge(){
   const badge=document.getElementById('floor-cleared-badge');
   if (badge) badge.style.display=G.floorCleared?'inline-block':'none';
+}
+function updateEnemyCounter(){
+  const el=document.getElementById('enemy-counter');
+  if (!el) return;
+  // Only show on floors that have floor enemies and aren't bonfire floors
+  if (G.isBonfireFloor||!G.enemies){ el.style.display='none'; return; }
+  const remaining=G.enemies.filter(e=>e.hp>0&&e.isFloorEnemy).length;
+  if (G.floorCleared){ el.style.display='none'; return; }
+  el.style.display='inline-block';
+  el.textContent=`🐀 ${remaining}`;
 }
 function drawClearedBanner(){
   if (_clearedBanner<=0) return;
@@ -2523,7 +2536,7 @@ function updateHUD(){
   document.getElementById('kill-count').textContent=G.kills;
   if(G.zone==='normal'&&!G.isBonfireFloor&&G.depth>(G.lowestDepth||0)) G.lowestDepth=G.depth;
   document.getElementById('depth-label').textContent=depthLabel();
-  updateClearedBadge(); updateAutonav(); updateTutorial();
+  updateClearedBadge(); updateEnemyCounter(); updateAutonav(); updateTutorial();
 }
 
 // ==================== TUTORIAL ====================
