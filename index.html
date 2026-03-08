@@ -1003,9 +1003,9 @@ function generateDungeon(){
   const upperFloorFactor = isUpper ? (G.depth === 1 ? 0.6 : G.depth === 2 ? 0.7 : 0.8) : 1.0;
 
   if (isUpper){
-    if      (G.depth === 1){ G.mapW = 10; G.mapH = 10; }
-    else if (G.depth === 2){ G.mapW = 13; G.mapH = 12; }
-    else                   { G.mapW = 15; G.mapH = 15; }
+    if      (G.depth === 1){ G.mapW = 12; G.mapH = 12; }
+    else if (G.depth === 2){ G.mapW = 16; G.mapH = 14; }
+    else                   { G.mapW = 18; G.mapH = 18; }
   } else {
     const sz = FLOOR_SIZES[RUN_CONFIG.floorSize] || FLOOR_SIZES.md;
     G.mapW = sz.w; G.mapH = sz.h;
@@ -1102,28 +1102,88 @@ function makeRat(pos, base, statMult, xpReward=1, spawned=false){
     waitTurns:0,      // turns left to wait at last-seen tile
     roamDir:{dx:0,dy:0}, // current roam direction
     roamCooldown:0,   // turns until next roam direction change
+    wakePopLife:0,    // frames remaining for the "!" pop
+    zzzPhase: Math.random()*Math.PI*2, // stagger zzz animation per rat
   };
 }
 
 // ── Enemy AI helpers ──────────────────────────────────────────
-function _enemyCanSeePlayer(enemy){
-  // Enemy sees player if player is in the enemy's FOV radius (use same FOV radius as player)
-  return G.fov.has(`${enemy.x},${enemy.y}`);
+
+// Rat vision radii
+const RAT_FOV_AWAKE = 6;  // awake rats (chase/hunt/alert/roam) see up to 6 tiles
+const RAT_FOV_SLEEP = 6;  // sleeping rats can be woken within 6 tiles
+const RAT_WAKE_GUARANTEED = 2; // within this Chebyshev distance → always wake
+
+// Wall-blocking line-of-sight from (ax,ay) to (bx,by) within maxR tiles.
+// Steps along the line in small increments and stops at any wall tile.
+function _hasLOS(ax, ay, bx, by, maxR){
+  const cheb = Math.max(Math.abs(bx-ax), Math.abs(by-ay));
+  if(cheb > maxR) return false;
+  const steps = Math.max(cheb * 4, 1);
+  for(let s=1; s<=steps; s++){
+    const tx = Math.round(ax + (bx-ax) * s/steps);
+    const ty = Math.round(ay + (by-ay) * s/steps);
+    if(tx===bx && ty===by) return true;
+    if(!G.tiles[ty] || G.tiles[ty][tx]===0) return false;
+  }
+  return true;
+}
+
+// Returns true if an awake rat at (ex,ey) can see the player
+function _ratCanSee(ex, ey){
+  return _hasLOS(ex, ey, G.player.x, G.player.y, RAT_FOV_AWAKE);
+}
+
+// Quadratic fall-off: 100% chance within guaranteed range, 0% at radius edge
+function _sleepWakeChance(chebDist){
+  if(chebDist <= RAT_WAKE_GUARANTEED) return 1.0;
+  const t = (chebDist - RAT_WAKE_GUARANTEED) / (RAT_FOV_SLEEP - RAT_WAKE_GUARANTEED);
+  return Math.max(0, 1 - t * t);
 }
 
 function _enemyStepToward(enemy, tx, ty){
-  // One step toward (tx,ty) using simple direct movement with wall avoidance
-  const dx=tx-enemy.x, dy=ty-enemy.y;
-  if (dx===0&&dy===0) return false;
-  const sx=dx!==0?Math.sign(dx):0, sy=dy!==0?Math.sign(dy):0;
-  // Try direct, then axis-only fallbacks
-  const moves=[];
-  if (sx!==0&&sy!==0) moves.push({dx:sx,dy:sy},{dx:sx,dy:0},{dx:0,dy:sy});
-  else moves.push({dx:sx,dy:sy});
-  for (const m of moves){
+  // BFS to target, treating other living enemies as soft obstacles so rats fan
+  // out instead of stacking. Falls back to sorted-8-dir greedy step if needed.
+  if (enemy.x===tx&&enemy.y===ty) return false;
+  const W=G.mapW, H=G.mapH;
+  const visited=new Uint8Array(W*H);
+  const prev=new Int32Array(W*H).fill(-1);
+  const start=enemy.y*W+enemy.x, goal=ty*W+tx;
+  const queue=[start]; visited[start]=1;
+  const DIRS8=[0,-1,0,1,-1,0,1,0,-1,-1,1,-1,-1,1,1,1];
+  let found=false;
+  bfsLoop: while(queue.length){
+    const cur=queue.shift();
+    if(cur===goal){found=true;break;}
+    const cx=cur%W, cy=Math.floor(cur/W);
+    for(let d=0;d<8;d++){
+      const nx=cx+DIRS8[d*2], ny=cy+DIRS8[d*2+1];
+      if(nx<0||ny<0||nx>=W||ny>=H) continue;
+      const ni=ny*W+nx;
+      if(visited[ni]||G.tiles[ny][nx]!==1) continue;
+      // Treat other enemies as soft walls (allow goal tile even if occupied)
+      if(ni!==goal&&enemyAt(nx,ny)) continue;
+      visited[ni]=1; prev[ni]=cur; queue.push(ni);
+    }
+  }
+  if(found){
+    // Walk back to find the first step after start
+    let c=goal;
+    while(prev[c]!==start&&prev[c]!==-1) c=prev[c];
+    const nx=c%W, ny=Math.floor(c/W);
+    if(!(nx===G.player.x&&ny===G.player.y)&&!enemyAt(nx,ny)){
+      enemy.x=nx; enemy.y=ny; return true;
+    }
+  }
+  // Fallback: all 8 dirs sorted by Euclidean distance — ensures rats spread diagonally
+  const ALL8=[{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0},
+              {dx:-1,dy:-1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:1,dy:1}];
+  ALL8.sort((a,b)=>Math.hypot((enemy.x+a.dx)-tx,(enemy.y+a.dy)-ty)
+                  -Math.hypot((enemy.x+b.dx)-tx,(enemy.y+b.dy)-ty));
+  for(const m of ALL8){
     const nx=enemy.x+m.dx, ny=enemy.y+m.dy;
-    if (nx>=0&&ny>=0&&nx<G.mapW&&ny<G.mapH&&G.tiles[ny][nx]===1
-        &&!enemyAt(nx,ny)&&!(nx===G.player.x&&ny===G.player.y)){
+    if(nx>=0&&ny>=0&&nx<W&&ny<H&&G.tiles[ny][nx]===1
+       &&!enemyAt(nx,ny)&&!(nx===G.player.x&&ny===G.player.y)){
       enemy.x=nx; enemy.y=ny; return true;
     }
   }
@@ -1152,22 +1212,38 @@ function _enemyRoamStep(enemy){
 }
 
 function enemyTurn(){
+  // Snapshot player position BEFORE any enemy moves.
+  // Enemies react to where the player WAS this turn, not where they are now.
+  // This kills the "predicts your movement" feeling and fixes the cross-room
+  // LOS follow-through bug in one stroke.
+  const snapX=G.player.x, snapY=G.player.y;
+
   G.enemies.filter(e=>e.hp>0).forEach(enemy=>{
-    const canSee=G.fov.has(`${enemy.x},${enemy.y}`);
-    // ── Wake up sleeping floor enemies when player is visible ──
-    if (enemy.aiState==='sleep'){
-      if (canSee){ enemy.aiState='chase'; }
-      else return; // sleeping enemies don't move
+    // Awake rats use their own LOS (radius 6), not the player's FOV cone
+    const canSee = _ratCanSee(enemy.x, enemy.y);
+
+    // ── Sleeping: chance-based wake using distance + LOS within radius 6 ──
+    if(enemy.aiState==='sleep'){
+      const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
+      const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
+      if(inRange && Math.random() < _sleepWakeChance(cheb)){
+        // Transition straight to chase — "!" is purely a visual pop, no extra delay turn
+        enemy.aiState='chase'; enemy.wakePopLife=45;
+        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
+      }
+      return; // sleeping rats never move regardless
     }
+
     // ── CHASE: actively chasing the player ──
-    if (enemy.aiState==='chase'){
-      if (canSee){
-        // Update last seen position every turn we can see player
-        enemy.lastSeenX=G.player.x; enemy.lastSeenY=G.player.y;
-        const dx=G.player.x-enemy.x, dy=G.player.y-enemy.y;
+    if(enemy.aiState==='chase'){
+      if(canSee){
+        // Record where the player was at the START of this turn
+        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
+        const dx=snapX-enemy.x, dy=snapY-enemy.y;
         const cheb=Math.max(Math.abs(dx),Math.abs(dy));
-        if (cheb<=1){
-          // Attack player
+        if(cheb<=1){
+          // Adjacent to snapshot position → attack (player is still right there
+          // or just stepped away one tile — either way, the rat swipes)
           const baseDmg=(enemy.str*0.2)+(enemy.dex*0.1);
           const spread=baseDmg*0.3;
           let dmg=parseFloat(Math.max(0.1,randFloat(baseDmg-spread,baseDmg+spread)).toFixed(1));
@@ -1177,13 +1253,15 @@ function enemyTurn(){
           addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
           spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
           flashCanvas('red'); triggerPlayerHpFlash();
-          if (G.hp<=0){ G.hp=0; updateHUD(); die(); return; }
+          if(G.hp<=0){ G.hp=0; updateHUD(); die(); return; }
+          // Do NOT move after attacking — rat stays in place this turn
         } else {
-          _enemyStepToward(enemy, G.player.x, G.player.y);
+          // Step toward snapshot position (1-turn lag feels natural, not psychic)
+          _enemyStepToward(enemy, snapX, snapY);
         }
       } else {
         // Lost sight — go to last known position
-        if (enemy.lastSeenX!==null){
+        if(enemy.lastSeenX!==null){
           enemy.aiState='hunt';
           _enemyStepToward(enemy, enemy.lastSeenX, enemy.lastSeenY);
         } else {
@@ -1192,43 +1270,60 @@ function enemyTurn(){
       }
       return;
     }
+
     // ── HUNT: moving toward last seen player tile ──
-    if (enemy.aiState==='hunt'){
-      if (canSee){
-        // Spotted player again — back to chase
+    if(enemy.aiState==='hunt'){
+      if(canSee){
         enemy.aiState='chase';
-        enemy.lastSeenX=G.player.x; enemy.lastSeenY=G.player.y;
-        _enemyStepToward(enemy, G.player.x, G.player.y);
+        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
+        const dx=snapX-enemy.x, dy=snapY-enemy.y;
+        const cheb=Math.max(Math.abs(dx),Math.abs(dy));
+        if(cheb<=1){
+          // Adjacent on re-spotting — attack immediately
+          const baseDmg=(enemy.str*0.2)+(enemy.dex*0.1);
+          const spread=baseDmg*0.3;
+          let dmg=parseFloat(Math.max(0.1,randFloat(baseDmg-spread,baseDmg+spread)).toFixed(1));
+          const def=G.def||0;
+          dmg=parseFloat(Math.max(0.1,dmg*(1-def/(def+10))).toFixed(1));
+          G.hp=parseFloat((G.hp-dmg).toFixed(1));
+          addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
+          spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
+          flashCanvas('red'); triggerPlayerHpFlash();
+          if(G.hp<=0){ G.hp=0; updateHUD(); die(); return; }
+        } else {
+          _enemyStepToward(enemy, snapX, snapY);
+        }
         return;
       }
-      if (enemy.lastSeenX===null){ enemy.aiState='roam'; return; }
+      if(enemy.lastSeenX===null){ enemy.aiState='roam'; return; }
       const atTarget=enemy.x===enemy.lastSeenX&&enemy.y===enemy.lastSeenY;
-      if (atTarget){
-        // Arrived at last known spot — wait 2–10 turns
+      if(atTarget){
         enemy.aiState='alert';
         enemy.waitTurns=randInt(2,10);
       } else {
         const moved=_enemyStepToward(enemy, enemy.lastSeenX, enemy.lastSeenY);
-        if (!moved){ enemy.aiState='roam'; } // can't reach it, give up
+        if(!moved){ enemy.aiState='roam'; }
       }
       return;
     }
-    // ── ALERT: standing at last-seen tile ──
-    if (enemy.aiState==='alert'){
-      if (canSee){
+
+    // ── ALERT: standing at last-seen tile, looking around ──
+    if(enemy.aiState==='alert'){
+      if(canSee){
         enemy.aiState='chase';
-        enemy.lastSeenX=G.player.x; enemy.lastSeenY=G.player.y;
+        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
         return;
       }
       enemy.waitTurns--;
-      if (enemy.waitTurns<=0){ enemy.aiState='roam'; enemy.lastSeenX=null; enemy.lastSeenY=null; }
+      if(enemy.waitTurns<=0){ enemy.aiState='roam'; enemy.lastSeenX=null; enemy.lastSeenY=null; }
       return;
     }
+
     // ── ROAM: wandering the floor ──
-    if (enemy.aiState==='roam'){
-      if (canSee){
+    if(enemy.aiState==='roam'){
+      if(canSee){
         enemy.aiState='chase';
-        enemy.lastSeenX=G.player.x; enemy.lastSeenY=G.player.y;
+        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
         return;
       }
       _enemyRoamStep(enemy);
@@ -1496,10 +1591,71 @@ function renderCanvas(){
     const sx=viz.x*TILE-camX, sy=viz.y*TILE-camY;
     const isPriority = e.id===priorityTargetId && getVisibleEnemies().filter(inAttackRange).length>0;
     if (isPriority){ ctx.strokeStyle='#f0d060'; ctx.lineWidth=1.5; ctx.strokeRect(sx+1,sy+1,TILE-2,TILE-2); }
+
+    // Sleeping rats rendered slightly dimmer
+    ctx.globalAlpha = (e.aiState==='sleep') ? 0.6 : 1.0;
     ctx.font=`${TILE-4}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('🐀',sx+TILE/2,sy+TILE/2);
+    ctx.globalAlpha=1;
+
     ctx.fillStyle='#400000'; ctx.fillRect(sx+2,sy,TILE-4,3);
     ctx.fillStyle='#c84040'; ctx.fillRect(sx+2,sy,Math.max(0,(TILE-4)*(e.hp/e.maxHP)),3);
+
+    // ── State indicators ──────────────────────────────────────
+    // ZZZ: sleeping — three small z's drifting slowly upward, low float height
+    if(e.aiState==='sleep'){
+      const t = (Date.now() * 0.00042) + (e.zzzPhase||0); // slow cycle (~2.4s per loop)
+      for(let z=0; z<3; z++){
+        const phase = (t + z * 0.38) % 1;
+        const fadeIn  = phase < 0.15 ? phase/0.15 : 1.0;
+        const fadeOut = phase > 0.72 ? (1-phase)/0.28 : 1.0;
+        const alpha   = fadeIn * fadeOut * 0.9;
+        // only drift up by ~0.55 tiles max, staggered by z index
+        const yOff = -(phase * TILE * 0.55 + z * TILE * 0.16);
+        const xOff = Math.sin(phase * Math.PI * 2 + z) * TILE * 0.16;
+        const zSize = Math.max(5, Math.floor(TILE * 0.27 - z * 1.2)); // slightly larger z's
+        ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+        ctx.font = `bold ${zSize}px "Press Start 2P", monospace`;
+        ctx.fillStyle = '#90c8ff';
+        ctx.shadowColor = '#4080c8'; ctx.shadowBlur = 3;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('z', sx+TILE/2+xOff, sy+yOff);
+        ctx.shadowBlur=0;
+      }
+      ctx.globalAlpha=1;
+    }
+
+    // "!" pop when rat just woke — wakePopLife ticks down each render frame
+    if((e.wakePopLife||0) > 0){
+      e.wakePopLife--;
+      const life = e.wakePopLife;
+      // 45-frame lifetime: hold full alpha for first 20 frames, then fade over 25
+      const alpha = life > 20 ? 1.0 : life/20;
+      // Tiny rise — max 5px over full lifetime
+      const rise  = (1 - life/45) * 5;
+      const popY  = sy - TILE*0.22 - rise;
+      ctx.globalAlpha = alpha;
+      const exSize = Math.max(7, Math.floor(TILE * 0.32));
+      ctx.font = `bold ${exSize}px "Press Start 2P", monospace`;
+      ctx.fillStyle = '#ffdd00';
+      ctx.shadowColor = '#ff8800'; ctx.shadowBlur = 7;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('!', sx+TILE/2, popY);
+      ctx.shadowBlur=0; ctx.globalAlpha=1;
+    }
+
+    // "?" while alert — small, slow pulse
+    if(e.aiState==='alert'){
+      const pulse = 0.7 + Math.sin(Date.now() * 0.003) * 0.3;
+      const qSize = Math.max(5, Math.floor(TILE * 0.24));
+      ctx.globalAlpha = pulse;
+      ctx.font = `bold ${qSize}px "Press Start 2P", monospace`;
+      ctx.fillStyle = '#a0d0ff';
+      ctx.shadowColor = '#4080ff'; ctx.shadowBlur = 5;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('?', sx+TILE/2, sy - TILE*0.52);
+      ctx.shadowBlur=0; ctx.globalAlpha=1;
+    }
   });
 
   // Draw ground items
@@ -1875,6 +2031,8 @@ function tickSavedEnemies(enemies, turnsDelta, tiles, mapW, mapH){
   const steps=Math.min(turnsDelta,20);
   const DIRS=[{dx:0,dy:-1},{dx:0,dy:1},{dx:-1,dy:0},{dx:1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:1,dy:1}];
   enemies.forEach(e=>{
+    // Sleeping enemies never move while the player is away
+    if(e.aiState==='sleep') return;
     for (let s=0;s<steps;s++){
       const d=DIRS[randInt(0,DIRS.length-1)];
       const nx=e.x+d.dx, ny=e.y+d.dy;
@@ -2049,12 +2207,21 @@ function autoNavTo(dir){
     const adj=[];
     for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){
       if (!dx&&!dy) continue;
-      const ax=target.x+dx,ay=target.y+dy;
+      const ax=target.x+dx, ay=target.y+dy;
+      // Never include the bonfire tile itself, only the 8 neighbours
+      if (ax===target.x&&ay===target.y) continue;
       if (ax>=0&&ay>=0&&ax<G.mapW&&ay<G.mapH&&G.tiles[ay][ax]===1) adj.push({x:ax,y:ay});
     }
     if (!adj.length) return;
-    const px=G.player.x,py=G.player.y;
-    adj.sort((a,b)=>Math.max(Math.abs(a.x-px),Math.abs(a.y-py))-Math.max(Math.abs(b.x-px),Math.abs(b.y-py)));
+    const px=G.player.x, py=G.player.y;
+    // If already standing on an adjacent tile, just use bonfire immediately
+    if (adj.some(a=>a.x===px&&a.y===py)){ useBonfire(); return; }
+    adj.sort((a,b)=>{
+      const pa=bfsPath(px,py,a.x,a.y); const pb=bfsPath(px,py,b.x,b.y);
+      const la=pa?pa.length:9999, lb=pb?pb.length:9999;
+      if(la!==lb) return la-lb;
+      return Math.hypot(a.x-px,a.y-py)-Math.hypot(b.x-px,b.y-py);
+    });
     walkTarget=adj[0]; onArrival=useBonfire;
   }
   if (G.player.x===walkTarget.x&&G.player.y===walkTarget.y){ onArrival?.(); return; }
