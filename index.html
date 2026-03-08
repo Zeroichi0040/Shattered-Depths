@@ -62,6 +62,20 @@
   .play-det-btn.danger:hover{border-color:var(--red);color:var(--red);}
   .play-det-btn.blue{border-color:#2a3a5a;color:#6090c0;}
   .play-det-btn.blue:hover{border-color:var(--blue);color:#80c0f0;}
+  /* inline confirm — replaces a button with YES/CANCEL in-place */
+  .iconfirm-wrap{display:flex;flex-direction:column;gap:4px;}
+  .iconfirm-msg{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--red);padding:5px 2px;line-height:1.5;}
+  .iconfirm-btns{display:flex;gap:6px;}
+  .iconfirm-yes{font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer;transition:all .12s;flex:1;}
+  .iconfirm-yes:hover{background:rgba(200,64,64,.18);}
+  .iconfirm-cancel{font-family:'Press Start 2P',monospace;font-size:6px;padding:7px 10px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;transition:all .12s;flex:1;}
+  .iconfirm-cancel:hover{border-color:var(--text);color:var(--text);}
+  /* wider variant for game menu context */
+  #game-menu-modal .iconfirm-yes, #game-menu-modal .iconfirm-cancel{font-size:7px;padding:9px 12px;}
+  /* title menu context */
+  .title-menu .iconfirm-wrap{padding:4px 0;}
+  .title-menu .iconfirm-msg{font-size:7px;}
+  .title-menu .iconfirm-yes, .title-menu .iconfirm-cancel{font-size:7px;padding:8px 12px;}
   .play-footer{padding:14px 36px;border-top:1px solid var(--border);flex-shrink:0;}
   /* new-slot action panel (start / import) */
   .play-new-panel{display:flex;flex-direction:column;gap:8px;}
@@ -433,19 +447,19 @@
 <body>
 
 <!-- TITLE -->
-<div class="screen active" id="title-screen">
-  <div class="title-left">
+<div class="screen active" id="title-screen" onclick="_cancelAllInlineConfirms()">
+  <div class="title-left" onclick="event.stopPropagation()">
     <h1>SHATTERED DEPTHS</h1>
     <div class="title-menu">
       <button class="title-menu-btn" onclick="showScreen('play-screen');renderPlaySlots()">PLAY</button>
       <button class="title-menu-btn" onclick="showComingSoon(event)">UPGRADES</button>
       <button class="title-menu-btn" onclick="showScreen('menu-settings-screen')">SETTINGS</button>
       <div class="title-separator"></div>
-      <button class="title-menu-btn danger" onclick="if(confirm('Quit?'))window.close()">QUIT</button>
+      <button class="title-menu-btn danger" onclick="_inlineConfirm(this,'Quit the game?',()=>window.close())">QUIT</button>
     </div>
     <div class="title-credit">Made by Zeroichi</div>
   </div>
-  <div class="title-right">
+  <div class="title-right" onclick="event.stopPropagation()">
     <pre class="title-dungeon-art">
  ╔═══════════════════════╗
  ║ ░░░░░█░░░░░░░░░░░░░░░ ║
@@ -775,14 +789,7 @@
 
 <!-- GAME MENU MODAL -->
 <div class="modal-overlay" id="game-menu-modal">
-  <div class="modal-box">
-    <div class="modal-title">MENU</div>
-    <button class="gmenu-btn" onclick="closeGameMenu();openInvFromMenu();">INVENTORY</button>
-    <button class="gmenu-btn" onclick="closeGameMenu();openSavesModal('saveload');">SAVE / LOAD</button>
-    <button class="gmenu-btn" onclick="closeGameMenu();openSettingsFromMenu();">SETTINGS</button>
-    <hr style="border-color:var(--border);margin:10px 0 12px;">
-    <button class="gmenu-btn danger" onclick="closeGameMenu();confirmQuit();">QUIT TO TITLE</button>
-  </div>
+  <div class="modal-box"></div>
 </div>
 
 <!-- SAVES MODAL -->
@@ -925,9 +932,11 @@ document.getElementById('settings-modal').addEventListener('click', function(e){
 
 // ==================== SCREENS ====================
 function showScreen(id){
+  // Close any open modals and cancel any pending inline confirms
+  document.querySelectorAll('.modal-overlay.active').forEach(m=>m.classList.remove('active'));
+  _cancelAllInlineConfirms();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  // refresh run-config descriptions when opening that screen
   if (id === 'config-screen'){
     setDifficulty(RUN_CONFIG.difficulty);
     setFloorSize(RUN_CONFIG.floorSize);
@@ -2748,7 +2757,46 @@ function die(){
     showScreen('death-screen');
   },900);
 }
-function confirmQuit(){ if (confirm('Abandon your run?')) showScreen('title-screen'); }
+function confirmQuit(){
+  // Handled inline in the game menu — this fallback is kept for safety
+  showScreen('title-screen');
+}
+
+// ── Inline confirmation utility ───────────────────────────────
+// Replaces `btn` with a message + YES/CANCEL pair in-place.
+// Calling _cancelAllInlineConfirms() restores every active inline confirm.
+const _activeConfirms = [];
+function _inlineConfirm(btn, message, onConfirm){
+  const parent = btn.parentNode;
+  if(!parent) return;
+  const origHTML = btn.outerHTML;
+  const wrap = document.createElement('div');
+  wrap.className = 'iconfirm-wrap';
+  wrap.dataset.origHtml = origHTML;
+  wrap.innerHTML = `<div class="iconfirm-msg">${message}</div>
+    <div class="iconfirm-btns">
+      <button class="iconfirm-yes">YES</button>
+      <button class="iconfirm-cancel">CANCEL</button>
+    </div>`;
+  const cancel = ()=>{ _restoreConfirmWrap(wrap); };
+  wrap.querySelector('.iconfirm-yes').onclick = (e)=>{ e.stopPropagation(); onConfirm(); };
+  wrap.querySelector('.iconfirm-cancel').onclick = (e)=>{ e.stopPropagation(); cancel(); };
+  parent.replaceChild(wrap, btn);
+  _activeConfirms.push(wrap);
+}
+function _restoreConfirmWrap(wrap){
+  const idx = _activeConfirms.indexOf(wrap);
+  if(idx !== -1) _activeConfirms.splice(idx, 1);
+  if(!wrap.parentNode) return;
+  const restored = document.createElement('div');
+  restored.innerHTML = wrap.dataset.origHtml;
+  wrap.parentNode.replaceChild(restored.firstChild, wrap);
+}
+function _cancelAllInlineConfirms(){
+  // copy since restoring mutates the array
+  [..._activeConfirms].forEach(_restoreConfirmWrap);
+}
+function _htmlToEl(html){ const t=document.createElement('div'); t.innerHTML=html; return t.firstChild; }
 
 let _flashColor=null, _flashAlpha=0, _flashDecay=0;
 function flashCanvas(color){
@@ -3157,8 +3205,22 @@ function invApplyCharAlloc(){
 document.addEventListener('DOMContentLoaded',()=>{ initDpad(); refreshLoadButton(); });
 
 // ==================== GAME MENU ====================
-function openGameMenu(){ document.getElementById('game-menu-modal').classList.add('active'); }
-function closeGameMenu(){ document.getElementById('game-menu-modal').classList.remove('active'); }
+const _GAME_MENU_INNER_HTML = `
+    <div class="modal-title">MENU</div>
+    <button class="gmenu-btn" onclick="closeGameMenu();openInvFromMenu();">INVENTORY</button>
+    <button class="gmenu-btn" onclick="closeGameMenu();openSavesModal('saveload');">SAVE / LOAD</button>
+    <button class="gmenu-btn" onclick="closeGameMenu();openSettingsFromMenu();">SETTINGS</button>
+    <hr style="border-color:var(--border);margin:10px 0 12px;">
+    <button class="gmenu-btn danger" id="gmenu-quit-btn" onclick="_inlineConfirm(this,'Abandon your run?',()=>{closeGameMenu();showScreen('title-screen');})">QUIT TO TITLE</button>`;
+function openGameMenu(){
+  const box = document.querySelector('#game-menu-modal .modal-box');
+  if(box) box.innerHTML = _GAME_MENU_INNER_HTML;
+  document.getElementById('game-menu-modal').classList.add('active');
+}
+function closeGameMenu(){
+  _cancelAllInlineConfirms();
+  document.getElementById('game-menu-modal').classList.remove('active');
+}
 document.getElementById('game-menu-modal').addEventListener('click',function(e){
   if(e.target===this) closeGameMenu();
 });
@@ -3235,7 +3297,7 @@ function loadGameFromSlot(idx){
     addLog(`Welcome back, ${G.name}!`,'info');return true;
   }catch(e){console.error(e);alert('Failed to load save.');return false;}
 }
-function deleteSaveSlot(idx){if(!confirm('Delete this save?'))return;localStorage.removeItem(_saveSlotKey(idx));refreshLoadButton();renderSaveSlots();}
+function deleteSaveSlot(idx){ deleteSaveSlotModal(idx); } // legacy alias
 function getSaveSlotInfo(idx){try{const raw=localStorage.getItem(_saveSlotKey(idx));if(!raw)return null;const snap=JSON.parse(raw);return(snap&&snap.G)?snap:null;}catch(e){return null;}}
 function hasAnySave(){return _allSaveKeys().length>0;}
 function refreshLoadButton(){const btn=document.getElementById('load-game-btn');if(btn)btn.style.display=hasAnySave()?'inline-block':'none';}
@@ -3349,9 +3411,13 @@ function confirmLoadSlotPlay(idx){
   if(loadGameFromSlot(idx)) showScreen('game-screen');
 }
 function deleteSaveSlotPlay(idx){
-  if(!confirm('Delete this save?'))return;
-  localStorage.removeItem(_saveSlotKey(idx));
-  renderPlaySlots();
+  // Triggered from a button in the detail panel — find it by data attr and inline confirm
+  const btn = document.querySelector(`#play-detail-col .play-det-btn.danger`);
+  if(!btn){ localStorage.removeItem(_saveSlotKey(idx)); renderPlaySlots(); return; }
+  _inlineConfirm(btn, 'Delete this save?', ()=>{
+    localStorage.removeItem(_saveSlotKey(idx));
+    renderPlaySlots();
+  });
 }
 function togglePlayImport(){
   const area=document.getElementById('play-import-area');
@@ -3402,10 +3468,14 @@ function doImportAllProgress(){
     const raw=decodeURIComponent(escape(atob(code)));
     const all=JSON.parse(raw);
     if(typeof all!=='object')throw new Error('bad');
-    if(!confirm('This will overwrite all existing saves. Continue?'))return;
-    Object.entries(all).forEach(([k,v])=>localStorage.setItem(k,v));
-    toggleProgressImport();
-    _showExportFeedback('ALL IMPORTED!');
+    const btn=document.querySelector('#progress-import-area .save-act[onclick*="doImportAllProgress"]');
+    const doIt=()=>{
+      Object.entries(all).forEach(([k,v])=>localStorage.setItem(k,v));
+      toggleProgressImport();
+      _showExportFeedback('ALL IMPORTED!');
+    };
+    if(btn){ _inlineConfirm(btn,'Overwrite all saves?',doIt); }
+    else doIt();
   }catch(e){alert('Invalid progress code.');}
 }
 
@@ -3483,14 +3553,25 @@ function _renderSavesDetail(idx, info){
     </div>`;
 }
 function deleteSaveSlotModal(idx){
-  if(!confirm('Delete this save?'))return;
-  localStorage.removeItem(_saveSlotKey(idx));
-  refreshLoadButton();
-  renderSaveSlots();
+  const btn = document.querySelector(`#saves-detail-panel .play-det-btn.danger`);
+  if(!btn){ localStorage.removeItem(_saveSlotKey(idx)); refreshLoadButton(); renderSaveSlots(); return; }
+  _inlineConfirm(btn, 'Delete this save?', ()=>{
+    localStorage.removeItem(_saveSlotKey(idx));
+    refreshLoadButton();
+    renderSaveSlots();
+  });
 }
-function confirmSaveToSlot(idx){if(!confirm('Overwrite this save?'))return;if(saveGameToSlot(idx))closeSavesModal();}
-function confirmLoadSlot(idx){if(loadGameFromSlot(idx))closeSavesModal();}
-function confirmLoadSlotInGame(idx){if(!confirm('Load this save? Your current run will be lost.'))return;if(loadGameFromSlot(idx))closeSavesModal();}
+function confirmSaveToSlot(idx){
+  const btn = document.querySelector(`#saves-detail-panel .play-det-btn.primary:not([onclick*="Load"])`);
+  if(!btn){ if(saveGameToSlot(idx)) closeSavesModal(); return; }
+  _inlineConfirm(btn, 'Overwrite this save?', ()=>{ if(saveGameToSlot(idx)) closeSavesModal(); });
+}
+function confirmLoadSlot(idx){ if(loadGameFromSlot(idx)) closeSavesModal(); }
+function confirmLoadSlotInGame(idx){
+  const btn = document.querySelector(`#saves-detail-panel .play-det-btn.primary`);
+  if(!btn){ if(loadGameFromSlot(idx)) closeSavesModal(); return; }
+  _inlineConfirm(btn, 'Lose current run?', ()=>{ if(loadGameFromSlot(idx)) closeSavesModal(); });
+}
 let _exportMode=false;
 function toggleExportMode(){if(!hasAnySave())return;_exportMode=!_exportMode;cancelImport();document.getElementById('export-btn')?.classList.toggle('active',_exportMode);renderSaveSlots();}
 function doExportSlot(idx){const raw=localStorage.getItem(_saveSlotKey(idx));if(!raw){alert('Save not found.');return;}const code=btoa(unescape(encodeURIComponent(raw)));if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(()=>_showExportFeedback('COPIED!')).catch(()=>_exportFallback(code));}else{_exportFallback(code);}_exportMode=false;document.getElementById('export-btn')?.classList.remove('active');renderSaveSlots();}
