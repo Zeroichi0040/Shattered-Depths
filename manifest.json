@@ -1,7 +1,7 @@
 {
   "name": "Shattered Depths",
   "short_name": "Shattered Depths",
-  "description": "A browser-based roguelike dungeon crawler",
+  "description": "A browser game, turn-based roguelike dungeon crawler",
   "start_url": "./index.html",
   "display": "fullscreen",
   "orientation": "landscape",

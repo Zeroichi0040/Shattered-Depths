@@ -18,6 +18,12 @@
   :root{--bg:#0a0a0f;--bg2:#12121a;--panel:#1a1a26;--border:#2a2a40;--gold:#c8a84b;--gold2:#f0d070;--red:#c84040;--green:#40c870;--blue:#4080c8;--purple:#9060c8;--text:#d0c8b0;--dim:#706858;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'VT323',monospace;font-size:18px;min-height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  /* Scale entire UI down on mobile to match desktop proportions */
+  @media (max-width:1024px) and (pointer:coarse){
+    html{zoom:0.6;}
+    /* dpad needs to render at full physical size, so counter-scale it */
+    #dpad{zoom:calc(1/0.6);}
+  }
   .screen{display:none;width:100vw;height:100vh;align-items:center;justify-content:center;}
   .screen.active{display:flex;}
 
@@ -3064,7 +3070,13 @@ document.addEventListener('click',      _requestFullscreen, {once:true});
 function initDpad(){
   const dpad=document.getElementById('dpad');
   if (!dpad) return;
-  if (isMobile()) dpad.classList.add('visible');
+  if (isMobile()){
+    dpad.classList.add('visible');
+    // Smaller default zoom on mobile so the dungeon fits the screen
+    SETTINGS.tileSize = 20;
+    const lbl = document.getElementById('sett-tileSize');
+    if (lbl) lbl.textContent = 20;
+  }
   const btnActions={
     'dp-up':   ()=>queueOrRun(()=>tryMove(0,-1)),
     'dp-down': ()=>queueOrRun(()=>tryMove(0,1)),
