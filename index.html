@@ -26,7 +26,8 @@
   /* TITLE */
   #title-screen{flex-direction:row;align-items:stretch;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
   .title-left{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px 56px;gap:0;min-width:320px;border-right:1px solid var(--border);}
-  .title-left h1{font-family:'Press Start 2P',monospace;font-size:clamp(13px,1.6vw,22px);color:var(--gold);text-shadow:0 0 20px #c8a84b88,0 0 40px #c8a84b44;letter-spacing:2px;margin-bottom:32px;}
+  .title-left h1{font-family:'Press Start 2P',monospace;font-size:clamp(13px,1.6vw,22px);color:var(--gold);text-shadow:0 0 20px #c8a84b88,0 0 40px #c8a84b44;letter-spacing:2px;margin-bottom:8px;}
+  .title-tagline{font-size:13px;color:var(--dim);margin-bottom:28px;letter-spacing:.5px;}
   .title-menu{display:flex;flex-direction:column;gap:4px;width:100%;}
   .title-menu-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:14px 20px;background:transparent;border:1px solid transparent;color:var(--text);cursor:pointer;text-align:left;letter-spacing:1px;transition:all .12s;}
   .title-menu-btn:hover{color:var(--gold);border-color:var(--border);background:rgba(200,168,75,.06);}
@@ -121,6 +122,21 @@
   .changelog-divider{border:none;border-top:1px solid var(--border);margin:8px 0 10px;}
   .changelog-para{font-size:15px;color:var(--text);line-height:1.5;margin-bottom:6px;}
   .changelog-para:last-child{margin-bottom:0;}
+  /* Changelog rich elements */
+  .changelog-sub{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold2);letter-spacing:1px;margin:10px 0 5px;text-transform:uppercase;}
+  .changelog-ul{list-style:none;padding:0;margin:0 0 8px 0;}
+  .changelog-ul li{font-size:15px;color:var(--text);line-height:1.5;padding:1px 0 1px 14px;position:relative;}
+  .changelog-ul li::before{content:'▸';position:absolute;left:0;color:var(--gold2);font-size:12px;}
+  .changelog-table{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:14px;}
+  .changelog-table th{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);text-align:left;padding:4px 8px 4px 0;border-bottom:1px solid var(--border);letter-spacing:1px;}
+  .changelog-table td{color:var(--text);padding:4px 8px 4px 0;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+  .changelog-table td:last-child,.changelog-table th:last-child{padding-right:0;}
+  .changelog-table td.cv{color:var(--gold2);white-space:nowrap;}
+  .changelog-note{font-size:13px;color:var(--dim);font-style:italic;margin-bottom:6px;padding-left:8px;border-left:2px solid var(--border);}
+  .changelog-tag{display:inline-block;font-family:'Press Start 2P',monospace;font-size:6px;padding:2px 5px;border-radius:2px;margin-right:4px;vertical-align:middle;}
+  .changelog-tag.fix{background:rgba(200,64,64,.18);color:#e07070;border:1px solid rgba(200,64,64,.3);}
+  .changelog-tag.new{background:rgba(64,200,112,.15);color:#60c878;border:1px solid rgba(64,200,112,.3);}
+  .changelog-tag.tweak{background:rgba(200,168,75,.13);color:var(--gold2);border:1px solid rgba(200,168,75,.3);}
   #changelog-screen .screen-title{margin-bottom:16px;flex-shrink:0;}
 
   /* DEV TOOLS MODAL */
@@ -193,17 +209,17 @@
   .weapon-note{font-size:12px;color:var(--gold2);font-style:italic;margin-top:7px;padding-top:6px;border-top:1px dashed var(--border);text-align:center;}
 
   /* STAT ALLOC */
-  #stat-screen{flex-direction:column;gap:24px;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
-  .stat-alloc-container{background:var(--panel);border:2px solid var(--border);padding:28px;width:min(624px,92vw);}
-  .points-left{text-align:center;font-size:34px;color:var(--gold2);margin-bottom:18px;}
-  .points-left span{font-family:'Press Start 2P',monospace;font-size:26px;}
-  .alloc-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
-  .alloc-name{width:117px;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--text);}
-  .alloc-effect{flex:1;font-size:18px;color:var(--dim);text-align:center;}
-  .alloc-controls{display:flex;align-items:center;gap:12px;}
-  .alloc-btn{font-family:'Press Start 2P',monospace;font-size:16px;width:34px;height:34px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;}
+  #stat-screen{flex-direction:column;gap:16px;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);}
+  .stat-alloc-container{background:var(--panel);border:2px solid var(--border);padding:18px 22px;width:min(520px,92vw);}
+  .points-left{text-align:center;font-size:22px;color:var(--gold2);margin-bottom:12px;}
+  .points-left span{font-family:'Press Start 2P',monospace;font-size:18px;}
+  .alloc-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+  .alloc-name{width:90px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text);}
+  .alloc-effect{flex:1;font-size:14px;color:var(--dim);text-align:center;}
+  .alloc-controls{display:flex;align-items:center;gap:8px;}
+  .alloc-btn{font-family:'Press Start 2P',monospace;font-size:13px;width:28px;height:28px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;}
   .alloc-btn:hover{border-color:var(--gold);color:var(--gold);}
-  .alloc-val{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--gold2);width:28px;text-align:center;}
+  .alloc-val{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold2);width:22px;text-align:center;}
 
   /* GAME */
   #game-screen{flex-direction:row;align-items:stretch;height:100vh;width:100vw;}
@@ -230,7 +246,7 @@
   /* ENLARGED dungeon header */
   #dungeon-header{background:var(--bg2);border-bottom:2px solid var(--border);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;font-size:17px;flex-shrink:0;min-height:44px;}
   #dungeon-header .depth{color:var(--gold);font-family:'Press Start 2P',monospace;font-size:10px;}
-  #canvas-container{flex:1;display:flex;align-items:center;justify-content:center;background:#08080f;overflow:hidden;}
+  #canvas-container{flex:1;display:flex;align-items:center;justify-content:center;background:#08080f;overflow:hidden;position:relative;}
   #game-canvas{image-rendering:pixelated;cursor:default;}
 
   /* RIGHT PANEL */
@@ -322,9 +338,9 @@
   .dstat-btn-bar{display:flex;width:min(760px,96vw);border:1px solid #402020;border-top:none;background:rgba(20,8,8,.7);}
 
   /* NAME INPUT */
-  .name-input-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
+  .name-input-wrap{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
   .name-input-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);letter-spacing:1px;}
-  .name-input{font-family:'VT323',monospace;font-size:24px;background:var(--bg);border:1px solid var(--border);color:var(--gold2);padding:8px 12px;outline:none;width:100%;box-sizing:border-box;letter-spacing:1px;}
+  .name-input{font-family:'VT323',monospace;font-size:22px;background:var(--bg);border:1px solid var(--border);color:var(--gold2);padding:6px 10px;outline:none;width:100%;box-sizing:border-box;letter-spacing:1px;}
   .name-input:focus{border-color:var(--gold);}
   .name-input::placeholder{color:#3a3830;}
   /* ENLARGED header buttons */
@@ -373,16 +389,16 @@
   .spawn-toggle.on{border-color:var(--green);color:var(--green);background:rgba(64,200,112,.12);}
   .spawn-toggle.off{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
 
-  #dpad{display:none;z-index:20;user-select:none;-webkit-user-select:none;touch-action:none;background:var(--bg2);border-left:1px solid var(--border);padding:8px;justify-content:center;align-items:center;flex-shrink:0;width:auto;flex-direction:column;gap:6px;}
+  /* Floating transparent D-pad overlay */
+  #dpad{display:none;position:absolute;bottom:14px;right:14px;z-index:30;user-select:none;-webkit-user-select:none;touch-action:none;flex-direction:column;align-items:center;gap:0;background:none;border:none;padding:0;}
   #dpad.visible{display:flex;}
-  #dpad-grid{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:3px;}
-  .dp{width:52px;height:52px;background:rgba(10,8,20,.82);border:1.5px solid rgba(200,168,75,.35);color:rgba(200,168,75,.8);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;transition:background .08s,border-color .08s;-webkit-tap-highlight-color:transparent;}
-  .dp:active,.dp.pressed{background:rgba(200,168,75,.22);border-color:rgba(200,168,75,.8);}
-  .dp.dp-blank{background:transparent;border-color:transparent;pointer-events:none;}
-  .dp.dp-center{border-radius:50%;font-size:15px;color:rgba(200,168,75,.6);}
-  .dp.dp-ul,.dp.dp-ur,.dp.dp-dl,.dp.dp-dr{font-size:16px;color:rgba(200,168,75,.5);border-color:rgba(200,168,75,.2);}
+  #dpad-grid{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px);gap:2px;}
+  .dp{width:48px;height:48px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;transition:background .08s,border-color .08s;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(2px);}
+  .dp:active,.dp.pressed{background:rgba(200,168,75,.28);border-color:rgba(200,168,75,.7);color:rgba(200,168,75,.95);}
+  .dp.dp-center{border-radius:50%;font-size:13px;color:rgba(255,255,255,.3);background:rgba(255,255,255,.04);}
+  .dp.dp-ul,.dp.dp-ur,.dp.dp-dl,.dp.dp-dr{font-size:14px;color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
   .dp.dp-ul:active,.dp.dp-ul.pressed,.dp.dp-ur:active,.dp.dp-ur.pressed,
-  .dp.dp-dl:active,.dp.dp-dl.pressed,.dp.dp-dr:active,.dp.dp-dr.pressed{background:rgba(200,168,75,.18);border-color:rgba(200,168,75,.6);}
+  .dp.dp-dl:active,.dp.dp-dl.pressed,.dp.dp-dr:active,.dp.dp-dr.pressed{background:rgba(200,168,75,.22);border-color:rgba(200,168,75,.6);color:rgba(200,168,75,.9);}
   /* Mobile action buttons inside dpad column */
   #dpad-actions{display:flex;flex-direction:column;gap:5px;width:159px;}
   .dpad-act-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:9px 4px;background:rgba(10,8,20,.82);border:1.5px solid rgba(200,168,75,.3);color:rgba(200,168,75,.7);cursor:pointer;text-align:center;border-radius:4px;width:100%;-webkit-tap-highlight-color:transparent;transition:background .08s,border-color .08s;}
@@ -503,9 +519,9 @@
   .icp-cfmbtn:disabled{opacity:.3;cursor:not-allowed;}
   /* inv header btn – enlarged */
   /* TUTORIAL HINTS */
-  #tutorial-panel{display:none;background:var(--bg2);border:1px solid var(--border);padding:8px 9px;flex-direction:column;gap:5px;}
-  #tutorial-panel .tut-title{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--dim);letter-spacing:1px;margin-bottom:3px;}
-  .tut-item{font-family:'VT323',monospace;font-size:15px;color:var(--gold);line-height:1.3;transition:color .3s;}
+  #tutorial-panel{display:none;background:var(--bg2);border:1px solid var(--border);padding:8px 9px;flex-direction:column;gap:4px;}
+  #tutorial-panel .tut-title{font-family:'Press Start 2P',monospace;font-size:5px;color:var(--dim);letter-spacing:1px;margin-bottom:2px;}
+  .tut-item{font-family:'VT323',monospace;font-size:12px;color:var(--gold);line-height:1.25;transition:color .3s;}
   .tut-item.done{color:#4a4a4a;text-decoration:line-through;text-decoration-color:#505050;}
 
   /* GAME MENU */
@@ -551,6 +567,7 @@
 <div class="screen active" id="title-screen" onclick="_cancelAllInlineConfirms()">
   <div class="title-left" onclick="event.stopPropagation()">
     <h1>SHATTERED DEPTHS</h1>
+    <div class="title-tagline">A turn-based rogue-lite dungeon crawler</div>
     <div class="title-menu">
       <button class="title-menu-btn" onclick="showScreen('play-screen');renderPlaySlots()">PLAY</button>
       <button class="title-menu-btn" onclick="showComingSoon(event)">UPGRADES</button>
@@ -663,16 +680,57 @@
 <div class="screen" id="changelog-screen" onclick="showScreen('title-screen')">
   <div class="screen-title" onclick="event.stopPropagation()">CHANGELOGS</div>
   <div class="changelog-container" onclick="event.stopPropagation()">
-<!-- Structure for each changelog entry:
+<!-- ═══════════════════════════════════════════════════════════════
+     CHANGELOG COPY-PASTE TEMPLATES
+     ═══════════════════════════════════════════════════════════════
+
+  ENTRY WRAPPER:
     <div class="changelog-entry">
-      <div class="changelog-title">v0.0.0 — title</div>
-      <div class="changelog-date">2026-00-00</div>
+      <div class="changelog-title">v0.0.0 — Title Here</div>
+      <div class="changelog-date">2026-MM-DD</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">paragraph</div>
-      <div class="changelog-para">paragraph</div>
-      <div class="changelog-para">paragraph</div>
+      ...content...
     </div>
--->
+
+  PARAGRAPH:
+    <div class="changelog-para">Plain text paragraph.</div>
+
+  SECTION SUB-HEADER:
+    <div class="changelog-sub">Sub-heading</div>
+
+  BULLET LIST:
+    <ul class="changelog-ul">
+      <li>First item</li>
+      <li>Second item</li>
+    </ul>
+
+  TABLE (label / value columns):
+    <table class="changelog-table">
+      <thead><tr><th>Stat</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>HP</td><td class="cv">100</td></tr>
+        <tr><td>DMG</td><td class="cv">4.8–11.2</td></tr>
+      </tbody>
+    </table>
+
+  ITALIC NOTE / QUOTE:
+    <div class="changelog-note">This is a side note or caveat.</div>
+
+  INLINE TAGS (NEW / FIX / TWEAK):
+    <div class="changelog-para">
+      <span class="changelog-tag new">NEW</span> Added something.
+    </div>
+    <div class="changelog-para">
+      <span class="changelog-tag fix">FIX</span> Fixed a bug.
+    </div>
+    <div class="changelog-para">
+      <span class="changelog-tag tweak">TWEAK</span> Adjusted a value.
+    </div>
+
+  DIVIDER (within an entry, to separate sections):
+    <hr class="changelog-divider">
+
+═══════════════════════════════════════════════════════════════ -->
     <div class="changelog-entry">
       <div class="changelog-title">v0.1.7 — Floor and Spawned Enemies Indicator, Imports and Exports, New UIs</div>
       <div class="changelog-date">2026-03-08</div>
@@ -952,16 +1010,31 @@
         <span id="enemy-counter" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;color:#c84040;border:1px solid #c84040;padding:3px 8px;opacity:.85;">🐀 0</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        <button class="hdr-btn" id="hdr-inv-btn" onclick="openInv()">INVENTORY</button>
         <button class="hdr-btn" onclick="openGameMenu()">MENU</button>
       </div>
     </div>
-    <div id="canvas-container" style="position:relative;">
+    <div id="canvas-container" style="position:relative;flex:1;overflow:hidden;">
       <canvas id="game-canvas"></canvas>
       <div id="target-panel"></div>
       <div id="autonav-panel" style="position:absolute;top:8px;right:8px;display:none;flex-direction:column;gap:4px;z-index:15;">
         <canvas id="autonav-up-canvas"     width="40" height="40" class="autonav-icon" title="Auto-walk to up stairs"   onclick="autoNavTo('up')"></canvas>
         <canvas id="autonav-down-canvas"   width="40" height="40" class="autonav-icon" title="Auto-walk to down stairs" onclick="autoNavTo('down')"></canvas>
         <canvas id="autonav-bonfire-canvas" width="40" height="40" class="autonav-icon" title="Auto-walk to bonfire"   onclick="autoNavTo('bonfire')" style="display:none;"></canvas>
+      </div>
+      <!-- MOBILE D-PAD floating overlay -->
+      <div id="dpad">
+        <div id="dpad-grid">
+          <div class="dp dp-ul" id="dp-ul">↖</div>
+          <div class="dp" id="dp-up">▲</div>
+          <div class="dp dp-ur" id="dp-ur">↗</div>
+          <div class="dp" id="dp-left">◀</div>
+          <div class="dp dp-center" id="dp-center">✦</div>
+          <div class="dp" id="dp-right">▶</div>
+          <div class="dp dp-dl" id="dp-dl">↙</div>
+          <div class="dp" id="dp-down">▼</div>
+          <div class="dp dp-dr" id="dp-dr">↘</div>
+        </div>
       </div>
     </div>
   </div>
@@ -977,28 +1050,7 @@
       Click player: Space action
     </div>
   </div>
-
-  <!-- MOBILE D-PAD (shown only on touch devices) -->
-  <div id="dpad">
-    <div id="dpad-grid">
-      <div class="dp dp-ul" id="dp-ul">↖</div>
-      <div class="dp" id="dp-up">▲</div>
-      <div class="dp dp-ur" id="dp-ur">↗</div>
-      <div class="dp" id="dp-left">◀</div>
-      <div class="dp dp-center" id="dp-center">✦</div>
-      <div class="dp" id="dp-right">▶</div>
-      <div class="dp dp-dl" id="dp-dl">↙</div>
-      <div class="dp" id="dp-down">▼</div>
-      <div class="dp dp-dr" id="dp-dr">↘</div>
-    </div>
-    <div id="dpad-actions">
-      <button class="dpad-act-btn" ontouchstart="event.preventDefault();openInv();" onclick="openInv()">INVENTORY [I]</button>
-      <button class="dpad-act-btn" ontouchstart="event.preventDefault();openGameMenu();" onclick="openGameMenu()">MENU</button>
-    </div>
-  </div>
 </div>
-
-<!-- INVENTORY OVERLAY -->
 <div id="inv-overlay">
   <div id="inv-win">
     <div id="inv-tabs">
@@ -1161,9 +1213,11 @@
       <div class="setting-lhs"><div class="setting-label">SHOW COORDINATES</div><div class="setting-desc">Display x/y on screen</div></div>
       <div class="setting-ctrl"><button class="toggle-btn" id="sett-showCoords" onclick="toggleSetting('showCoords')">OFF</button></div>
     </div>
-    <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;">
+    <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;position:relative;">
       <button class="btn sm secondary" onclick="closeSettings()">BACK</button>
-      <button class="btn sm" style="border-color:#9060c8;color:#b080f0;font-size:8px;padding:9px 18px;" onclick="openDevTools()">DEV TOOLS</button>
+      <button id="dev-tools-btn" class="btn sm" style="border-color:#9060c8;color:#b080f0;font-size:8px;padding:9px 18px;display:none;" onclick="openDevTools()">DEV TOOLS</button>
+      <!-- Secret invisible tap zone — 5 taps opens dev code screen when locked -->
+      <button id="dev-secret-btn" onclick="_dtSecretTap()" style="position:absolute;right:0;top:0;width:36px;height:36px;opacity:0;cursor:default;border:none;background:none;padding:0;" tabindex="-1" aria-hidden="true"></button>
     </div>
   </div>
 </div>
@@ -1242,6 +1296,13 @@ function openSettings(){
     btn.textContent = SETTINGS[k] ? 'ON' : 'OFF';
     btn.classList.toggle('on', SETTINGS[k]);
   });
+  // Dev Tools button only visible when a run is active and unlocked; secret btn hidden when unlocked
+  const dtBtn = document.getElementById('dev-tools-btn');
+  const dtSecret = document.getElementById('dev-secret-btn');
+  const inRun = !!(G && G.player);
+  const unlocked = _dtIsUnlocked();
+  if(dtBtn) dtBtn.style.display = (inRun && unlocked) ? '' : 'none';
+  if(dtSecret) dtSecret.style.display = (inRun && !unlocked) ? '' : 'none';
   document.getElementById('settings-modal').classList.add('active');
 }
 function openSettingsFromMenu(){ _settingsFromMenu=true; openSettings(); }
@@ -1272,7 +1333,7 @@ function showScreen(id){
     setFloorSize(RUN_CONFIG.floorSize);
     updateSpawnBtn();
   }
-
+  if(window._dpadSetVisible) window._dpadSetVisible(id === 'game-screen');
 }
 
 // ==================== CLASS SELECT ====================
@@ -2290,10 +2351,33 @@ document.addEventListener('keydown', e=>{
   const tag = document.activeElement && document.activeElement.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
   if (document.getElementById('levelup-modal').classList.contains('active')) return;
+
+  // M — toggle game menu, or close any open overlay and return to game
+  if (e.key==='m'||e.key==='M'){
+    e.preventDefault();
+    const settOpen  = document.getElementById('settings-modal').classList.contains('active');
+    const menuOpen  = document.getElementById('game-menu-modal').classList.contains('active');
+    const savesOpen = document.getElementById('saves-modal').classList.contains('active');
+    const devOpen   = document.getElementById('devtools-modal').classList.contains('active');
+    if (settOpen || savesOpen || devOpen){
+      // Close everything and return to game directly
+      document.getElementById('settings-modal').classList.remove('active');
+      document.getElementById('saves-modal').classList.remove('active');
+      document.getElementById('devtools-modal').classList.remove('active');
+      closeGameMenu();
+    } else if (invIsOpen()){
+      _invFromMenu=false; closeInv();
+    } else if (menuOpen){
+      closeGameMenu();
+    } else {
+      openGameMenu();
+    }
+    return;
+  }
+
   if (document.getElementById('settings-modal').classList.contains('active')) return;
   if (document.getElementById('game-menu-modal').classList.contains('active')) return;
   if (e.key==='i'||e.key==='I'){ e.preventDefault(); if(invIsOpen()){ _invFromMenu=false; closeInv(); } else { openInv(); } return; }
-  if (e.key==='m'||e.key==='M'){ e.preventDefault(); openGameMenu(); return; }
   if (e.key==='Escape'){
     if (invIsOpen()){ closeInv(); return; }
     cancelAutoWalk(); _stopMouseWalk(); return;
@@ -3274,6 +3358,16 @@ document.addEventListener('touchstart', _requestFullscreen, {once:true, passive:
 document.addEventListener('click',      _requestFullscreen, {once:true});
 
 function initDpad(){
+  // Show dpad only when in a run, on touch devices
+  const dpadEl = document.getElementById('dpad');
+  let _isTouchDevice = false;
+  window.addEventListener('touchstart', ()=>{ _isTouchDevice = true; }, {once:true, passive:true});
+  window._dpadSetVisible = function(show){
+    if(!dpadEl) return;
+    if(show && _isTouchDevice) dpadEl.classList.add('visible');
+    else dpadEl.classList.remove('visible');
+  };
+
   const btnActions={
     'dp-up':   ()=>queueOrRun(()=>tryMove(0,-1)),
     'dp-down': ()=>queueOrRun(()=>tryMove(0,1)),
@@ -3686,6 +3780,21 @@ document.getElementById('game-menu-modal').addEventListener('click',function(e){
 const DT_CODE = 'ZeroIsCool';
 
 function _dtIsUnlocked(){ return !!(G && G.devUnlocked); }
+
+let _dtSecretTaps = 0, _dtSecretTimer = null;
+function _dtSecretTap(){
+  if(_dtIsUnlocked()) return;
+  _dtSecretTaps++;
+  clearTimeout(_dtSecretTimer);
+  _dtSecretTimer = setTimeout(()=>{ _dtSecretTaps = 0; }, 5000);
+  if(_dtSecretTaps >= 5){
+    _dtSecretTaps = 0;
+    document.getElementById('settings-modal').classList.remove('active');
+    _settingsFromMenu = false;
+    _showDevToolsCode();
+    document.getElementById('devtools-modal').classList.add('active');
+  }
+}
 
 function openDevTools(){
   // Close settings first
