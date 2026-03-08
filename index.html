@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="screen-orientation" content="landscape">
 <meta name="x5-orientation" content="landscape">
 <meta name="full-screen" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+<meta name="apple-mobile-web-app-title" content="Shattered Depths">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="manifest" href="manifest.json">
 <title>Shattered Depths</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
@@ -330,7 +336,7 @@
   .spawn-toggle.on{border-color:var(--green);color:var(--green);background:rgba(64,200,112,.12);}
   .spawn-toggle.off{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
 
-  #dpad{display:none;z-index:20;user-select:none;-webkit-user-select:none;touch-action:none;background:var(--bg2);border-left:1px solid var(--border);padding:8px;justify-content:center;align-items:center;flex-shrink:0;width:auto;}
+  #dpad{display:none;z-index:20;user-select:none;-webkit-user-select:none;touch-action:none;background:var(--bg2);border-left:1px solid var(--border);padding:8px;justify-content:center;align-items:center;flex-shrink:0;width:auto;flex-direction:column;gap:6px;}
   #dpad.visible{display:flex;}
   #dpad-grid{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:3px;}
   .dp{width:52px;height:52px;background:rgba(10,8,20,.82);border:1.5px solid rgba(200,168,75,.35);color:rgba(200,168,75,.8);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;transition:background .08s,border-color .08s;-webkit-tap-highlight-color:transparent;}
@@ -340,6 +346,13 @@
   .dp.dp-ul,.dp.dp-ur,.dp.dp-dl,.dp.dp-dr{font-size:16px;color:rgba(200,168,75,.5);border-color:rgba(200,168,75,.2);}
   .dp.dp-ul:active,.dp.dp-ul.pressed,.dp.dp-ur:active,.dp.dp-ur.pressed,
   .dp.dp-dl:active,.dp.dp-dl.pressed,.dp.dp-dr:active,.dp.dp-dr.pressed{background:rgba(200,168,75,.18);border-color:rgba(200,168,75,.6);}
+  /* Mobile action buttons inside dpad column */
+  #dpad-actions{display:flex;flex-direction:column;gap:5px;width:159px;}
+  .dpad-act-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:9px 4px;background:rgba(10,8,20,.82);border:1.5px solid rgba(200,168,75,.3);color:rgba(200,168,75,.7);cursor:pointer;text-align:center;border-radius:4px;width:100%;-webkit-tap-highlight-color:transparent;transition:background .08s,border-color .08s;}
+  .dpad-act-btn:active{background:rgba(200,168,75,.18);border-color:rgba(200,168,75,.8);}
+  /* body / html safe area */
+  html,body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+
 
   /* INVENTORY OVERLAY */
   #inv-overlay{display:none;position:fixed;inset:0;background:rgba(4,4,8,.86);z-index:200;align-items:center;justify-content:center;}
@@ -731,10 +744,10 @@
       </div>
       <div id="tutorial-panel">
         <div class="tut-title">▓ HOW TO PLAY</div>
-        <div class="tut-item" id="tut-move">Move: WASD keys</div>
+        <div class="tut-item" id="tut-move">Move: WASD / D-pad</div>
         <div class="tut-item" id="tut-attack">Attack: bump enemies or F</div>
-        <div class="tut-item" id="tut-wait">Wait/Interact: SPACE</div>
-        <div class="tut-item" id="tut-inv">Open inventory: I</div>
+        <div class="tut-item" id="tut-wait">Wait/Interact: SPACE / ✦</div>
+        <div class="tut-item" id="tut-inv">Inventory: I / INV button</div>
       </div>
       <button class="btn secondary sm" style="margin-top:auto;" onclick="openGameMenu()">MENU</button>
     </div>
@@ -771,6 +784,25 @@
       F / Tab: Attack target<br>
       Click enemy: Attack<br>
       Click player: Space action
+    </div>
+  </div>
+
+  <!-- MOBILE D-PAD (shown only on touch devices) -->
+  <div id="dpad">
+    <div id="dpad-grid">
+      <div class="dp dp-ul" id="dp-ul">↖</div>
+      <div class="dp" id="dp-up">▲</div>
+      <div class="dp dp-ur" id="dp-ur">↗</div>
+      <div class="dp" id="dp-left">◀</div>
+      <div class="dp dp-center" id="dp-center">✦</div>
+      <div class="dp" id="dp-right">▶</div>
+      <div class="dp dp-dl" id="dp-dl">↙</div>
+      <div class="dp" id="dp-down">▼</div>
+      <div class="dp dp-dr" id="dp-dr">↘</div>
+    </div>
+    <div id="dpad-actions">
+      <button class="dpad-act-btn" ontouchstart="event.preventDefault();openInv();" onclick="openInv()">INVENTORY [I]</button>
+      <button class="dpad-act-btn" ontouchstart="event.preventDefault();openGameMenu();" onclick="openGameMenu()">MENU</button>
     </div>
   </div>
 </div>
@@ -3015,11 +3047,24 @@ window.addEventListener('resize',()=>{
 });
 
 const isMobile=()=>/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||navigator.maxTouchPoints>1;
+
+// Request fullscreen on first user interaction (required by browsers)
+let _fullscreenRequested = false;
+function _requestFullscreen(){
+  if (_fullscreenRequested) return;
+  _fullscreenRequested = true;
+  const el = document.documentElement;
+  const req = el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen;
+  if (req) req.call(el).catch(()=>{});
+  if (screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
+}
+document.addEventListener('touchstart', _requestFullscreen, {once:true, passive:true});
+document.addEventListener('click',      _requestFullscreen, {once:true});
+
 function initDpad(){
   const dpad=document.getElementById('dpad');
   if (!dpad) return;
   if (isMobile()) dpad.classList.add('visible');
-  if (isMobile()&&screen.orientation&&screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
   const btnActions={
     'dp-up':   ()=>queueOrRun(()=>tryMove(0,-1)),
     'dp-down': ()=>queueOrRun(()=>tryMove(0,1)),
