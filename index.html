@@ -21,80 +21,6 @@
   .screen{display:none;width:100vw;height:100vh;align-items:center;justify-content:center;}
   .screen.active{display:flex;}
 
-  /* ═══════════════════════════════════════════
-     MOBILE LAYOUT  (touch devices)
-     ═══════════════════════════════════════════ */
-  @media (pointer:coarse){
-    /* Hide desktop right panel and old inline dpad */
-    #right-panel{ display:none !important; }
-    #dpad{ display:none !important; }
-
-    /* Left panel: slimmer, no MENU button at bottom */
-    #left-panel{ width:140px; min-width:140px; }
-    #left-panel .btn{ display:none; }
-
-    /* Dungeon fills remaining space */
-    #dungeon-wrap{ flex:1; }
-
-    /* Fixed overlay bag button — top-right of screen */
-    #mob-bag-btn{
-      display:flex;
-      position:fixed; top:10px; right:12px; z-index:500;
-      width:44px; height:44px;
-      background:rgba(10,8,20,.72); border:1.5px solid rgba(200,168,75,.5);
-      border-radius:8px; align-items:center; justify-content:center;
-      font-size:22px; cursor:pointer;
-      -webkit-tap-highlight-color:transparent;
-      transition:background .1s, border-color .1s;
-    }
-    #mob-bag-btn:active{ background:rgba(200,168,75,.2); border-color:var(--gold); }
-
-    /* Fixed overlay menu button — top-right, below bag */
-    #mob-menu-btn{
-      display:flex;
-      position:fixed; top:62px; right:12px; z-index:500;
-      width:44px; height:44px;
-      background:rgba(10,8,20,.72); border:1.5px solid rgba(200,168,75,.3);
-      border-radius:8px; align-items:center; justify-content:center;
-      font-family:'Press Start 2P',monospace; font-size:5px; color:rgba(200,168,75,.7);
-      cursor:pointer; letter-spacing:.5px;
-      -webkit-tap-highlight-color:transparent;
-      transition:background .1s, border-color .1s;
-    }
-    #mob-menu-btn:active{ background:rgba(200,168,75,.2); border-color:var(--gold); }
-
-    /* Fixed transparent d-pad — bottom right corner */
-    #mob-dpad{
-      display:grid;
-      position:fixed; bottom:16px; right:16px; z-index:500;
-      grid-template-columns:repeat(3,54px);
-      grid-template-rows:repeat(3,54px);
-      gap:4px;
-      user-select:none; -webkit-user-select:none; touch-action:none;
-    }
-    .mdp{
-      width:54px; height:54px;
-      background:rgba(10,8,20,.45);
-      border:1.5px solid rgba(200,168,75,.25);
-      border-radius:10px;
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; font-size:18px; color:rgba(200,168,75,.65);
-      -webkit-tap-highlight-color:transparent;
-      transition:background .07s, border-color .07s;
-    }
-    .mdp:active,.mdp.pressed{ background:rgba(200,168,75,.25); border-color:rgba(200,168,75,.85); color:rgba(200,168,75,1); }
-    .mdp-blank{ background:transparent !important; border-color:transparent !important; pointer-events:none; }
-    .mdp-center{
-      border-radius:50%;
-      background:rgba(10,8,20,.55);
-      border-color:rgba(200,168,75,.35);
-      font-size:14px; color:rgba(200,168,75,.5);
-    }
-    .mdp-diag{ font-size:14px; color:rgba(200,168,75,.4); border-color:rgba(200,168,75,.15); background:rgba(10,8,20,.3); }
-    .mdp-diag:active,.mdp-diag.pressed{ background:rgba(200,168,75,.2); border-color:rgba(200,168,75,.7); }
-  }
-  /* Hide overlay buttons on desktop */
-  #mob-bag-btn, #mob-menu-btn, #mob-dpad{ display:none; }
 
 
   /* TITLE */
@@ -1154,12 +1080,7 @@ function showScreen(id){
     setFloorSize(RUN_CONFIG.floorSize);
     updateSpawnBtn();
   }
-  // Show mobile overlay controls only during gameplay
-  const inGame = id === 'game-screen';
-  ['mob-bag-btn','mob-menu-btn','mob-dpad'].forEach(bid=>{
-    const el=document.getElementById(bid);
-    if(el) el.style.display = inGame ? '' : 'none';
-  });
+
 }
 
 // ==================== CLASS SELECT ====================
@@ -3144,59 +3065,38 @@ document.addEventListener('touchstart', _requestFullscreen, {once:true, passive:
 document.addEventListener('click',      _requestFullscreen, {once:true});
 
 function initDpad(){
-  if (isMobile()){
-    // Smaller default zoom on mobile so the dungeon fits the screen
-    SETTINGS.tileSize = 20;
-    const lbl = document.getElementById('sett-tileSize');
-    if (lbl) lbl.textContent = 20;
-  }
-
-  // Action map — covers both old #dp-* ids and new #mdp-* ids
-  const moveActions={
-    up:    ()=>queueOrRun(()=>tryMove(0,-1)),
-    down:  ()=>queueOrRun(()=>tryMove(0,1)),
-    left:  ()=>queueOrRun(()=>tryMove(-1,0)),
-    right: ()=>queueOrRun(()=>tryMove(1,0)),
-    ul:    ()=>queueOrRun(()=>tryMove(-1,-1)),
-    ur:    ()=>queueOrRun(()=>tryMove(1,-1)),
-    dl:    ()=>queueOrRun(()=>tryMove(-1,1)),
-    dr:    ()=>queueOrRun(()=>tryMove(1,1)),
-    center:()=>queueOrRun(doSpaceAction),
+  const btnActions={
+    'dp-up':   ()=>queueOrRun(()=>tryMove(0,-1)),
+    'dp-down': ()=>queueOrRun(()=>tryMove(0,1)),
+    'dp-left': ()=>queueOrRun(()=>tryMove(-1,0)),
+    'dp-right':()=>queueOrRun(()=>tryMove(1,0)),
+    'dp-ul':   ()=>queueOrRun(()=>tryMove(-1,-1)),
+    'dp-ur':   ()=>queueOrRun(()=>tryMove(1,-1)),
+    'dp-dl':   ()=>queueOrRun(()=>tryMove(-1,1)),
+    'dp-dr':   ()=>queueOrRun(()=>tryMove(1,1)),
+    'dp-center':()=>queueOrRun(doSpaceAction),
   };
-
   let dpHeld=null, dpInterval=null;
-  function dpStart(dir, el){
-    const fn=moveActions[dir]; if (!fn) return;
-    el?.classList.add('pressed'); fn();
-    if (dir==='center') return;
+  function dpStart(id){
+    const fn=btnActions[id]; if (!fn) return;
+    document.getElementById(id)?.classList.add('pressed'); fn();
+    if (id==='dp-center') return;
     dpHeld=fn;
     if (!dpInterval) dpInterval=setInterval(()=>{if(dpHeld)dpHeld();},MOVE_INTERVAL_MS);
   }
-  function dpStop(el){
-    el?.classList.remove('pressed'); dpHeld=null;
+  function dpStop(id){
+    document.getElementById(id)?.classList.remove('pressed'); dpHeld=null;
     if (dpInterval){clearInterval(dpInterval);dpInterval=null;}
   }
-
-  function bindBtn(id, dir){
+  Object.keys(btnActions).forEach(id=>{
     const el=document.getElementById(id); if (!el) return;
-    el.addEventListener('touchstart', e=>{e.preventDefault();dpStart(dir,el);},{passive:false});
-    el.addEventListener('touchend',   e=>{e.preventDefault();dpStop(el); },{passive:false});
-    el.addEventListener('touchcancel',e=>{e.preventDefault();dpStop(el); },{passive:false});
-    el.addEventListener('mousedown',  e=>{e.preventDefault();dpStart(dir,el);});
-    el.addEventListener('mouseup',    e=>{e.preventDefault();dpStop(el); });
-    el.addEventListener('mouseleave', e=>{if(dpHeld)dpStop(el);});
-  }
-
-  // Old inline dpad (hidden on mobile but still functional on desktop if shown)
-  bindBtn('dp-up','up'); bindBtn('dp-down','down'); bindBtn('dp-left','left'); bindBtn('dp-right','right');
-  bindBtn('dp-ul','ul'); bindBtn('dp-ur','ur'); bindBtn('dp-dl','dl'); bindBtn('dp-dr','dr');
-  bindBtn('dp-center','center');
-
-  // New fixed overlay dpad
-  bindBtn('mdp-up','up'); bindBtn('mdp-down','down'); bindBtn('mdp-left','left'); bindBtn('mdp-right','right');
-  bindBtn('mdp-ul','ul'); bindBtn('mdp-ur','ur'); bindBtn('mdp-dl','dl'); bindBtn('mdp-dr','dr');
-  bindBtn('mdp-center','center');
-
+    el.addEventListener('touchstart', e=>{e.preventDefault();dpStart(id);},{passive:false});
+    el.addEventListener('touchend',   e=>{e.preventDefault();dpStop(id); },{passive:false});
+    el.addEventListener('touchcancel',e=>{e.preventDefault();dpStop(id); },{passive:false});
+    el.addEventListener('mousedown',  e=>{e.preventDefault();dpStart(id);});
+    el.addEventListener('mouseup',    e=>{e.preventDefault();dpStop(id); });
+    el.addEventListener('mouseleave', e=>{if(dpHeld)dpStop(id);});
+  });
   document.getElementById('canvas-container')?.addEventListener('touchmove',e=>{
     if (e.touches.length>1) e.preventDefault();
   },{passive:false});
@@ -3948,20 +3848,6 @@ function toggleImportArea(){const area=document.getElementById('import-paste-are
 function cancelImport(){const area=document.getElementById('import-paste-area');if(area)area.style.display='none';document.getElementById('import-btn')?.classList.remove('active');document.getElementById('export-btn')?.classList.remove('active');}
 function doImport(){const ta=document.getElementById('import-textarea');if(!ta)return;const code=ta.value.trim();if(!code){alert('Nothing to import.');return;}try{const raw=decodeURIComponent(escape(atob(code)));const snap=JSON.parse(raw);if(!snap||!snap.G)throw new Error('bad');localStorage.setItem(_saveSlotKey(_nextSlotIndex()),raw);refreshLoadButton();cancelImport();ta.value='';renderSaveSlots();_showExportFeedback('IMPORTED!');}catch(e){alert('Invalid save code.');}}
 </script>
-<!-- MOBILE OVERLAY CONTROLS (fixed, only visible on touch devices) -->
-<button id="mob-bag-btn" ontouchstart="event.preventDefault();openInv();" onclick="openInv()" title="Inventory">🎒</button>
-<button id="mob-menu-btn" ontouchstart="event.preventDefault();openGameMenu();" onclick="openGameMenu()">MENU</button>
-<div id="mob-dpad">
-  <div class="mdp mdp-diag" id="mdp-ul">↖</div>
-  <div class="mdp" id="mdp-up">▲</div>
-  <div class="mdp mdp-diag" id="mdp-ur">↗</div>
-  <div class="mdp" id="mdp-left">◀</div>
-  <div class="mdp mdp-center" id="mdp-center">⬡</div>
-  <div class="mdp" id="mdp-right">▶</div>
-  <div class="mdp mdp-diag" id="mdp-dl">↙</div>
-  <div class="mdp" id="mdp-down">▼</div>
-  <div class="mdp mdp-diag" id="mdp-dr">↘</div>
-</div>
 
 </body>
 </html>
