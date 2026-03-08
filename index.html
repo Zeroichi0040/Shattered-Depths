@@ -227,13 +227,63 @@
   .toggle-btn.on{border-color:var(--green);color:var(--green);}
 
   /* DEATH */
-  #death-screen{flex-direction:column;gap:22px;background:radial-gradient(ellipse at center,#1a0808 0%,#020202 80%);}
-  .death-title{font-family:'Press Start 2P',monospace;font-size:clamp(16px,4vw,34px);color:var(--red);text-align:center;text-shadow:0 0 30px #c8404088;animation:flicker 2s infinite;}
+  #death-screen{flex-direction:column;align-items:center;justify-content:center;gap:0;background:radial-gradient(ellipse at center,#1a0808 0%,#020202 80%);}
+  .death-title{font-family:'Press Start 2P',monospace;font-size:clamp(16px,4vw,34px);color:var(--red);text-align:center;text-shadow:0 0 30px #c8404088;animation:flicker 2s infinite;margin-bottom:6px;}
+  .death-subtitle{font-size:15px;color:#604040;letter-spacing:3px;text-align:center;margin-bottom:28px;}
   @keyframes flicker{0%,100%{opacity:1;}92%{opacity:1;}93%{opacity:.4;}94%{opacity:1;}96%{opacity:.6;}97%{opacity:1;}}
-  .death-stats{background:var(--panel);border:1px solid #402020;padding:18px 28px;font-size:17px;line-height:2;}
-  .death-stat-row{display:flex;justify-content:space-between;gap:28px;}
-  .death-stat-row .label{color:var(--dim);}
-  .death-stat-row .val{color:var(--text);}
+  .death-card{background:var(--panel);border:1px solid #402020;width:min(480px,92vw);margin-bottom:0;}
+  .death-card-header{font-family:'Press Start 2P',monospace;font-size:7px;color:#804040;letter-spacing:1px;padding:8px 18px;border-bottom:1px solid #301818;background:rgba(60,10,10,.4);}
+  /* Summary rows — sections with gaps */
+  .death-stats{padding:14px 20px;display:flex;flex-direction:column;gap:8px;}
+  .death-sec{background:var(--bg2);border:1px solid #402020;padding:9px 12px;}
+  .death-sec-t{font-family:'Press Start 2P',monospace;font-size:6px;color:#604040;letter-spacing:1px;margin-bottom:6px;}
+  .death-stat-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+  .death-stat-row .label{font-family:'Press Start 2P',monospace;font-size:6px;color:#604040;letter-spacing:.5px;}
+  .death-stat-row .val{font-size:17px;color:var(--text);}
+  .death-stat-row .val.gold{color:var(--gold);}
+  .death-msg{font-size:14px;color:#b05050;font-style:italic;line-height:1.6;text-align:center;padding-top:5px;}
+  /* Button bar attached to bottom of death-card */
+  .death-btn-bar{display:flex;width:min(480px,92vw);border:1px solid #402020;border-top:none;background:rgba(20,8,8,.7);}
+  .death-btn-bar .dbb{flex:1;font-family:'Press Start 2P',monospace;font-size:7px;padding:11px 6px;background:transparent;border:none;border-right:1px solid #402020;cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+  .death-btn-bar .dbb:last-child{border-right:none;}
+  .death-btn-bar .dbb:hover{background:rgba(80,20,20,.5);}
+  .death-btn-bar .dbb.main{color:#c08060;}
+  .death-btn-bar .dbb.main:hover{color:#e0a070;}
+  .death-btn-bar .dbb.stats{color:#6080a0;}
+  .death-btn-bar .dbb.stats:hover{color:#80a0c0;}
+  .death-btn-bar .dbb.load{color:#607860;}
+  .death-btn-bar .dbb.load:hover{color:#80a080;}
+  .death-btn-bar .dbb.newrun{color:#806040;}
+  .death-btn-bar .dbb.newrun:hover{color:#a08060;}
+  .death-btn-bar .dbb.back{color:#705050;}
+  .death-btn-bar .dbb.back:hover{color:#907070;}
+  /* Full stats detail layout */
+  .dstat-card{background:var(--panel);border:1px solid #402020;width:min(760px,96vw);margin-bottom:0;max-height:78vh;display:flex;flex-direction:column;}
+  .dstat-body{display:flex;flex:1;overflow:hidden;gap:0;}
+  .dstat-col{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;}
+  .dstat-col::-webkit-scrollbar{width:3px;}
+  .dstat-col::-webkit-scrollbar-thumb{background:#402020;}
+  /* section block — mirrors icp-blk */
+  .dstat-blk{background:var(--bg2);border:1px solid #402020;padding:9px 11px;}
+  .dstat-blk-t{font-family:'Press Start 2P',monospace;font-size:6px;color:#604040;letter-spacing:1px;margin-bottom:7px;}
+  /* player header inside first block */
+  .dstat-player-header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .dstat-player-icon{font-size:26px;flex-shrink:0;}
+  .dstat-player-name{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);margin-bottom:3px;}
+  .dstat-player-class{font-size:13px;color:var(--dim);}
+  /* data row — no bottom border, just vertical padding */
+  .dstat-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;}
+  .dstat-row .dl{font-family:'Press Start 2P',monospace;font-size:6px;color:#604040;letter-spacing:.5px;}
+  .dstat-row .dv{font-size:15px;color:var(--text);}
+  .dstat-msg{padding-top:7px;font-size:13px;color:#b05050;font-style:italic;line-height:1.5;text-align:center;}
+  .dstat-btn-bar{display:flex;width:min(760px,96vw);border:1px solid #402020;border-top:none;background:rgba(20,8,8,.7);}
+
+  /* NAME INPUT */
+  .name-input-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
+  .name-input-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);letter-spacing:1px;}
+  .name-input{font-family:'VT323',monospace;font-size:24px;background:var(--bg);border:1px solid var(--border);color:var(--gold2);padding:8px 12px;outline:none;width:100%;box-sizing:border-box;letter-spacing:1px;}
+  .name-input:focus{border-color:var(--gold);}
+  .name-input::placeholder{color:#3a3830;}
   /* ENLARGED header buttons */
   .hdr-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:5px 11px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
   .hdr-btn:hover{border-color:var(--gold);color:var(--gold);}
@@ -310,10 +360,10 @@
   #inv-eq-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;overflow-y:auto;padding:4px;}
   .eslot-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 3px;gap:3px;}
   .eslot-title{font-family:'Press Start 2P',monospace;font-size:5.5px;color:var(--gold);letter-spacing:.5px;text-align:center;}
-  .eslot{width:100%;aspect-ratio:1;border:3px solid #3a3a5a;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:var(--bg2);transition:background .1s;min-height:56px;}
-  .eslot:hover{background:#1a1a2c;border-color:var(--gold);}
+  .eslot{width:100%;aspect-ratio:1;border:3px solid #3a3a5a;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:var(--bg2);transition:background .1s,transform .1s,border-color .1s;min-height:56px;}
+  .eslot:hover{background:rgba(200,168,75,0.07);border-color:var(--gold);}
   .eslot.has-item{background:var(--panel);border-color:#545480;}
-  .eslot.has-item:hover{background:#1f1f2e;border-color:var(--gold);}
+  .eslot.has-item:hover{background:rgba(200,168,75,0.07);border-color:var(--gold);transform:scale(1.03);z-index:2;}
   .eslot.sel{background:#222234;border-color:var(--gold2);box-shadow:0 0 5px #f0d07028;}
   .eslot.is-empty{opacity:.3;cursor:default;}
   .eslot.is-empty:hover{background:var(--bg2);border-color:#3a3a5a;}
@@ -333,10 +383,11 @@
   #inv-slots-wrap::-webkit-scrollbar{width:3px;}
   #inv-slots-wrap::-webkit-scrollbar-thumb{background:var(--border);}
   #inv-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
-  .icell{aspect-ratio:1;border:7px solid #4a4a72;box-shadow:inset 0 0 0 3px #6a6a9a;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;transition:border-color .1s,background .1s;min-height:58px;}
-  .icell:hover{border-color:var(--gold);box-shadow:inset 0 0 0 3px #e0c870;background:#1f1f2e;}
-  .icell.sel{border-color:var(--gold2);box-shadow:inset 0 0 0 3px #f8e888;background:#222234;}
-  .icell.mt{opacity:.15;cursor:default;pointer-events:none;border-color:#303050;box-shadow:inset 0 0 0 3px #404060;}
+  .icell{aspect-ratio:1;border:1px solid #4a4a72;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;transition:border-color .1s,background .1s,transform .12s;min-height:58px;}
+  .icell:hover{border-color:var(--gold);background:rgba(200,168,75,0.07);}
+  .icell.has-item:hover{border-color:var(--gold);background:rgba(200,168,75,0.07);transform:scale(1.03);z-index:2;}
+  .icell.sel{border-color:var(--gold2);background:#222234;}
+  .icell.mt{opacity:.15;cursor:default;pointer-events:none;border-color:#303050;}
   .icell .sbadge{position:absolute;bottom:1px;right:2px;font-family:'Press Start 2P',monospace;font-size:5px;color:var(--gold2);}
   #inv-footer{padding:5px 10px;border-top:1px solid var(--border);font-size:15px;color:var(--dim);display:flex;gap:8px;align-items:center;flex-shrink:0;}
   .inv-cbar{flex:1;height:4px;background:var(--bg);border:1px solid var(--border);overflow:hidden;}
@@ -371,7 +422,7 @@
 
   /* inv char page */
   #inv-char-page{flex-direction:row;}
-  .icp-col{flex:1;padding:14px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+  .icp-col{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
   .icp-col:last-child{border-right:none;}
   .icp-col::-webkit-scrollbar{width:3px;}
   .icp-col::-webkit-scrollbar-thumb{background:var(--border);}
@@ -486,7 +537,7 @@
       </div>
     </div>
     <div class="play-footer">
-      <button class="btn sm secondary" onclick="showScreen('title-screen')">◀ BACK</button>
+      <button class="btn sm secondary" onclick="showScreen('title-screen')">BACK</button>
     </div>
   </div>
 </div>
@@ -506,7 +557,7 @@
       <div class="menu-sett-card-desc">Import or export all save data.</div>
     </div>
   </div>
-  <button class="btn sm secondary" onclick="showScreen('title-screen')">◀ BACK</button>
+  <button class="btn sm secondary" onclick="showScreen('title-screen')">BACK</button>
 </div>
 
 <!-- PROGRESS SCREEN -->
@@ -542,8 +593,8 @@
       </div>
     </div>
   </div>
+  <button class="btn sm secondary" onclick="event.stopPropagation();showScreen('menu-settings-screen')">BACK</button>
 </div>
-<!-- WIPE CONFIRMATION MODAL -->
 <div class="modal-overlay" id="wipe-modal">
   <div class="modal-box" style="width:min(380px,92vw);text-align:center;">
     <div style="font-size:32px;margin-bottom:12px;">⚠️</div>
@@ -584,8 +635,8 @@
     </div>
   </div>
   <div style="display:flex;gap:14px;">
-    <button class="btn secondary" onclick="showScreen('config-screen')">◀ BACK</button>
-    <button class="btn" onclick="showStatAlloc()">NEXT ▶</button>
+    <button class="btn secondary" onclick="showScreen('config-screen')">BACK</button>
+    <button class="btn" onclick="showStatAlloc()">NEXT</button>
   </div>
 </div>
 
@@ -593,12 +644,16 @@
 <div class="screen" id="stat-screen">
   <div class="screen-title">ALLOCATE STARTING STATS</div>
   <div class="stat-alloc-container">
+    <div class="name-input-wrap">
+      <div class="name-input-label">CHARACTER NAME</div>
+      <input class="name-input" id="char-name-input" type="text" maxlength="20" placeholder="Enter a name..." autocomplete="off" spellcheck="false">
+    </div>
     <div class="points-left">Points remaining: <span id="points-display">5</span></div>
     <div id="alloc-rows"></div>
   </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-    <button class="btn secondary" onclick="showClassSelect()">◀ BACK</button>
-    <button class="btn" onclick="startGame()">BEGIN ▶</button>
+    <button class="btn secondary" onclick="showClassSelect()">BACK</button>
+    <button class="btn" onclick="startGame()">BEGIN</button>
   </div>
 </div>
 
@@ -643,8 +698,8 @@
     </div>
   </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-    <button class="btn secondary" onclick="showScreen('title-screen')">◀ BACK</button>
-    <button class="btn" onclick="showClassSelect()">NEXT ▶</button>
+    <button class="btn secondary" onclick="showScreen('title-screen')">BACK</button>
+    <button class="btn" onclick="showClassSelect()">NEXT</button>
   </div>
 </div>
 
@@ -757,11 +812,6 @@
     <div class="inv-page" id="inv-page-char">
       <div class="icp-col">
         <div class="icp-blk">
-          <div class="icp-blk-t">CLASS</div>
-          <div style="text-align:center;font-size:44px;margin-bottom:5px" id="icp-icon">⚔️</div>
-          <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);text-align:center" id="icp-name">WARRIOR</div>
-        </div>
-        <div class="icp-blk">
           <div class="icp-blk-t">VITALS</div>
           <div class="icp-bwrap">
             <div class="icp-blrow"><span>HP</span><span id="icp-hp">—</span></div>
@@ -773,10 +823,19 @@
           </div>
         </div>
         <div class="icp-blk">
-          <div class="icp-blk-t">LEVEL INFO</div>
+          <div class="icp-blk-t">PLAYER INFO</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:6px;">
+            <div id="icp-icon" style="font-size:32px;line-height:1;flex-shrink:0;">⚔️</div>
+            <div>
+              <div id="icp-name" style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);margin-bottom:4px;">—</div>
+              <div id="icp-class" style="font-size:13px;color:var(--dim);">—</div>
+            </div>
+          </div>
           <div class="icpsr"><span class="il">Level</span><span class="iv gld" id="icp-lvl">1</span></div>
-          <div class="icpsr"><span class="il">Kills</span><span class="iv" id="icp-kills">0</span></div>
+          <div class="icpsr"><span class="il">Difficulty / Floor Size</span><span class="iv" id="icp-diff">—</span></div>
+          <div class="icpsr"><span class="il">Current Floor</span><span class="iv" id="icp-floor">—</span></div>
           <div class="icpsr"><span class="il">Lowest Depth</span><span class="iv" id="icp-depth">—</span></div>
+          <div class="icpsr"><span class="il">Kills</span><span class="iv" id="icp-kills">0</span></div>
           <div class="icpsr"><span class="il">Turn</span><span class="iv" id="icp-turn">1</span></div>
         </div>
       </div>
@@ -842,7 +901,7 @@
     <div id="lu-alloc-rows"></div>
     <div class="lu-spacer"></div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;">
-      <button class="btn sm" onclick="confirmLevelUp()">CONFIRM ▶</button>
+      <button class="btn sm" onclick="confirmLevelUp()">CONFIRM</button>
     </div>
   </div>
 </div>
@@ -850,7 +909,7 @@
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal-box" style="border-color:var(--blue);box-shadow:0 0 40px #4080c833;">
-    <div class="modal-title" style="color:#80c0f0;text-shadow:none;">⚙ SETTINGS</div>
+    <div class="modal-title" style="color:#80c0f0;text-shadow:none;">SETTINGS</div>
     <div class="setting-row">
       <div class="setting-lhs"><div class="setting-label">CAMERA ZOOM</div><div class="setting-desc">Tile pixel size (larger = closer)</div></div>
       <div class="setting-ctrl">
@@ -883,15 +942,40 @@
   </div>
 </div>
 
-<!-- DEATH SCREEN -->
+<!-- DEATH SCREEN — summary (no click-outside) -->
 <div class="screen" id="death-screen">
   <div class="death-title">YOU DIED</div>
-  <div class="death-stats" id="death-stats"></div>
-  <button class="btn" onclick="showScreen('title-screen')">▶ MAIN MENU</button>
+  <div class="death-subtitle">▓ RUN SUMMARY ▓</div>
+  <div class="death-card">
+    <div class="death-card-header">▓ RUN SUMMARY</div>
+    <div class="death-stats" id="death-stats"></div>
+  </div>
+  <div class="death-btn-bar">
+    <button class="dbb main" onclick="showScreen('title-screen')">MAIN MENU</button>
+    <button class="dbb stats" onclick="showScreen('death-detail-screen')">FULL STATS</button>
+    <button class="dbb load" id="death-load-btn" onclick="openSavesModal('load')" style="display:none">LOAD</button>
+    <button class="dbb newrun" onclick="showScreen('config-screen')">NEW RUN</button>
+  </div>
+</div>
+
+<!-- DEATH DETAIL SCREEN — click-outside returns to summary -->
+<div class="screen" id="death-detail-screen" style="flex-direction:column;align-items:center;justify-content:center;gap:0;background:radial-gradient(ellipse at center,#1a0808 0%,#020202 80%);" onclick="showScreen('death-screen')">
+  <div onclick="event.stopPropagation()">
+    <div class="dstat-card">
+      <div class="death-card-header">▓ FULL RUN STATS</div>
+      <div class="dstat-body">
+        <div class="dstat-col" id="dstat-left"></div>
+        <div class="dstat-col" id="dstat-right"></div>
+      </div>
+    </div>
+    <div class="dstat-btn-bar death-btn-bar">
+      <button class="dbb back" onclick="showScreen('death-screen')">BACK</button>
+      <button class="dbb main" onclick="showScreen('title-screen')">MAIN MENU</button>
+    </div>
+  </div>
 </div>
 
 <script>
-// ==================== SETTINGS ====================
 const SETTINGS = {tileSize:30, fovRadius:12, smoothCam:true, smoothEntities:true, showLog:false, showGrid:false, showCoords:false};
 const SETTING_LIMITS = {tileSize:[10,40]};
 
@@ -985,7 +1069,11 @@ const STAT_DEFS = [
   {key:'STR', label:'STR', effect:'Hit harder and carry more weight.'},
   {key:'DEX', label:'DEX', effect:'Move faster and strike more accurately.'},
 ];
-function showStatAlloc(){ allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0}; renderAllocRows(); showScreen('stat-screen'); }
+function showStatAlloc(){
+  allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0}; renderAllocRows(); showScreen('stat-screen');
+  // Focus the name field so player can type immediately
+  setTimeout(()=>{ const el=document.getElementById('char-name-input'); if(el){ el.value=''; el.focus(); } },50);
+}
 function renderAllocRows(){
   const c = document.getElementById('alloc-rows'); c.innerHTML = '';
   STAT_DEFS.forEach(d => {
@@ -1090,13 +1178,16 @@ let camX = 0, camY = 0;
 
 function startGame(){
   const tmpl = CLASS_TEMPLATES[selectedClass];
+  const inputEl = document.getElementById('char-name-input');
+  const enteredName = inputEl ? inputEl.value.trim() : '';
+  const charName = enteredName || tmpl.name;
   const con  = tmpl.baseCON + (allocValues.CON || 0);
   const str  = tmpl.baseSTR + (allocValues.STR || 0);
   const dex  = tmpl.baseDEX + (allocValues.DEX || 0);
   const maxHP = con;
 
   G = {
-    class: selectedClass, icon: tmpl.icon, name: tmpl.name,
+    class: selectedClass, icon: tmpl.icon, name: charName,
     weaponType: tmpl.weaponType,
     level:1, xp:0, xpNeeded:10,
     hp: maxHP, maxHP,
@@ -1104,7 +1195,7 @@ function startGame(){
     baseDmg: calcDmg(tmpl.weaponType, str, dex),
     def: calcDef(con),
     regen: calcRegen(con),
-    kills:0, turn:1, depth:1, zone:'upper', lowestDepth:0,
+    kills:0, turn:1, depth:1, zone:'upper', lowestDepth:0, killedBy:null, dead:false,
     enemySpawn: RUN_CONFIG.enemySpawn,
     pendingLevelUps: 0,
     unspentPoints: allocPoints,
@@ -1444,7 +1535,7 @@ function enemyTurn(){
           addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
           spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
           flashCanvas('red'); triggerPlayerHpFlash();
-          if(G.hp<=0){ G.hp=0; updateHUD(); die(); return; }
+          if(G.hp<=0){ G.hp=0; updateHUD(); G.killedBy={type:enemy.type,dmg,floor:depthLabel()}; die(); return; }
           // Do NOT move after attacking — rat stays in place this turn
         } else {
           // Step toward snapshot position (1-turn lag feels natural, not psychic)
@@ -1480,7 +1571,7 @@ function enemyTurn(){
           addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
           spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
           flashCanvas('red'); triggerPlayerHpFlash();
-          if(G.hp<=0){ G.hp=0; updateHUD(); die(); return; }
+          if(G.hp<=0){ G.hp=0; updateHUD(); G.killedBy={type:enemy.type,dmg,floor:depthLabel()}; die(); return; }
         } else {
           _enemyStepToward(enemy, snapX, snapY);
         }
@@ -2118,7 +2209,7 @@ function doSpaceAction(){
   endTurn();
 }
 function useBonfire(){
-  const healed=parseFloat((G.maxHP-G.hp).toFixed(1));
+    const healed=parseFloat((G.maxHP-G.hp).toFixed(1));
   G.hp=G.maxHP;
   addLog(`You rest at the bonfire and recover ${healed} HP.`,'heal');
   spawnFloat(G.player.x,G.player.y-0.5,`+${healed.toFixed(0)}HP`,'#40c870');
@@ -2147,10 +2238,10 @@ function doAttackEnemy(enemy){
   const spread  = baseDmg * 0.4;
   const dmg     = parseFloat(Math.max(0.1, randFloat(baseDmg-spread, baseDmg+spread)).toFixed(1));
   enemy.hp = parseFloat((enemy.hp-dmg).toFixed(1));
-  addLog(`You hit the ${enemy.type} for ${dmg}!`,'damage');
+    addLog(`You hit the ${enemy.type} for ${dmg}!`,'damage');
   spawnFloat(enemy.x,enemy.y-0.3,dmg.toFixed(1),'#ff6060');
   if (enemy.hp<=0){
-    addLog(`The ${enemy.type} dies!`,'damage');
+        addLog(`The ${enemy.type} dies!`,'damage');
     G.kills++;
     gainXP(enemy.xp);
     if (priorityTargetId===enemy.id) priorityTargetId=null;
@@ -2520,7 +2611,7 @@ function drawClearedBanner(){
 // When ascending:  player spawns on the DESCEND stair tile of the new floor
 
 function descend(){
-  saveFloor();
+    saveFloor();
 
   if (G.zone==='upper'){
     if (G.isBonfireFloor){
@@ -2550,7 +2641,7 @@ function descend(){
 }
 
 function ascend(){
-  saveFloor();
+    saveFloor();
 
   if (G.zone==='upper'){
     if (G.isBonfireFloor){
@@ -2765,15 +2856,104 @@ function addLog(msg, type='info'){
 }
 
 function die(){
+  if(G.dead) return;
+  G.dead = true;
   addLog('YOU HAVE DIED.','death');
   setTimeout(()=>{
-    document.getElementById('death-stats').innerHTML=`
-      <div class="death-stat-row"><span class="label">Hero</span><span class="val">${G.name}</span></div>
-      <div class="death-stat-row"><span class="label">Level</span><span class="val">${G.level}</span></div>
-      <div class="death-stat-row"><span class="label">Depth Reached</span><span class="val">${depthLabel()}</span></div>
-      <div class="death-stat-row"><span class="label">Enemies Slain</span><span class="val">${G.kills}</span></div>
-      <div class="death-stat-row"><span class="label">Turns Survived</span><span class="val">${G.turn}</span></div>
-    `;
+    const diff = (G.enemySpawn !== false ? (RUN_CONFIG.difficulty||'normal') : 'easy').toUpperCase();
+    const size = (RUN_CONFIG.floorSize||'md').toUpperCase();
+    const deepest = G.lowestDepth > 0 ? `Depth ${G.lowestDepth}` : depthLabel();
+    const kb = G.killedBy;
+    const _pick = arr => arr[Math.floor(Math.random()*arr.length)];
+    const DEATH_MSGS = {
+      rat: [
+        `A rat nibbled {name} to death. How embarrassing.`,
+        `Finished off by a rat. The dungeon will not mourn {name}.`,
+        `A rat saw an opening. {name} did not.`,
+        `{name} was gnawed into oblivion by a common rat.`,
+        `The rat was faster. {name} was not.`,
+        `Death by rodent. The dungeon has seen worse. Barely.`,
+        `{name} underestimated the rat. The rat did not underestimate {name}.`,
+        `Somewhere, a rat is licking its paws clean.`,
+        `The rat family will feast well tonight.`,
+        `{name} came looking for glory. A rat had other plans.`,
+      ],
+      _default: [
+        `{name} met their end in the depths.`,
+        `The dungeon claimed another soul.`,
+        `Darkness took {name}.`,
+        `{name} fought bravely. Not bravely enough.`,
+        `The dungeon does not give back what it takes.`,
+      ],
+    };
+    const pool = (kb && DEATH_MSGS[kb.type]) || DEATH_MSGS._default;
+    const flavorMsg = _pick(pool).replace(/{name}/g, G.name);
+    const fixedKillMsg = kb
+      ? `Killed by ${kb.type.charAt(0).toUpperCase()+kb.type.slice(1)}.`
+      : `Fell to the dungeon.`;
+
+    const msgBlock = (txt) => `<div class="death-msg">${txt}</div>`;
+    const row = (label, val) => `<div class="death-stat-row"><span class="label">${label}</span><span class="val">${val}</span></div>`;
+    const sec = (title, content) => `<div class="death-sec"><div class="death-sec-t">${title}</div>${content}</div>`;
+    const drow = (label, val) => `<div class="dstat-row"><span class="dl">${label}</span><span class="dv">${val}</span></div>`;
+
+    // ── Slim summary — sections with gaps, randomised flavour in run info ─
+    document.getElementById('death-stats').innerHTML =
+      sec('PLAYER',
+        row('PLAYER', `${G.name} — ${(G.class||'?').charAt(0).toUpperCase()+(G.class||'?').slice(1)}`) +
+        row('LEVEL', G.level)
+      ) +
+      sec('RUN INFO',
+        row('DEEPEST FLOOR', deepest) +
+        row('ENEMIES SLAIN', G.kills) +
+        msgBlock(flavorMsg)
+      );
+
+    // Show LOAD button
+    const loadBtn = document.getElementById('death-load-btn');
+    if(loadBtn) loadBtn.style.display = '';
+
+    // ── Full stats — two-col layout ───────────────────────────
+    const dmgRange = (()=>{
+      const w = G.weaponType ? WEAPON_DEFS[G.weaponType] : null;
+      const mid = w ? (w.base + G.str*w.str + G.dex*w.dex) : G.baseDmg;
+      return `${(mid*0.6).toFixed(1)}–${(mid*1.4).toFixed(1)}`;
+    })();
+    const cls = (G.class||'?').charAt(0).toUpperCase()+(G.class||'?').slice(1);
+
+    document.getElementById('dstat-left').innerHTML =
+      `<div class="dstat-blk">
+        <div class="dstat-blk-t">PLAYER INFO</div>
+        <div class="dstat-player-header">
+          <div class="dstat-player-icon">${G.icon}</div>
+          <div><div class="dstat-player-name">${G.name}</div><div class="dstat-player-class">${cls}</div></div>
+        </div>` +
+        drow('LEVEL', G.level) +
+      `</div>` +
+      `<div class="dstat-blk">
+        <div class="dstat-blk-t">RUN INFO</div>` +
+        drow('DIFFICULTY', diff) +
+        drow('MAP SIZE', size) +
+        drow('ENEMY SPAWNS', G.enemySpawn !== false ? 'ON' : 'OFF') +
+        drow('DIED AT', depthLabel()) +
+        drow('DEEPEST FLOOR', deepest) +
+        drow('ENEMIES SLAIN', G.kills) +
+        drow('TURNS SURVIVED', G.turn) +
+        drow('KILLED BY', kb ? kb.type.charAt(0).toUpperCase()+kb.type.slice(1) : '—') +
+      `</div>`;
+
+    document.getElementById('dstat-right').innerHTML =
+      `<div class="dstat-blk">
+        <div class="dstat-blk-t">BASE ATTRIBUTES</div>` +
+        drow('CON', G.con) +
+        drow('STR', G.str) +
+        drow('DEX', G.dex) +
+        drow('DEF', (G.def||0).toFixed(2)) +
+        drow('REGEN', (G.regen||0).toFixed(3)) +
+        drow('MAX HP', G.maxHP) +
+        drow('DMG RANGE', dmgRange) +
+      `</div>`;
+
     showScreen('death-screen');
   },900);
 }
@@ -2976,7 +3156,7 @@ function invRenderGrid(){
     const item=items[i];
     const cell=document.createElement('div');
     if (item){
-      cell.className='icell'+(invSelId===item.id?' sel':'');
+      cell.className='icell has-item'+(invSelId===item.id?' sel':'');
       cell.innerHTML=item.icon+(item.stack?`<span class="sbadge">×${item.stack}</span>`:'');
       cell.title=item.name;
       cell.addEventListener('click',()=>invSelect(item.id));
@@ -3047,7 +3227,7 @@ function invBuildActs(item){
 }
 function invShowEmptyDetail(){
   document.getElementById('inv-det-body').innerHTML=
-    `<div class="det-empty"><span class="dei">🎒</span><span class="dem">SELECT AN<br>ITEM TO VIEW<br>DETAILS</span></div>`;
+    `<div class="det-empty"><span class="dem">SELECT AN<br>ITEM TO VIEW<br>DETAILS</span></div>`;
 }
 
 let _invNextId=100;
@@ -3164,12 +3344,15 @@ function invRenderCharPage(){
   const mid=w?(w.base+G.str*w.str+G.dex*w.dex):G.baseDmg;
   const lo=(mid*0.6).toFixed(1), hi=(mid*1.4).toFixed(1);
   document.getElementById('icp-icon').textContent=G.icon;
-  document.getElementById('icp-name').textContent=G.name;
+  document.getElementById('icp-name').textContent=G.name||'—';
+  document.getElementById('icp-class').textContent=(G.class||'?').charAt(0).toUpperCase()+(G.class||'?').slice(1);
   document.getElementById('icp-hp').textContent=`${Math.max(0,G.hp).toFixed(1)}/${G.maxHP}`;
   document.getElementById('icp-hpbar').style.width=`${Math.max(0,G.hp)/G.maxHP*100}%`;
   document.getElementById('icp-xp').textContent=`${G.xp}/${G.xpNeeded}`;
   document.getElementById('icp-xpbar').style.width=`${G.xp/G.xpNeeded*100}%`;
   document.getElementById('icp-lvl').textContent=G.level;
+  document.getElementById('icp-diff').textContent=`${(RUN_CONFIG.difficulty||'normal').toUpperCase()} · ${(RUN_CONFIG.floorSize||'md').toUpperCase()}`;
+  document.getElementById('icp-floor').textContent=depthLabel();
   document.getElementById('icp-kills').textContent=G.kills;
   document.getElementById('icp-depth').textContent=G.lowestDepth?`Depth ${G.lowestDepth}`:'—';
   document.getElementById('icp-turn').textContent=G.turn;
@@ -3392,7 +3575,7 @@ function selectPlaySlot(idx,cardEl){
     title:(s.icon||'⚔️')+' '+(s.name||'?').toUpperCase(),
     lines:[`Class: ${(s.class||'?').toUpperCase()}`,`Level: ${s.level||1}`,`Depth: ${depth}`,`Difficulty: ${diff}`,`Map size: ${size}`,`Kills: ${s.kills||0}`,`Turn: ${s.turn||1}`,`Saved: ${date}`],
     actions:[
-      {label:'▶ CONTINUE', cls:'primary', fn:`confirmLoadSlotPlay(${idx})`},
+      {label:'CONTINUE', cls:'primary', fn:`confirmLoadSlotPlay(${idx})`},
       {label:'EXPORT SAVE', cls:'blue', fn:`doExportSlot(${idx})`},
       {label:'DELETE', cls:'danger', fn:`deleteSaveSlotPlay(${idx})`},
     ]
@@ -3518,7 +3701,7 @@ function openSavesModal(mode){
 }
 function closeSavesModal(){
   _exportMode=false;cancelImport();document.getElementById('saves-modal').classList.remove('active');
-  if(_inGameSaves){_inGameSaves=false;openGameMenu();}
+  if(_inGameSaves){_inGameSaves=false;closeGameMenu();}
 }
 document.getElementById('wipe-modal').addEventListener('click',function(e){
   if(e.target===this) closeWipeModal();
@@ -3571,7 +3754,7 @@ function _renderSavesDetail(idx, info){
   const diff=(rc.difficulty||'normal').toUpperCase();
   const size=(rc.floorSize||'md').toUpperCase();
   const overwriteBtn=_inGameSaves?`<button class="play-det-btn primary" onclick="confirmSaveToSlot(${idx})">OVERWRITE</button>`:'';
-  const loadLabel=_inGameSaves?'LOAD (LOSE RUN)':'▶ LOAD';
+  const loadLabel=_inGameSaves?'LOAD (LOSE RUN)':'LOAD';
   const loadFn=_inGameSaves?`confirmLoadSlotInGame(${idx})`:`confirmLoadSlot(${idx})`;
   panel.innerHTML=`
     <div class="play-detail-name">${s.icon||'⚔️'} ${(s.name||'?').toUpperCase()}</div>
