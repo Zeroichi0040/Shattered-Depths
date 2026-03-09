@@ -646,7 +646,7 @@
         <button class="save-io-btn" id="progress-import-toggle" onclick="toggleProgressImport()">PASTE CODE</button>
       </div>
       <div id="progress-import-area" style="display:none;margin-top:10px;">
-        <textarea id="progress-import-ta" style="width:100%;height:64px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'VT323',monospace;font-size:16px;padding:6px 8px;resize:none;outline:none;box-sizing:border-box;" placeholder="Paste progress code here..."></textarea>
+        <textarea id="progress-import-ta" style="width:100%;height:64px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'VT323',monospace;font-size:16px;padding:6px 8px;resize:none;outline:none;box-sizing:border-box;" placeholder="Paste progress code here"></textarea>
         <div style="display:flex;gap:8px;margin-top:6px;justify-content:flex-end;">
           <button class="save-act" onclick="toggleProgressImport()">CANCEL</button>
           <button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doImportAllProgress()">IMPORT</button>
@@ -961,7 +961,7 @@
   <div class="stat-alloc-container">
     <div class="name-input-wrap">
       <div class="name-input-label">CHARACTER NAME</div>
-      <input class="name-input" id="char-name-input" type="text" maxlength="20" placeholder="Enter a name..." autocomplete="off" spellcheck="false">
+      <input class="name-input" id="char-name-input" type="text" maxlength="20" placeholder="Enter a name" autocomplete="off" spellcheck="false">
     </div>
     <div class="points-left">Points remaining: <span id="points-display">5</span></div>
     <div id="alloc-rows"></div>
@@ -1123,7 +1123,7 @@
           <button class="inv-fbtn" onclick="invSetFilter(this,'armor')">ARMOR</button>
           <button class="inv-fbtn" onclick="invSetFilter(this,'consumable')">USE</button>
           <button class="inv-fbtn" onclick="invSetFilter(this,'misc')">MISC</button>
-          <input id="inv-search" type="text" placeholder="search..." autocomplete="off" oninput="invRenderGrid()">
+          <input id="inv-search" type="text" placeholder="search" autocomplete="off" oninput="invRenderGrid()">
         </div>
         <div id="inv-slots-wrap"><div id="inv-slots"></div></div>
         <div id="inv-footer">
@@ -1609,7 +1609,7 @@ function startGame(){
     if (SETTINGS.smoothCam && !SETTINGS.smoothEntities) smoothCamLoop();
     renderCanvas();
   }, 50);
-  addLog('You descend into the dungeon...', 'info');
+  addLog('You descend into the dungeon.', 'info');
   addLog('Rats scurry in the darkness.', 'info');
   if (G.unspentPoints > 0) addLog(`${G.unspentPoints} unspent stat points — see CHAR tab!`, 'level');
 }
@@ -2752,7 +2752,7 @@ function doSpaceAction(){
     const bx=G.bonfire.x, by=G.bonfire.y;
     if (Math.abs(x-bx)<=1&&Math.abs(y-by)<=1&&!(x===bx&&y===by)){ useBonfire(); return; }
   }
-  addLog('You wait...','info');
+  addLog('You wait','info');
   spawnFloat(G.player.x, G.player.y-0.4, '...', '#ffffff', 22, 0.45);
   floatNums[floatNums.length-1].dy = 0.02;
   tutMarkDone('wait');
@@ -3167,13 +3167,13 @@ function descend(){
   if (G.zone==='upper'){
     if (G.isBonfireFloor){
       G.isBonfireFloor=false; G.zone='normal'; G.depth=1;
-      addLog('You descend into the dungeon depths...','stairs');
+      addLog('You descend into the dungeon depth','stairs');
     } else if (G.depth<3){
       G.depth++;
       addLog(`You descend to ${depthLabel()}.`,'stairs');
     } else {
       G.isBonfireFloor=true;
-      addLog('You find a bonfire before the depths...','stairs');
+      addLog('You find a bonfire before the depths','stairs');
     }
     regenMap('down'); return;
   }
@@ -3183,7 +3183,7 @@ function descend(){
     addLog(`You descend to ${depthLabel()}.`,'stairs');
   } else if (_shouldInsertBonfire()){
     G.isBonfireFloor=true;
-    addLog(`You find a bonfire after depth ${G.depth}...`,'stairs');
+    addLog(`You find a bonfire after depth ${G.depth}`,'stairs');
   } else {
     G.depth++;
     addLog(`You descend to ${depthLabel()}.`,'stairs');
@@ -3221,7 +3221,7 @@ function ascend(){
 
   if ((G.depth-1)%5===0){
     G.depth--; G.isBonfireFloor=true;
-    addLog(`You ascend back through the bonfire at depth ${G.depth}...`,'stairs');
+    addLog(`You ascend back through the bonfire at depth ${G.depth}`,'stairs');
   } else {
     G.depth--;
     addLog(`You ascend to ${depthLabel()}.`,'stairs');
@@ -4334,7 +4334,7 @@ function _renderPlayDetail(data){
       <button class="play-det-btn primary" onclick="showScreen('config-screen')">▶ START NEW RUN</button>
       <button class="play-det-btn blue" onclick="togglePlayImport()">IMPORT SAVE</button>
       <div id="play-import-area">
-        <textarea id="play-import-ta" placeholder="Paste save code here..."></textarea>
+        <textarea id="play-import-ta" placeholder="Paste save code here"></textarea>
         <div style="display:flex;gap:8px;margin-top:6px;justify-content:flex-end;">
           <button class="save-act" onclick="togglePlayImport()">CANCEL</button>
           <button class="save-act" style="border-color:var(--blue);color:#80c0f0;" onclick="doPlayImport()">IMPORT</button>
