@@ -732,132 +732,185 @@
 
 ═══════════════════════════════════════════════════════════════ -->
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.7 — Floor and Spawned Enemies Indicator, Imports and Exports, New UIs</div>
+      <div class="changelog-title">v0.1.8 — Dynamic Combat</div>
+      <div class="changelog-date">2026-03-09</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Action Point System</div>
+      <div class="changelog-para">Every entity now has an action point (AP) counter. Each turn cycle, entities gain AP equal to their rate (default 1). Actions are resolved in AP order — the entity with the most AP acts first, with the player winning ties.</div>
+      <div class="changelog-para">This lays the foundation for characters and enemies with different speeds. A rate of 2 acts twice per cycle; a rate of 0.5 acts every other cycle. Rates can be decimals.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Telegraph &amp; Bite</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Rats no longer deal instant damage when adjacent. Instead they enter a telegraph phase — targeting the tile the player is on and showing a pulsing red X with a red border.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> On the following turn the rat commits to biting that tile regardless of whether the player moved. Step off the marked tile to dodge; stay and take the hit.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Visual Feedback</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> A white slash particle appears on any attacked tile — both when the player strikes an enemy and when a rat bites a tile.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Waiting (SPACE on an empty tile) now shows a "..." float above the player.</div>
+    </div>
+
+    <div class="changelog-entry">
+      <div class="changelog-title">v0.1.7 — Enemy Indicators &amp; UI Overhaul</div>
       <div class="changelog-date">2026-03-08</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Spawned enemies have a different colored hp bar</div>
-      <div class="changelog-para">Indicator for number of floor enemies left to kill</div>
+      <div class="changelog-sub">Enemy Visuals</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Spawned enemies now have an amber HP bar, distinct from floor enemies (red). Makes it easy to tell at a glance which rats were always there and which appeared over time.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Floor enemy counter in the dungeon header — shows how many enemies remain before the floor is cleared.</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">You can import/export specific runs</div>
-      <div class="changelog-para">You are able to import/export your entire data</div>
+      <div class="changelog-sub">Save Data</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Export and import individual run slots. Share or back up a specific run without touching the others.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Export and import all save data at once from the Progress screen. Useful for moving between devices or browsers.</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">New main menu ui</div>
-      <div class="changelog-para">New death screen. run summary will have a randomized death message</div>
-      <div class="changelog-para">inventory ui changes</div>
-      <div class="changelog-para">Player name input</div>
+      <div class="changelog-sub">UI</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Redesigned main menu with two-column layout — title and navigation on the left, animated ASCII dungeon preview on the right.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Death screen split into two views: a compact run summary with a randomised death flavour message, and a full stats breakdown.</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Inventory UI updated. Character panel now shows class icon and player name at the top.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Character name input on the stat allocation screen. Defaults to class name if left empty.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.6 — Enemy state indicators</div>
+      <div class="changelog-title">v0.1.6 — Enemy State Indicators</div>
       <div class="changelog-date">2026-03-08</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">- Enemy state indicators</div>
-      <div class="changelog-para">ZZZ's - Sleeping</div>
-      <div class="changelog-para">! ----- Awoken, surprised</div>
-      <div class="changelog-para">? ----- Alert, lost sight of player</div>
-      <div class="changelog-para">- Better pathfinding</div>
+      <div class="changelog-sub">State Indicators</div>
+      <ul class="changelog-ul">
+        <li><strong>ZZZ</strong> — enemy is sleeping. Three z's drift upward with staggered timing.</li>
+        <li><strong>!</strong> — enemy just woke up, surprised by the player.</li>
+        <li><strong>?</strong> — enemy is alert; lost sight of the player and is searching.</li>
+      </ul>
+      <div class="changelog-sub">Pathfinding</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Improved enemy pathfinding. Rats no longer take large detours around each other unless the player is within line of sight — when hunting to a last-known position they walk through each other, preventing corridor gridlock.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.5 — Unlimited Save slots</div>
+      <div class="changelog-title">v0.1.5 — Save Slots &amp; Bug Fixes</div>
       <div class="changelog-date">2026-03-08</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Unlimited save slots. ability to import and export save files.</div>
-      <div class="changelog-para">XL floors with respawn on can now be "cleared" (there was a bug where spawned enemies counted towards requirements to satisfy cleared floor. now its fixed, so you only need to kill enemies that originated from the floor generation)</div>
-      <hr class="changelog-divider">
-      <div class="changelog-para">Other minor bug fixes</div>
-      <div class="changelog-para">UI changes</div>
+      <div class="changelog-sub">Save System</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Unlimited save slots. Previously capped; now as many slots as you want, each with per-slot import and export.</div>
+      <div class="changelog-sub">Bug Fixes</div>
+      <div class="changelog-para"><span class="changelog-tag fix">FIX</span> XL floors with enemy respawn enabled can now be properly cleared. Spawned enemies no longer counted toward the kill requirement — only enemies that originated from floor generation do.</div>
+      <div class="changelog-para"><span class="changelog-tag fix">FIX</span> Various minor UI and logic fixes.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v.1.4 — Balancing</div>
+      <div class="changelog-title">v0.1.4 — Balancing</div>
       <div class="changelog-date">2026-03-07</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Buffed DEF and REGEN CON scaling</div>
-      <div class="changelog-para">0.002 DEF per CON   -> 0.02 DEF per CON</div>
-      <div class="changelog-para">0.0005 REGEN per CON -> 0.001 REGEN per CON</div>
+      <div class="changelog-sub">Stat Scaling</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> DEF and REGEN scaling off CON significantly buffed — both were too weak to feel meaningful at low levels.</div>
+      <table class="changelog-table">
+        <thead><tr><th>Stat</th><th>Old rate</th><th>New rate</th></tr></thead>
+        <tbody>
+          <tr><td>DEF per CON</td><td class="cv">0.002</td><td class="cv">0.02</td></tr>
+          <tr><td>REGEN per CON</td><td class="cv">0.0005</td><td class="cv">0.001</td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.3 — New Stats, Inventory, Enemy States</div>
+      <div class="changelog-title">v0.1.3 — Stats, Inventory &amp; Enemy AI</div>
       <div class="changelog-date">2026-03-07</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">New Stats</div>
-      <div class="changelog-para">- DEF(Defense) - Resistance against attcks, scalse swith con at a rate of 0.0005 REGEN per CON.</div>
-      <div class="changelog-para">- REGEN(Regeneration) - Regenerates hp per turn, scales with con at a rate of 0.002 DEF per CON.</div>
+      <div class="changelog-sub">New Stats</div>
+      <ul class="changelog-ul">
+        <li><strong>DEF</strong> (Defense) — reduces incoming damage. Scales with CON at 0.02 DEF per point.</li>
+        <li><strong>REGEN</strong> (Regeneration) — recovers HP each turn. Scales with CON at 0.001 REGEN per point.</li>
+      </ul>
       <hr class="changelog-divider">
-      <div class="changelog-para">Inventory System</div>
-      <div class="changelog-para">Equip/Unequip, Drop and Pickup items. Right now the only items in the game are the starting weapons of each class. 10 STR = 1 inventory slot. all characters will have a default 10 inventory slots.</div>
+      <div class="changelog-sub">Inventory</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Full inventory system: equip, unequip, drop, and pick up items. Base capacity is 10 slots; every 10 STR adds 1 more. Currently only starting weapons are in the game.</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Enemies now have 5 states</div>
-      <div class="changelog-para">sleep - floor enemies will be motionless until player enters their FOV</div>
-      <div class="changelog-para">chase - actively chases player while in sight</div>
-      <div class="changelog-para">hunt - lost sight of player: walks to the last tile where the player was last seen</div>
-      <div class="changelog-para">alert - reached that tile, will wait for 2-10 turns before roaming</div>
-      <div class="changelog-para">roam - wanders randomly. woken enemies cant be in the sleep state again</div>
-      <div class="changelog-para">spawned enemies will start in the roam state</div>
+      <div class="changelog-sub">Enemy AI States</div>
+      <ul class="changelog-ul">
+        <li><strong>sleep</strong> — floor enemies are motionless until the player enters their FOV.</li>
+        <li><strong>chase</strong> — actively pursues the player while in sight.</li>
+        <li><strong>hunt</strong> — lost sight of player; walks to the last known tile.</li>
+        <li><strong>alert</strong> — reached last known tile; waits 2–10 turns before roaming.</li>
+        <li><strong>roam</strong> — wanders randomly. Once woken, enemies never return to sleep.</li>
+      </ul>
+      <div class="changelog-note">Spawned enemies start in roam state, never sleep.</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Distance -- Wake chance</div>
-      <div class="changelog-para">≤ 2 tiles - 100% (guaranteed)</div>
-      <div class="changelog-para">3 tiles --- ~94%</div>
-      <div class="changelog-para">4 tiles --- ~75%</div>
-      <div class="changelog-para">5 tiles --- ~44%</div>
-      <div class="changelog-para">6 tiles --- ~0%</div>
+      <div class="changelog-sub">Wake Chance by Distance</div>
+      <table class="changelog-table">
+        <thead><tr><th>Distance</th><th>Wake chance</th></tr></thead>
+        <tbody>
+          <tr><td>≤ 2 tiles</td><td class="cv">100%</td></tr>
+          <tr><td>3 tiles</td><td class="cv">~94%</td></tr>
+          <tr><td>4 tiles</td><td class="cv">~75%</td></tr>
+          <tr><td>5 tiles</td><td class="cv">~44%</td></tr>
+          <tr><td>6 tiles</td><td class="cv">~0%</td></tr>
+        </tbody>
+      </table>
       <hr class="changelog-divider">
-      <div class="changelog-para">QoL</div>
-      <div class="changelog-para">Clicking on a tile will make player move to that tile(same speed as WASD). Clicking on character/the tile the character is on simulates pressing the SPACE bar(wait, interact, pick up). Bonfire lighting looks natural now.</div>
+      <div class="changelog-sub">QoL</div>
+      <div class="changelog-para">Click a tile to auto-walk there. Click the player's tile to simulate SPACE (wait, interact, pick up). Bonfire glow now looks natural.</div>
     </div>
     <div class="changelog-entry">
       <div class="changelog-title">v0.1.2 — Auto Navigation</div>
       <div class="changelog-date">2026-03-06</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Auto Navigation Buttons does the action</div>
-      <div class="changelog-para">- Ascend Button - auto walks to ascend tile and ascends to previous floor</div>
-      <div class="changelog-para">- Descend Button - auto walks to descend tile and descends to the next floor</div>
-      <div class="changelog-para">- Bonfire Button(in bonfire rooms) - auto walks to nearest adjacent tile to bonfire and heals</div>
-      <hr class="changelog-divider">
-      <div class="changelog-para">if player is standing in destination, then action fires immediately</div>
-      <div class="changelog-para">enemy spotted mid-walk cancels auto walk</div>
-      <div class="changelog-para">walking is hella faster now</div>
-      <div class="changelog-para"></div>
+      <div class="changelog-sub">Navigation Buttons</div>
+      <ul class="changelog-ul">
+        <li><strong>Ascend</strong> — auto-walks to the up-stairs tile and ascends.</li>
+        <li><strong>Descend</strong> — auto-walks to the down-stairs tile and descends.</li>
+        <li><strong>Bonfire</strong> — auto-walks to the nearest adjacent bonfire tile and heals.</li>
+      </ul>
+      <div class="changelog-para">If the player is already standing at the destination, the action fires immediately without walking.</div>
+      <div class="changelog-sub">Auto-walk Behaviour</div>
+      <ul class="changelog-ul">
+        <li>Any key press cancels auto-walk.</li>
+        <li>Spotting an enemy mid-walk cancels auto-walk.</li>
+        <li>Walk speed significantly increased.</li>
+      </ul>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.1 — Level Scaling, Run config, Floor clearing and Enemy spawning</div>
+      <div class="changelog-title">v0.1.1 — Level Scaling, Run Config &amp; Enemy Spawning</div>
       <div class="changelog-date">2026-03-05</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Passive level up stat scaling</div>
-      <div class="changelog-para">- Every level up increments all stats by 1(con, str, etc)</div>
+      <div class="changelog-sub">Level Scaling</div>
+      <div class="changelog-para">Every level-up now increments all base stats (CON, STR, DEX, etc.) by 1 passively, in addition to any manually allocated points.</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Run Config Screen</div>
-      <div class="changelog-para">- Difficulty selector</div>
-      <div class="changelog-para">- Floor size selector. Upper floors are always fixed size regardless of this setting. </div>
-      <div class="changelog-para">- Enemy respawn toggle. ON/OFF default based on selected difficulty, can still be changed.</div>
+      <div class="changelog-sub">Run Config Screen</div>
+      <ul class="changelog-ul">
+        <li><strong>Difficulty</strong> — scales enemy stats and pacing.</li>
+        <li><strong>Floor size</strong> — XS through XL. Upper floors are always fixed size regardless of this setting.</li>
+        <li><strong>Enemy respawn</strong> — ON/OFF, defaulting based on difficulty. Can be overridden.</li>
+      </ul>
       <hr class="changelog-divider">
-      <div class="changelog-para">Floor Cleared Systems</div>
-      <div class="changelog-para">- Floor cleared indicator</div>
-      <div class="changelog-para">- Auto-navigation buttons</div>
-      <div class="changelog-para">- Auto walk cancels when any key is pressed or an enemy appears in line of sight.</div>
-      <div class="changelog-para">- Fog of war on cleared floors(no respawn) on floors with respawn disabled(basically every floor with this settings) makes the map permanently visible(no fov raycasting)</div>
-      <div class="changelog-para">- Fog of war on cleared floors(with respawn) on floors with fog of war enabled makes the floor layout as "seen" or "explored"(with fov raycasting). enemies may lurk in the dark</div>
+      <div class="changelog-sub">Floor Cleared System</div>
+      <ul class="changelog-ul">
+        <li>Floor cleared banner and indicator when all floor enemies are dead.</li>
+        <li>Auto-navigation buttons appear on cleared floors.</li>
+        <li>No-respawn cleared floors: fog of war disabled, full map visible permanently.</li>
+        <li>Respawn-enabled cleared floors: layout stays explored but enemies may lurk in the dark.</li>
+      </ul>
       <hr class="changelog-divider">
-      <div class="changelog-para">Enemy spawning system</div>
-      <div class="changelog-para">- Enemies spawn on normal floors when the run's spawning setting is ON(upper floors never spawn enemies)</div>
-      <div class="changelog-para">- attempts occur every 25 turns</div>
-      <div class="changelog-para">- Exponential diminishing returns on spawn probability based on currently alive enemies: 0.6^(n + 1) where n is number of alive enemies</div>
-      <div class="changelog-para">- Enemies only spawn on unseen tiles</div>
-      <hr class="changelog-divider">
-      <div class="changelog-para">Alive enemies - Spawn chance</div>
-      <div class="changelog-para">0 ------------- 60%</div>
-      <div class="changelog-para">1 ------------- 36%</div>
-      <div class="changelog-para">2 ------------- 21.6%</div>
-      <div class="changelog-para">3 ------------- 12.9%</div>
-      <div class="changelog-para">5 ------------- 4.7%</div>
-      <div class="changelog-para">10 ------------ 0.36%</div>
-      <div class="changelog-para">20 ------------ 0.000036%</div>
+      <div class="changelog-sub">Enemy Spawning</div>
+      <div class="changelog-para">Enemies spawn on normal floors when respawn is enabled. Upper floors never spawn enemies. Spawn attempts occur every 25 turns on unseen tiles only.</div>
+      <div class="changelog-para">Spawn probability uses exponential diminishing returns: <strong>0.6^(n+1)</strong> where n is the number of currently alive enemies.</div>
+      <table class="changelog-table">
+        <thead><tr><th>Alive enemies</th><th>Spawn chance</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td class="cv">60%</td></tr>
+          <tr><td>1</td><td class="cv">36%</td></tr>
+          <tr><td>2</td><td class="cv">21.6%</td></tr>
+          <tr><td>3</td><td class="cv">12.9%</td></tr>
+          <tr><td>5</td><td class="cv">4.7%</td></tr>
+          <tr><td>10</td><td class="cv">0.36%</td></tr>
+          <tr><td>20</td><td class="cv">&lt;0.0001%</td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="changelog-entry">
       <div class="changelog-title">v0.1.0 — Initial Release</div>
       <div class="changelog-date">2026-03-05</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">Initial release.</div>
-      <div class="changelog-para">The game at its basic core. Player movement, Enemies, Leveling up and Floor Generation.</div>
-      <div class="changelog-para">Only has 1 class: Warrior, and only has two stats: CON(constitution) and STR(strength), and one enemy: Rats.</div>
+      <div class="changelog-para">First playable build. The game at its core — movement, combat, leveling, and floor generation.</div>
+      <div class="changelog-sub">What's in</div>
+      <ul class="changelog-ul">
+        <li>1 class: Warrior</li>
+        <li>2 stats: CON and STR</li>
+        <li>1 enemy type: Rat</li>
+        <li>Procedurally generated dungeon floors</li>
+        <li>Turn-based movement and combat</li>
+        <li>XP and level-up system</li>
+      </ul>
     </div>
   </div>
   <button class="btn sm secondary" onclick="event.stopPropagation();showScreen('title-screen')" style="margin-top:12px;flex-shrink:0;">BACK</button>
@@ -1499,7 +1552,7 @@ function startGame(){
     stairsDown:null, stairsUp:null, bonfire:null,
     isBonfireFloor: false,
     floorCleared: false,
-    player: {x:0, y:0},
+    player: {x:0, y:0, apRate:1, ap:0},
     enemies: [],
     fov: new Set(), seen: new Set(),
     // inventory does NOT include equipped items — they live only in equipment
@@ -1538,7 +1591,7 @@ function startGame(){
   document.getElementById('hero-name').textContent     = G.name;
 
   camX = 0; camY = 0;
-  turnPhase = 'player'; priorityTargetId = null; floatNums = []; playerHpFlash = 0;
+  turnPhase = 'player'; priorityTargetId = null; floatNums = []; slashParticles = []; playerHpFlash = 0;
   _queuedAction = null; _panelDirty = true; _clearedBanner = 0;
   _floorNotifier = {text:'', life:0, maxLife:0}; _autoWalkOnArrival = null;
   heldKeys.clear(); stopMoveLoop();
@@ -1669,19 +1722,22 @@ function makeRat(pos, base, statMult, xpReward=1, spawned=false){
   const str = Math.max(1, Math.round(base.str * randFloat(0.7, 1.3) * statMult));
   const dex = Math.max(1, Math.round(base.dex * randFloat(0.7, 1.3) * statMult));
   const hp  = con;
-  // AI states: 'sleep' (floor enemies, inactive) | 'chase' (chasing player) | 'hunt' (going to last seen pos) | 'alert' (waiting at last seen pos) | 'roam' (wandering)
+  // AI states: 'sleep' | 'chase' | 'telegraph' | 'hunt' | 'alert' | 'roam'
   const aiState = spawned ? 'roam' : 'sleep';
   return {
     id:++G._eid, type:'rat', x:pos.x, y:pos.y,
     con, str, dex, hp, maxHP:hp, xp:xpReward, isFloorEnemy:!spawned,
-    aiState,          // current behaviour state
-    lastSeenX:null,   // last known player position
+    aiState,
+    apRate:1,         // action points gained per turn cycle
+    ap:0,             // current action points
+    telegraphTile:null, // {x,y} when in 'telegraph' state
+    lastSeenX:null,
     lastSeenY:null,
-    waitTurns:0,      // turns left to wait at last-seen tile
-    roamDir:{dx:0,dy:0}, // current roam direction
-    roamCooldown:0,   // turns until next roam direction change
-    wakePopLife:0,    // frames remaining for the "!" pop
-    zzzPhase: Math.random()*Math.PI*2, // stagger zzz animation per rat
+    waitTurns:0,
+    roamDir:{dx:0,dy:0},
+    roamCooldown:0,
+    wakePopLife:0,
+    zzzPhase: Math.random()*Math.PI*2,
   };
 }
 
@@ -1793,124 +1849,218 @@ function _enemyRoamStep(enemy){
   return moved;
 }
 
-function enemyTurn(){
-  // Snapshot player position BEFORE any enemy moves.
-  // Enemies react to where the player WAS this turn, not where they are now.
-  // This kills the "predicts your movement" feeling and fixes the cross-room
-  // LOS follow-through bug in one stroke.
-  const snapX=G.player.x, snapY=G.player.y;
+// ── Action-point helpers ──────────────────────────────────────
+// Cost constants — easy to tune or per-enemy-type in future
+const AP_COST_MOVE     = 1;
+const AP_COST_TELEGRAPH = 1;
+const AP_COST_BITE     = 1;
 
-  G.enemies.filter(e=>e.hp>0).forEach(enemy=>{
-    // Awake rats use their own LOS (radius 6), not the player's FOV cone
-    const canSee = _ratCanSee(enemy.x, enemy.y);
+function _ratDealBite(enemy){
+  const tx = enemy.telegraphTile.x, ty = enemy.telegraphTile.y;
+  enemy.telegraphTile = null;
+  enemy.aiState = 'chase';
+  spawnSlash(tx, ty); // always show slash on the bitten tile
+  if (G.player.x === tx && G.player.y === ty){
+    const baseDmg = (enemy.str*0.2)+(enemy.dex*0.1);
+    const spread  = baseDmg * 0.3;
+    let dmg = parseFloat(Math.max(0.1, randFloat(baseDmg-spread, baseDmg+spread)).toFixed(1));
+    const def = G.def||0;
+    dmg = parseFloat(Math.max(0.1, dmg*(1-def/(def+10))).toFixed(1));
+    if(!G.devGod){ G.hp = parseFloat((G.hp - dmg).toFixed(1)); }
+    addLog(`The ${enemy.type} bites you for ${dmg}!`, 'damage');
+    spawnFloat(G.player.x, G.player.y-0.5, `-${dmg}`, '#ff4444');
+    flashCanvas('red'); triggerPlayerHpFlash();
+    if(!G.devGod && G.hp<=0){ G.hp=0; updateHUD(); G.killedBy={type:enemy.type,dmg,floor:depthLabel()}; die(); }
+  } else {
+    addLog(`The ${enemy.type} bites empty air!`, 'info');
+  }
+}
 
-    // ── Sleeping: chance-based wake using distance + LOS within radius 6 ──
-    if(enemy.aiState==='sleep'){
-      const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
-      const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
-      if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
-        // Transition straight to chase — "!" is purely a visual pop, no extra delay turn
-        enemy.aiState='chase'; enemy.wakePopLife=45;
-        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
-      }
-      return; // sleeping rats never move regardless
+function _ratDoAction(enemy, snapX, snapY){
+  // Returns true if the enemy spent AP on a meaningful action
+  const canSee = _ratCanSee(enemy.x, enemy.y);
+
+  // ── TELEGRAPH state: committed to biting the stored tile ──
+  if(enemy.aiState === 'telegraph'){
+    if(enemy.ap >= AP_COST_BITE){
+      enemy.ap -= AP_COST_BITE;
+      _ratDealBite(enemy);
+      return true;
     }
+    return false;
+  }
 
-    // ── CHASE: actively chasing the player ──
-    if(enemy.aiState==='chase'){
-      if(canSee){
-        // Record where the player was at the START of this turn
-        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
-        const dx=snapX-enemy.x, dy=snapY-enemy.y;
-        const cheb=Math.max(Math.abs(dx),Math.abs(dy));
-        if(cheb<=1){
-          // Adjacent to snapshot position → attack (player is still right there
-          // or just stepped away one tile — either way, the rat swipes)
-          const baseDmg=(enemy.str*0.2)+(enemy.dex*0.1);
-          const spread=baseDmg*0.3;
-          let dmg=parseFloat(Math.max(0.1,randFloat(baseDmg-spread,baseDmg+spread)).toFixed(1));
-          const def=G.def||0;
-          dmg=parseFloat(Math.max(0.1,dmg*(1-def/(def+10))).toFixed(1));
-          if(!G.devGod){ G.hp=parseFloat((G.hp-dmg).toFixed(1)); }
-          addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
-          spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
-          flashCanvas('red'); triggerPlayerHpFlash();
-          if(!G.devGod&&G.hp<=0){ G.hp=0; updateHUD(); G.killedBy={type:enemy.type,dmg,floor:depthLabel()}; die(); return; }
-          // Do NOT move after attacking — rat stays in place this turn
-        } else {
-          // Step toward snapshot position (1-turn lag feels natural, not psychic)
-          _enemyStepToward(enemy, snapX, snapY);
+  // ── CHASE ──
+  if(enemy.aiState === 'chase'){
+    if(canSee){
+      enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+      const dx = snapX-enemy.x, dy = snapY-enemy.y;
+      const cheb = Math.max(Math.abs(dx), Math.abs(dy));
+      if(cheb <= 1){
+        // Adjacent — begin telegraph
+        if(enemy.ap >= AP_COST_TELEGRAPH){
+          enemy.ap -= AP_COST_TELEGRAPH;
+          enemy.aiState = 'telegraph';
+          enemy.telegraphTile = {x: snapX, y: snapY};
+          return true;
         }
+        return false;
       } else {
-        // Lost sight — go to last known position
-        if(enemy.lastSeenX!==null){
-          enemy.aiState='hunt';
+        if(enemy.ap >= AP_COST_MOVE){
+          enemy.ap -= AP_COST_MOVE;
+          _enemyStepToward(enemy, snapX, snapY);
+          return true;
+        }
+        return false;
+      }
+    } else {
+      if(enemy.lastSeenX !== null){
+        enemy.aiState = 'hunt';
+        if(enemy.ap >= AP_COST_MOVE){
+          enemy.ap -= AP_COST_MOVE;
           _enemyStepToward(enemy, enemy.lastSeenX, enemy.lastSeenY);
-        } else {
-          enemy.aiState='roam';
+          return true;
         }
-      }
-      return;
-    }
-
-    // ── HUNT: moving toward last seen player tile ──
-    if(enemy.aiState==='hunt'){
-      if(canSee){
-        enemy.aiState='chase';
-        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
-        const dx=snapX-enemy.x, dy=snapY-enemy.y;
-        const cheb=Math.max(Math.abs(dx),Math.abs(dy));
-        if(cheb<=1){
-          // Adjacent on re-spotting — attack immediately
-          const baseDmg=(enemy.str*0.2)+(enemy.dex*0.1);
-          const spread=baseDmg*0.3;
-          let dmg=parseFloat(Math.max(0.1,randFloat(baseDmg-spread,baseDmg+spread)).toFixed(1));
-          const def=G.def||0;
-          dmg=parseFloat(Math.max(0.1,dmg*(1-def/(def+10))).toFixed(1));
-          if(!G.devGod){ G.hp=parseFloat((G.hp-dmg).toFixed(1)); }
-          addLog(`The ${enemy.type} bites you for ${dmg}!`,'damage');
-          spawnFloat(G.player.x,G.player.y-0.5,`-${dmg}`,'#ff4444');
-          flashCanvas('red'); triggerPlayerHpFlash();
-          if(!G.devGod&&G.hp<=0){ G.hp=0; updateHUD(); G.killedBy={type:enemy.type,dmg,floor:depthLabel()}; die(); return; }
-        } else {
-          _enemyStepToward(enemy, snapX, snapY);
-        }
-        return;
-      }
-      if(enemy.lastSeenX===null){ enemy.aiState='roam'; return; }
-      const atTarget=enemy.x===enemy.lastSeenX&&enemy.y===enemy.lastSeenY;
-      if(atTarget){
-        enemy.aiState='alert';
-        enemy.waitTurns=randInt(2,10);
       } else {
-        const moved=_enemyStepToward(enemy, enemy.lastSeenX, enemy.lastSeenY);
-        if(!moved){ enemy.aiState='roam'; }
+        enemy.aiState = 'roam';
       }
-      return;
+      return false;
     }
+  }
 
-    // ── ALERT: standing at last-seen tile, looking around ──
-    if(enemy.aiState==='alert'){
-      if(canSee){
-        enemy.aiState='chase';
-        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
-        return;
+  // ── HUNT ──
+  if(enemy.aiState === 'hunt'){
+    if(canSee){
+      enemy.aiState = 'chase';
+      enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+      const dx = snapX-enemy.x, dy = snapY-enemy.y;
+      const cheb = Math.max(Math.abs(dx), Math.abs(dy));
+      if(cheb <= 1){
+        if(enemy.ap >= AP_COST_TELEGRAPH){
+          enemy.ap -= AP_COST_TELEGRAPH;
+          enemy.aiState = 'telegraph';
+          enemy.telegraphTile = {x: snapX, y: snapY};
+          return true;
+        }
+        return false;
+      } else {
+        if(enemy.ap >= AP_COST_MOVE){
+          enemy.ap -= AP_COST_MOVE;
+          _enemyStepToward(enemy, snapX, snapY);
+          return true;
+        }
+        return false;
       }
-      enemy.waitTurns--;
-      if(enemy.waitTurns<=0){ enemy.aiState='roam'; enemy.lastSeenX=null; enemy.lastSeenY=null; }
-      return;
     }
-
-    // ── ROAM: wandering the floor ──
-    if(enemy.aiState==='roam'){
-      if(canSee){
-        enemy.aiState='chase';
-        enemy.lastSeenX=snapX; enemy.lastSeenY=snapY;
-        return;
+    if(enemy.lastSeenX === null){ enemy.aiState = 'roam'; return false; }
+    const atTarget = enemy.x===enemy.lastSeenX && enemy.y===enemy.lastSeenY;
+    if(atTarget){
+      enemy.aiState = 'alert';
+      enemy.waitTurns = randInt(2,10);
+      return false;
+    } else {
+      if(enemy.ap >= AP_COST_MOVE){
+        enemy.ap -= AP_COST_MOVE;
+        const moved = _enemyStepToward(enemy, enemy.lastSeenX, enemy.lastSeenY);
+        if(!moved) enemy.aiState = 'roam';
+        return true;
       }
+      return false;
+    }
+  }
+
+  // ── ALERT ──
+  if(enemy.aiState === 'alert'){
+    if(canSee){
+      enemy.aiState = 'chase';
+      enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+      return false;
+    }
+    enemy.waitTurns--;
+    if(enemy.waitTurns <= 0){ enemy.aiState = 'roam'; enemy.lastSeenX=null; enemy.lastSeenY=null; }
+    return false;
+  }
+
+  // ── ROAM ──
+  if(enemy.aiState === 'roam'){
+    if(canSee){
+      enemy.aiState = 'chase';
+      enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+      return false;
+    }
+    if(enemy.ap >= AP_COST_MOVE){
+      enemy.ap -= AP_COST_MOVE;
       _enemyRoamStep(enemy);
+      return true;
+    }
+    return false;
+  }
+
+  return false;
+}
+
+function enemyTurn(){
+  // Snapshot player position — enemies react to where player WAS this turn
+  const snapX = G.player.x, snapY = G.player.y;
+
+  // ── Passive wake check for sleeping enemies (not an action, costs no AP) ──
+  G.enemies.filter(e => e.hp > 0 && e.aiState === 'sleep').forEach(enemy => {
+    const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
+    const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
+    if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
+      enemy.aiState = 'chase'; enemy.wakePopLife = 45;
+      enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
     }
   });
+
+  // Grant AP to all entities at the start of this turn cycle
+  if(!G.player.apRate) G.player.apRate = 1;
+  if(!G.player.ap) G.player.ap = 0;
+  G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
+
+  const liveEnemies = G.enemies.filter(e => e.hp > 0);
+  liveEnemies.forEach(e => {
+    if(!e.apRate) e.apRate = 1;
+    if(e.ap === undefined) e.ap = 0;
+    // Sleeping enemies don't accrue AP
+    if(e.aiState === 'sleep') return;
+    e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
+  });
+
+  // Build interleaved action queue
+  const MAX_ACTIONS = 200;
+  let iterations = 0;
+
+  while(iterations++ < MAX_ACTIONS){
+    if(G.hp <= 0) break;
+
+    let best = null;
+    let bestAP = -1;
+
+    if(G.player.ap >= 1){
+      best = 'player';
+      bestAP = G.player.ap;
+    }
+
+    liveEnemies.forEach(e => {
+      if(e.hp <= 0 || e.aiState === 'sleep') return;
+      const minCost = e.aiState === 'telegraph' ? AP_COST_BITE : AP_COST_MOVE;
+      if(e.ap < minCost) return;
+      if(e.ap > bestAP){
+        best = e;
+        bestAP = e.ap;
+      }
+    });
+
+    if(best === null) break;
+
+    if(best === 'player'){
+      G.player.ap = parseFloat((G.player.ap - 1).toFixed(6));
+      break;
+    } else {
+      _ratDoAction(best, snapX, snapY);
+    }
+  }
 }
 
 function generateBonfireFloor(){
@@ -2017,11 +2167,57 @@ function entityLoop(){
 }
 
 let floatNums = [];
-function spawnFloat(wx, wy, text, color){
-  floatNums.push({wx, wy, text, color, life:50, maxLife:50, dy:-0.04});
+function spawnFloat(wx, wy, text, color, life=50, sizeMult=1){
+  floatNums.push({wx, wy, text, color, life, maxLife:life, dy:0.04, sizeMult});
 }
 function tickFloats(){
   floatNums = floatNums.filter(f => { f.wy -= f.dy; f.life--; return f.life > 0; });
+}
+
+// Slash particles — short-lived diagonal line drawn on a tile
+let slashParticles = [];
+function spawnSlash(wx, wy){
+  // Pick one of 4 diagonal directions for the slash
+  const angles = [Math.PI*0.22, Math.PI*0.72, Math.PI*1.22, Math.PI*1.72];
+  const angle = angles[Math.floor(Math.random()*angles.length)];
+  slashParticles.push({wx, wy, angle, life:12, maxLife:12});
+}
+function tickSlashes(){
+  slashParticles = slashParticles.filter(s => { s.life--; return s.life > 0; });
+}
+function drawSlashes(TILE, camX, camY){
+  slashParticles.forEach(s => {
+    const cx = s.wx*TILE - camX + TILE/2;
+    const cy = s.wy*TILE - camY + TILE/2;
+    const progress = s.life / s.maxLife; // 1→0 as it fades
+    const alpha = progress * 0.92;
+    const len = TILE * (0.45 + progress * 0.25);
+    const dx = Math.cos(s.angle) * len;
+    const dy = Math.sin(s.angle) * len;
+
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = Math.max(1.5, TILE * 0.09 * progress);
+    ctx.lineCap = 'round';
+
+    // Soft white glow pass
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = Math.max(3, TILE * 0.18 * progress);
+    ctx.beginPath();
+    ctx.moveTo(cx - dx, cy - dy);
+    ctx.lineTo(cx + dx, cy + dy);
+    ctx.stroke();
+
+    // Sharp bright core
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = Math.max(1, TILE * 0.07 * progress);
+    ctx.beginPath();
+    ctx.moveTo(cx - dx, cy - dy);
+    ctx.lineTo(cx + dx, cy + dy);
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+    ctx.lineCap = 'butt';
+  });
 }
 
 // playerHpFlash is only used for the bar fill; the text-above-head is removed
@@ -2098,7 +2294,7 @@ let bfFlicker = 0;
 function renderCanvas(){
   if (!canvas) return;
   bfFlicker = (bfFlicker + 0.07) % (Math.PI*2);
-  tickFloats(); tickFlash();
+  tickFloats(); tickFlash(); tickSlashes();
   const TILE = SETTINGS.tileSize;
   const camTX = SETTINGS.smoothEntities ? vizPlayer.x : G.player.x;
   const camTY = SETTINGS.smoothEntities ? vizPlayer.y : G.player.y;
@@ -2168,6 +2364,28 @@ function renderCanvas(){
   }
 
   const freezeEnemies = (turnPhase==='anim_player' && SETTINGS.smoothEntities);
+
+  // ── Telegraph tiles: red X + red border on targeted tiles ──
+  G.enemies.filter(e=>e.hp>0&&e.telegraphTile).forEach(e=>{
+    const tx=e.telegraphTile.x, ty=e.telegraphTile.y;
+    if(!G.fov.has(`${tx},${ty}`)) return;
+    const sx=tx*TILE-camX, sy=ty*TILE-camY;
+    const pulse = 0.65 + Math.sin(Date.now()*0.008)*0.35;
+    // Red border
+    ctx.globalAlpha = pulse;
+    ctx.strokeStyle = '#ff2020';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(sx+1, sy+1, TILE-2, TILE-2);
+    // Red X
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#ff2020';
+    const pad = Math.floor(TILE*0.22);
+    ctx.beginPath();
+    ctx.moveTo(sx+pad, sy+pad); ctx.lineTo(sx+TILE-pad, sy+TILE-pad);
+    ctx.moveTo(sx+TILE-pad, sy+pad); ctx.lineTo(sx+pad, sy+TILE-pad);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
   G.enemies.filter(e=>e.hp>0).forEach(e=>{
     if (!G.fov.has(`${e.x},${e.y}`)) return;
     const viz = (SETTINGS.smoothEntities&&!freezeEnemies&&vizEnemies[e.id])?vizEnemies[e.id]:e;
@@ -2284,12 +2502,14 @@ function renderCanvas(){
     const sx2=f.wx*TILE-camX+TILE/2, sy2=f.wy*TILE-camY;
     const alpha=Math.min(1,f.life/15);
     ctx.globalAlpha=alpha;
-    const fsize=Math.max(7,Math.floor((TILE-6)/2));
+    const fsize=Math.max(4,Math.floor((TILE-6)/2 * (f.sizeMult||1)));
     ctx.font=`bold ${fsize}px "Press Start 2P",monospace`; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillStyle='#000'; ctx.fillText(f.text,sx2+1,sy2+1);
     ctx.fillStyle=f.color; ctx.fillText(f.text,sx2,sy2);
     ctx.globalAlpha=1;
   });
+
+  drawSlashes(TILE, camX, camY);
 
   const {x:plx,y:ply}=G.player;
   let promptText=null, promptColor=null;
@@ -2533,6 +2753,8 @@ function doSpaceAction(){
     if (Math.abs(x-bx)<=1&&Math.abs(y-by)<=1&&!(x===bx&&y===by)){ useBonfire(); return; }
   }
   addLog('You wait...','info');
+  spawnFloat(G.player.x, G.player.y-0.4, '...', '#ffffff', 22, 0.45);
+  floatNums[floatNums.length-1].dy = 0.02;
   tutMarkDone('wait');
   endTurn();
 }
@@ -2568,6 +2790,7 @@ function doAttackEnemy(enemy){
   enemy.hp = parseFloat((enemy.hp-dmg).toFixed(1));
     addLog(`You hit the ${enemy.type} for ${dmg}!`,'damage');
   spawnFloat(enemy.x,enemy.y-0.3,dmg.toFixed(1),'#ff6060');
+  spawnSlash(enemy.x, enemy.y);
   if (enemy.hp<=0){
         addLog(`The ${enemy.type} dies!`,'damage');
     G.kills++;
@@ -3990,7 +4213,7 @@ function loadGameFromSlot(idx){
       _eid:s._eid||0,mapW:s.mapW,mapH:s.mapH,tiles:s.tiles,rooms:s.rooms,
       stairsDown:s.stairsDown,stairsUp:s.stairsUp,bonfire:s.bonfire,
       isBonfireFloor:s.isBonfireFloor||false,floorCleared:s.floorCleared||false,
-      player:{...s.player},enemies:s.enemies.map(e=>({...e})),
+      player:{apRate:1, ap:0, ...s.player},enemies:s.enemies.map(e=>({apRate:1,ap:0,telegraphTile:null,...e})),
       seen:new Set(s.seen),fov:new Set(s.fov),
       inventory:JSON.parse(JSON.stringify(s.inventory||[])),
       equipment:JSON.parse(JSON.stringify(s.equipment||{})),
