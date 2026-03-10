@@ -173,6 +173,19 @@
   .stat-row{display:flex;justify-content:space-between;color:var(--text);padding:2px 0;}
   .stat-row span:last-child{color:var(--gold);}
   .weapon-note{font-size:12px;color:var(--gold2);font-style:italic;margin-top:6px;padding-top:5px;border-top:1px dashed var(--border);text-align:center;}
+  .class-plus-btn{position:absolute;top:6px;right:6px;font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0;z-index:5;}
+  .class-plus-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .class-detail-title{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--gold);text-align:center;margin-bottom:16px;letter-spacing:1px;}
+  .class-detail-desc{font-size:15px;color:var(--text);line-height:1.6;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .class-detail-sub{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold2);letter-spacing:1px;margin:12px 0 6px;text-transform:uppercase;}
+  .class-detail-stat{display:flex;justify-content:space-between;font-size:15px;color:var(--text);padding:2px 0;}
+  .class-detail-stat span:last-child{color:var(--gold);}
+  .class-detail-perlvl{font-size:13px;color:var(--dim);margin-top:6px;}
+  .class-detail-gear{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .class-detail-gear-icon{font-size:22px;}
+  .class-detail-gear-info{display:flex;flex-direction:column;gap:2px;}
+  .class-detail-gear-name{font-size:15px;color:var(--text);}
+  .class-detail-gear-meta{font-size:12px;color:var(--dim);}
 
   /* LEVEL UP — wider, taller, single-line descriptions */
   #levelup-modal .modal-box{width:min(580px,95vw);padding:32px 36px;}
@@ -236,7 +249,8 @@
   .bar-track{height:9px;background:var(--bg);border:1px solid var(--border);margin-bottom:7px;overflow:hidden;}
   .bar-fill{height:100%;transition:width .3s;}
   .bar-hp .bar-fill{background:linear-gradient(90deg,#802020,#c84040);}
-  .bar-xp .bar-fill{background:linear-gradient(90deg,#406080,#60a0c0);}
+  .bar-sta .bar-fill{background:linear-gradient(90deg,#1a6632,#2ea854);}
+  .bar-xp .bar-fill{background:linear-gradient(90deg,#806010,#c8a020);}
   .mini-stat{display:flex;justify-content:space-between;font-size:14px;padding:2px 0;}
   .mini-stat .label{color:var(--dim);}
   .mini-stat .val{color:var(--text);}
@@ -448,13 +462,15 @@
   #inv-slots-wrap{flex:1;overflow-y:auto;padding:8px;}
   #inv-slots-wrap::-webkit-scrollbar{width:3px;}
   #inv-slots-wrap::-webkit-scrollbar-thumb{background:var(--border);}
-  #inv-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
-  .icell{aspect-ratio:1;border:1px solid #4a4a72;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;transition:border-color .1s,background .1s,transform .12s;min-height:58px;}
+  #inv-slots{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}
+  .icell{aspect-ratio:1;border:1px solid #4a4a72;background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;transition:border-color .1s,background .1s,transform .12s;min-height:46px;}
   .icell:hover{border-color:var(--gold);background:rgba(200,168,75,0.07);}
   .icell.has-item:hover{border-color:var(--gold);background:rgba(200,168,75,0.07);transform:scale(1.03);z-index:2;}
   .icell.sel{border-color:var(--gold2);background:#222234;}
   .icell.mt{opacity:.15;cursor:default;pointer-events:none;border-color:#303050;}
   .icell .sbadge{position:absolute;bottom:1px;right:2px;font-family:'Press Start 2P',monospace;font-size:5px;color:var(--gold2);}
+  .kgbadge{position:absolute;top:1px;left:2px;font-family:'Press Start 2P',monospace;font-size:4.5px;color:#8080a0;}
+  .inv-empty-msg{color:var(--dim);font-size:10px;text-align:center;padding:20px;grid-column:1/-1;}
   #inv-footer{padding:5px 10px;border-top:1px solid var(--border);font-size:15px;color:var(--dim);display:flex;gap:8px;align-items:center;flex-shrink:0;}
   .inv-cbar{flex:1;height:4px;background:var(--bg);border:1px solid var(--border);overflow:hidden;}
   .inv-cfill{height:100%;background:var(--gold);transition:width .3s;}
@@ -475,7 +491,8 @@
   .drow{display:flex;justify-content:space-between;font-size:17px;padding:2px 0;}
   .drow .dl{color:var(--dim);}
   .drow .dv{color:var(--text);}
-  .drow .dv.pos{color:var(--green);}
+  .drow .dv.pos{color:var(--gold2);}
+  .drow .dv.pos.hover-compare{color:var(--green);}
   .ddesc{font-size:17px;color:var(--dim);line-height:1.4;font-style:italic;border-left:2px solid var(--border);padding-left:8px;}
   .dacts{display:flex;flex-direction:column;gap:5px;margin-top:auto;}
   .dact{font-family:'Press Start 2P',monospace;font-size:6px;padding:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;text-align:center;transition:all .1s;}
@@ -561,6 +578,8 @@
 
 </style>
 </head>
+<!-- Arbitrary precision math for infinite stat scaling -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
 <body>
 
 <!-- TITLE -->
@@ -732,12 +751,87 @@
 
 ═══════════════════════════════════════════════════════════════ -->
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.8 — Dynamic Combat</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="changelog-title" style="margin-bottom:0;">v0.1.9 — Precision Math &amp; Systems Update</div>
+        <button onclick="toggleV019Detail(this)" style="font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;flex-shrink:0;transition:all .15s;" title="Show technical details">+</button>
+      </div>
+      <div class="changelog-date">2026-03-11</div>
+      <!-- Technical detail panel -->
+      <div id="v019-detail-panel" style="display:none;background:var(--bg2);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;">
+        <div class="changelog-sub">Arbitrary Precision Math (Decimal.js)</div>
+        <div class="changelog-para">Added Decimal.js 10.4.3 for infinite stat scaling. All player and enemy stats (hp, str, con, dex, def, regen, xp, etc.) converted from native JS numbers to Decimal objects. calcDmg, calcDef, calcRegen, gainXP, doAttackEnemy, and rat bite damage all rewritten to use Decimal arithmetic. Save format bumped to version 2.</div>
+        <ul class="changelog-ul">
+          <li><strong>D(x)</strong> — convert anything to a Decimal</li>
+          <li><strong>Dn(x)</strong> — convert Decimal to native number (rendering only)</li>
+          <li><strong>Dfmt(x)</strong> — format a Decimal as a compact human-readable string</li>
+          <li><strong>Dser/Ddes</strong> — serialize/deserialize Decimals for save data</li>
+        </ul>
+        <div class="changelog-sub">Endurance &amp; Stamina Internals</div>
+        <div class="changelog-para">Max stamina = 50 + (5 × END). Regen = 0.1 + (0.02 × END) per turn when under carry limit. Drain = 0.2 + (0.5 × kg over limit) per turn when overweight. G.stamina and G.maxStamina stored as Decimals and serialized in save v2.</div>
+      </div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Arbitrary Precision Scaling</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> All stats now use arbitrary-precision math under the hood, enabling numbers to scale infinitely without floating-point errors.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Inventory — Weight-Based System</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Replaced slot-based inventory with a weight (kg) carry system. Base capacity: 20 kg; STR adds +0.5 kg per point.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Overweight penalty: reduces AP rate gain (−5% per kg over, capped at −60%). Weight bar turns red and shows ⚠ OVER when exceeded.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Endurance Stat &amp; Stamina</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> New allocatable stat: END (Endurance). Warrior base: 12, Rogue base: 10. Available at character creation and in the Character tab.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> New resource: Stamina. Drains when overweight, regens passively otherwise. Reserved for active skills.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Class Select Screen</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Class cards now show only the name and a short description. A <strong>+</strong> button on each card opens a detail popup with full starting stats, per-level gains, and starting gear — click outside to close.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Weapon Item Detail</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Item inspect panel now shows weapons under their correct category (e.g. Melee Weapons &gt; One-Handed Sword, Dagger).</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Base DMG shows the weapon's raw base value. DMG shows the stat-scaled damage for your current build. Hovering EQUIP live-updates DMG to show what you'd deal with the weapon equipped, with a green/red delta. Hovering UNEQUIP shows what damage would revert to (unarmed).</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Character Tab</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Character tab now shows Base DMG (raw weapon base), Current DMG (stat-scaled), and DMG range as three separate rows.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Settings</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> All settings now persist across sessions. Added a Reset Defaults button to the settings panel.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Damage Scaling</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Simple Sword: STR ×0.25, DEX ×0.10. Simple Dagger: DEX ×0.25, STR ×0.10. Fists: base 1 + STR ×0.10 + DEX ×0.10.</div>
+    </div>
+
+    <div class="changelog-entry">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="changelog-title" style="margin-bottom:0;">v0.1.8 — Dynamic Combat</div>
+        <button onclick="toggleAPDetail(this)" style="font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;flex-shrink:0;transition:all .15s;" title="Show AP system details">+</button>
+      </div>
       <div class="changelog-date">2026-03-09</div>
+      <!-- AP Detail Panel (hidden by default) -->
+      <div id="ap-detail-panel" style="display:none;background:var(--bg2);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;">
+        <div class="changelog-sub">How the Action Point System Works</div>
+        <div class="changelog-para">Each entity has an invisible action counter that increases by their <em>rate</em> each turn cycle (default rate: 1). An entity can spend 1 action point to perform one action: move, attack, wait, etc.</div>
+        <div class="changelog-sub">Turn Order</div>
+        <div class="changelog-para">Within a turn, entities spend their accumulated AP in order — the entity with the most AP acts first (player wins ties). Leftover fractional AP carries over to the next turn, enabling decimal rates like 1.5 to give 2 actions every other turn.</div>
+        <div class="changelog-sub">Action Costs (Current)</div>
+        <table class="changelog-table">
+          <thead><tr><th>Action</th><th>AP Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Move</td><td class="cv">1</td></tr>
+            <tr><td>Attack</td><td class="cv">1</td></tr>
+            <tr><td>Wait</td><td class="cv">1</td></tr>
+            <tr><td>Telegraph (target tile)</td><td class="cv">1 (future: 0.25)</td></tr>
+            <tr><td>Bite</td><td class="cv">1 (future: 0.75)</td></tr>
+          </tbody>
+        </table>
+        <div class="changelog-sub">Example Scenarios</div>
+        <div class="changelog-para">Player rate 1, Rat rate 1 → Player → Rat</div>
+        <div class="changelog-para">Player rate 2, Rat rate 1 → Player → Player → Rat</div>
+        <div class="changelog-para">Player rate 1, Rat rate 2 → Rat → Rat → Player</div>
+        <div class="changelog-para">Player rate 1.5, Rat rate 1 → on turn 1: Player, Rat. On turn 2: Player, Player, Rat (0.5 AP carried over).</div>
+        <div class="changelog-note">Rates can be decimals. The foundation is laid for characters with higher AP rates, enabling multi-action turns before slow enemies can respond.</div>
+      </div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Action Point System</div>
-      <div class="changelog-para">Every entity now has an action point (AP) counter. Each turn cycle, entities gain AP equal to their rate (default 1). Actions are resolved in AP order — the entity with the most AP acts first, with the player winning ties.</div>
-      <div class="changelog-para">This lays the foundation for characters and enemies with different speeds. A rate of 2 acts twice per cycle; a rate of 0.5 acts every other cycle. Rates can be decimals.</div>
+      <div class="changelog-para">Every entity now has an action point (AP) counter. Each turn cycle, entities gain AP equal to their rate (default 1, tests telegraph). Actions are resolved in AP order — the entity with the most AP acts first, with the player winning ties.</div>
+      <div class="changelog-para">This lays the foundation for characters and enemies with different speeds. A rate of 2 can act twice per turn; a rate of 0.5 can act every other turn. Rates can be decimals.</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Telegraph &amp; Bite</div>
       <div class="changelog-para"><span class="changelog-tag new">NEW</span> Rats no longer deal instant damage when adjacent. Instead they enter a telegraph phase — targeting the tile the player is on and showing a pulsing red X with a red border.</div>
@@ -798,8 +892,8 @@
       <table class="changelog-table">
         <thead><tr><th>Stat</th><th>Old rate</th><th>New rate</th></tr></thead>
         <tbody>
-          <tr><td>DEF per CON</td><td class="cv">0.002</td><td class="cv">0.02</td></tr>
-          <tr><td>REGEN per CON</td><td class="cv">0.0005</td><td class="cv">0.001</td></tr>
+          <tr><td>DEF per CON</td><td class="cv">0.002</td><td class="cv">0.05</td></tr>
+          <tr><td>REGEN per CON</td><td class="cv">0.0005</td><td class="cv">0.002</td></tr>
         </tbody>
       </table>
     </div>
@@ -809,12 +903,12 @@
       <hr class="changelog-divider">
       <div class="changelog-sub">New Stats</div>
       <ul class="changelog-ul">
-        <li><strong>DEF</strong> (Defense) — reduces incoming damage. Scales with CON at 0.02 DEF per point.</li>
-        <li><strong>REGEN</strong> (Regeneration) — recovers HP each turn. Scales with CON at 0.001 REGEN per point.</li>
+        <li><strong>DEF</strong> (Defense) — reduces incoming damage. Scales with CON at 0.002 DEF per point.</li>
+        <li><strong>REGEN</strong> (Regeneration) — recovers HP each turn. Scales with CON at 0.0005 REGEN per point.</li>
       </ul>
       <hr class="changelog-divider">
       <div class="changelog-sub">Inventory</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Full inventory system: equip, unequip, drop, and pick up items. Base capacity is 10 slots; every 10 STR adds 1 more. Currently only starting weapons are in the game.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Full inventory system: equip, unequip, drop, and pick up items. Weight-based carry capacity (20 kg base, scales with STR). Currently only starting weapons are in the game.</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Enemy AI States</div>
       <ul class="changelog-ul">
@@ -927,31 +1021,31 @@
   <div class="screen-title">CHOOSE A CLASS</div>
   <div class="class-cards">
     <div class="class-card selected" id="card-warrior" onclick="selectClass('warrior')">
+      <button class="class-plus-btn" onclick="event.stopPropagation();openClassDetail('warrior')">+</button>
       <span class="class-icon">⚔️</span>
       <div class="class-name">WARRIOR</div>
-      <div class="class-desc">Powerful and durable.</div>
-      <div class="class-stats">
-        <div class="stat-row"><span>CON</span><span>30</span></div>
-        <div class="stat-row"><span>STR</span><span>20</span></div>
-        <div class="stat-row"><span>DEX</span><span>10</span></div>
-      </div>
-      <div class="weapon-note">Starts with a sword.</div>
+      <div class="class-desc">Powerful and durable. Relies on strength to overwhelm enemies.</div>
     </div>
     <div class="class-card" id="card-rogue" onclick="selectClass('rogue')">
+      <button class="class-plus-btn" onclick="event.stopPropagation();openClassDetail('rogue')">+</button>
       <span class="class-icon">🗡️</span>
       <div class="class-name">ROGUE</div>
-      <div class="class-desc">Agile and dexterous.</div>
-      <div class="class-stats">
-        <div class="stat-row"><span>CON</span><span>20</span></div>
-        <div class="stat-row"><span>STR</span><span>10</span></div>
-        <div class="stat-row"><span>DEX</span><span>15</span></div>
-      </div>
-      <div class="weapon-note">Starts with a dagger.</div>
+      <div class="class-desc">Agile and precise. Uses speed and dexterity to outmaneuver foes.</div>
     </div>
   </div>
   <div style="display:flex;gap:14px;">
     <button class="btn secondary" onclick="showScreen('config-screen')">BACK</button>
     <button class="btn" onclick="showStatAlloc()">NEXT</button>
+  </div>
+</div>
+
+<!-- CLASS DETAIL MODAL -->
+<div class="modal-overlay" id="class-detail-modal" onclick="if(event.target===this)closeClassDetail()">
+  <div class="modal-box" style="width:min(500px,92vw);padding:28px 32px;">
+    <div id="class-detail-inner"></div>
+    <div style="text-align:center;margin-top:22px;">
+      <button class="btn sm secondary" onclick="closeClassDetail()">CLOSE</button>
+    </div>
   </div>
 </div>
 
@@ -1029,6 +1123,8 @@
         <div class="stat-section-title">VITALS</div>
         <div class="bar-label bar-hp"><span>HP</span><span id="hp-text">20/20</span></div>
         <div class="bar-track bar-hp"><div class="bar-fill" id="hp-bar" style="width:100%"></div></div>
+        <div class="bar-label bar-sta"><span>STA</span><span id="sta-text">60/60</span></div>
+        <div class="bar-track bar-sta"><div class="bar-fill" id="sta-bar" style="width:100%"></div></div>
         <div class="bar-label"><span>XP</span><span id="xp-text">0/10</span></div>
         <div class="bar-track bar-xp"><div class="bar-fill" id="xp-bar" style="width:0%"></div></div>
       </div>
@@ -1173,12 +1269,20 @@
           <div class="icpsr"><span class="il">CON</span><span class="iv" id="icp-con">—</span></div>
           <div class="icpsr"><span class="il">STR</span><span class="iv" id="icp-str">—</span></div>
           <div class="icpsr"><span class="il">DEX</span><span class="iv" id="icp-dex">—</span></div>
+          <div class="icpsr"><span class="il">END</span><span class="iv" id="icp-end">—</span></div>
           <div class="icpsr"><span class="il">DEF</span><span class="iv" id="icp-def">—</span></div>
           <div class="icpsr"><span class="il">REGEN</span><span class="iv" id="icp-regen">—</span></div>
           <div class="icpsr" style="border-top:1px solid var(--border);margin-top:3px;padding-top:3px;">
             <span class="il">Max HP</span><span class="iv" id="icp-maxhp">—</span>
           </div>
-          <div class="icpsr"><span class="il">DMG range</span><span class="iv" id="icp-dmg">—</span></div>
+          <div class="icpsr"><span class="il">Stamina</span><span class="iv" id="icp-stamina" style="color:#2ea854">—</span></div>
+          <div class="icpsr"><span class="il">Base DMG</span><span class="iv" id="icp-dmg">—</span></div>
+          <div class="icpsr"><span class="il">Current DMG</span><span class="iv" id="icp-cur-dmg" style="color:var(--gold2)">—</span></div>
+          <div class="icpsr"><span class="il">DMG range</span><span class="iv" id="icp-dmg-range" style="color:var(--dim);font-size:9px">—</span></div>
+          <div class="icpsr" style="border-top:1px solid var(--border);margin-top:3px;padding-top:3px;">
+            <span class="il">Carry wt.</span><span class="iv" id="icp-weight">—</span>
+          </div>
+          <div class="icpsr"><span class="il">Wt. penalty</span><span class="iv" id="icp-weight-pen" style="color:var(--dim)">—</span></div>
         </div>
         <div class="icp-blk">
           <div class="icp-blk-t">ALLOCATE POINTS</div>
@@ -1268,9 +1372,8 @@
     </div>
     <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;position:relative;">
       <button class="btn sm secondary" onclick="closeSettings()">BACK</button>
+      <button class="btn sm secondary" style="border-color:#5a4a2a;color:#907848;font-size:7px;" onclick="resetSettingsToDefault()">RESET DEFAULTS</button>
       <button id="dev-tools-btn" class="btn sm" style="border-color:#9060c8;color:#b080f0;font-size:8px;padding:9px 18px;display:none;" onclick="openDevTools()">DEV TOOLS</button>
-      <!-- Secret invisible tap zone — 5 taps opens dev code screen when locked -->
-      <button id="dev-secret-btn" onclick="_dtSecretTap()" style="position:absolute;right:0;top:0;width:36px;height:36px;opacity:0;cursor:default;border:none;background:none;padding:0;" tabindex="-1" aria-hidden="true"></button>
     </div>
   </div>
 </div>
@@ -1309,8 +1412,54 @@
 </div>
 
 <script>
-const SETTINGS = {tileSize:30, fovRadius:12, smoothCam:true, smoothEntities:true, showLog:false, showGrid:false, showCoords:false};
+// ── Decimal.js helpers for arbitrary precision stat values ──
+// D(x)   : convert anything to a Decimal (string, number, Decimal)
+// Dn(x)  : convert Decimal → native JS number (for rendering/canvas math only)
+// Dfmt(x): format a Decimal as a compact human-readable string
+function D(x){
+  if(x instanceof Decimal) return x;
+  try{ return new Decimal(x==null?0:x); }catch(e){ return new Decimal(0); }
+}
+function Dn(x){ return D(x).toNumber(); }
+function Dfmt(x){
+  const d = D(x);
+  const abs = d.abs();
+  // If the exponent is huge, use exponential notation
+  if(abs.gte(D('1e15')) || (abs.gt(0) && abs.lt(D('0.001')))){
+    // toExponential but trim trailing zeros in mantissa
+    let s = d.toExponential(3);
+    s = s.replace(/(\.\d*?)0+(e)/, '$1$2').replace(/\.(e)/, '$1');
+    return s;
+  }
+  // Normal range: show up to 2 decimal places, trimming zeros
+  let s = d.toFixed(2);
+  s = s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+  return s;
+}
+// Serialize a Decimal to string for JSON
+function Dser(x){ return D(x).toJSON(); } // returns string like "123.45" or "1.5e+9999"
+// Deserialize string → Decimal
+function Ddes(x){ return D(x); }
+
+const SETTINGS_DEFAULTS = {tileSize:30, fovRadius:12, smoothCam:true, smoothEntities:true, showLog:false, showGrid:false, showCoords:false};
+const SETTINGS = Object.assign({}, SETTINGS_DEFAULTS);
 const SETTING_LIMITS = {tileSize:[10,40]};
+// Load persisted settings
+(function(){try{const s=JSON.parse(localStorage.getItem('sd_settings')||'{}');Object.assign(SETTINGS,s);}catch(e){}})();
+function _saveSettings(){ try{localStorage.setItem('sd_settings',JSON.stringify(SETTINGS));}catch(e){} }
+function resetSettingsToDefault(){
+  Object.assign(SETTINGS, SETTINGS_DEFAULTS);
+  _saveSettings();
+  // Refresh UI
+  ['tileSize'].forEach(k => document.getElementById('sett-'+k).textContent = SETTINGS[k]);
+  ['smoothCam','smoothEntities','showLog','showGrid','showCoords'].forEach(k => {
+    const btn = document.getElementById('sett-'+k);
+    btn.textContent = SETTINGS[k] ? 'ON' : 'OFF';
+    btn.classList.toggle('on', SETTINGS[k]);
+  });
+  applyLogVisibility();
+  if (document.getElementById('game-screen').classList.contains('active')){ setupCanvas(); renderCanvas(); }
+}
 
 let vizPlayer  = {x:0, y:0};
 let vizEnemies = {};
@@ -1321,6 +1470,7 @@ function changeSetting(key, delta){
   const [mn,mx] = SETTING_LIMITS[key];
   SETTINGS[key] = Math.max(mn, Math.min(mx, SETTINGS[key] + delta));
   document.getElementById('sett-'+key).textContent = SETTINGS[key];
+  _saveSettings();
   if (document.getElementById('game-screen').classList.contains('active')){ setupCanvas(); renderCanvas(); }
 }
 function toggleSetting(key){
@@ -1328,6 +1478,7 @@ function toggleSetting(key){
   const btn = document.getElementById('sett-'+key);
   btn.textContent = SETTINGS[key] ? 'ON' : 'OFF';
   btn.classList.toggle('on', SETTINGS[key]);
+  _saveSettings();
   const inGame = document.getElementById('game-screen').classList.contains('active');
   if (key === 'showLog') applyLogVisibility();
   if (inGame){
@@ -1351,11 +1502,9 @@ function openSettings(){
   });
   // Dev Tools button only visible when a run is active and unlocked; secret btn hidden when unlocked
   const dtBtn = document.getElementById('dev-tools-btn');
-  const dtSecret = document.getElementById('dev-secret-btn');
   const inRun = !!(G && G.player);
   const unlocked = _dtIsUnlocked();
   if(dtBtn) dtBtn.style.display = (inRun && unlocked) ? '' : 'none';
-  if(dtSecret) dtSecret.style.display = (inRun && !unlocked) ? '' : 'none';
   document.getElementById('settings-modal').classList.add('active');
 }
 function openSettingsFromMenu(){ _settingsFromMenu=true; openSettings(); }
@@ -1403,15 +1552,58 @@ function selectClass(cls){
   document.getElementById('card-'+cls).classList.add('selected');
 }
 
+const CLASS_DETAIL_INFO = {
+  warrior: {
+    fullDesc: 'A seasoned fighter who relies on brute strength and toughness. High HP and damage output.',
+    stats: {CON:30, STR:20, DEX:10, END:12},
+    perlvl: 'Per level: CON +5, STR +1, DEX +1, END +1',
+    weapon: 'sword',
+  },
+  rogue: {
+    fullDesc: 'A nimble fighter who strikes fast and precisely. Lower HP but naturally quicker and more accurate.',
+    stats: {CON:20, STR:10, DEX:15, END:10},
+    perlvl: 'Per level: CON +3, STR +1, DEX +2, END +0.5',
+    weapon: 'dagger',
+  },
+};
+
+function openClassDetail(cls){
+  const info = CLASS_DETAIL_INFO[cls];
+  if (!info) return;
+  const t = CLASS_TEMPLATES[cls];
+  const w = WEAPON_DEFS[info.weapon];
+  const wDmgBase = w ? `Base DMG ${w.base}` : '';
+  const wScaling = w ? `STR ×${w.str.toFixed(2)} · DEX ×${w.dex.toFixed(2)}` : '';
+  document.getElementById('class-detail-inner').innerHTML = `
+    <div class="class-detail-title">${cls.toUpperCase()}</div>
+    <div class="class-detail-desc">${info.fullDesc}</div>
+    <div class="class-detail-sub">Starting Stats</div>
+    ${Object.entries(info.stats).map(([k,v])=>`<div class="class-detail-stat"><span>${k}</span><span>${v}</span></div>`).join('')}
+    <div class="class-detail-perlvl">${info.perlvl}</div>
+    <div class="class-detail-sub">Starting Gear</div>
+    <div class="class-detail-gear">
+      <div class="class-detail-gear-icon">${w?w.icon:''}</div>
+      <div class="class-detail-gear-info">
+        <div class="class-detail-gear-name">${w?w.name:''}</div>
+        <div class="class-detail-gear-meta">${w?w.subcategory:''} · ${w?w.kg+' kg':''} · ${wDmgBase} · ${w?'DEX ×'+w.dex.toFixed(2):''}</div>
+      </div>
+    </div>`;
+  document.getElementById('class-detail-modal').classList.add('active');
+}
+function closeClassDetail(){
+  document.getElementById('class-detail-modal').classList.remove('active');
+}
+
 // ==================== STAT ALLOC ====================
-let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0};
+let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0, END:0};
 const STAT_DEFS = [
   {key:'CON', label:'CON', effect:'Last longer in fights.'},
   {key:'STR', label:'STR', effect:'Hit harder and carry more weight.'},
   {key:'DEX', label:'DEX', effect:'Move faster and strike more accurately.'},
+  {key:'END', label:'END', effect:'Boost stamina, recovery, and weight penalty resistance.'},
 ];
 function showStatAlloc(){
-  allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0}; renderAllocRows(); showScreen('stat-screen');
+  allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0,END:0}; renderAllocRows(); showScreen('stat-screen');
   // Focus the name field so player can type immediately
   setTimeout(()=>{
     const el=document.getElementById('char-name-input');
@@ -1497,27 +1689,54 @@ function setFloorSize(sz){
 
 // ==================== CLASS & WEAPON DEFS ====================
 const CLASS_TEMPLATES = {
-  warrior: {icon:'⚔️', name:'Warrior', baseCON:30, baseSTR:20, baseDEX:10, weaponType:'sword'},
-  rogue:   {icon:'🗡️', name:'Rogue',   baseCON:20, baseSTR:10, baseDEX:15, weaponType:'dagger'},
+  warrior: {icon:'⚔️', name:'Warrior', baseCON:30, baseSTR:20, baseDEX:10, baseEND:12, weaponType:'sword'},
+  rogue:   {icon:'🗡️', name:'Rogue',   baseCON:20, baseSTR:10, baseDEX:15, baseEND:10, weaponType:'dagger'},
 };
 const CLASS_LEVEL_GAINS = {
   warrior: {con:5, str:1, dex:1},
   rogue:   {con:3, str:1, dex:2},
 };
 const FISTS_DEF = {base:1, str:0.10, dex:0.10};
-function calcDmgFists(str,dex){ return parseFloat((FISTS_DEF.base+str*FISTS_DEF.str+dex*FISTS_DEF.dex).toFixed(2)); }
+function calcDmgFists(str,dex){ return D(FISTS_DEF.base).plus(D(str).times(FISTS_DEF.str)).plus(D(dex).times(FISTS_DEF.dex)); }
 const WEAPON_DEFS = {
-  sword:  {name:'Simple Sword',  icon:'⚔️', base:2, str:0.25, dex:0.10},
-  dagger: {name:'Simple Dagger', icon:'🗡️', base:1, str:0.10, dex:0.25},
+  sword:  {name:'Simple Sword',  icon:'⚔️', base:2, str:0.25, dex:0.10, kg:1.2, category:'Melee Weapons', subcategory:'One-Handed Sword'},
+  dagger: {name:'Simple Dagger', icon:'🗡️', base:1, str:0.10, dex:0.25, kg:0.4, category:'Melee Weapons', subcategory:'Dagger'},
 };
+// Base carry capacity + STR bonus (subject to tuning)
+function calcCarryWeight(str){ return D(20).plus(D(str).times('0.5')); }
+// Overweight reduces apRate. Returns how much to subtract from apRate (0 if under limit).
+// Gradual: -0.05 apRate per kg over, capped at -0.6 (so minimum apRate = 0.4)
+function calcOverweightAPRatePenalty(carriedKg, limitKg){
+  const over = D(carriedKg).minus(limitKg);
+  if(over.lte(0)) return 0;
+  return Math.min(0.6, Dn(over.times('0.05')));
+}
+// Legacy alias used by AP cost in tryMove — now 0 since penalty is on apRate
+function calcOverweightAPCost(){ return 0; }
+// Sum of kg of all items in inventory + equipped items
+function calcCarriedWeight(){
+  let total = D(0);
+  G.inventory.forEach(item => { if(item.kg) total = total.plus(item.kg); });
+  if(G.equipment) Object.values(G.equipment).forEach(item => { if(item&&item.kg) total = total.plus(item.kg); });
+  return total;
+}
+// Stamina derived from END
+function calcMaxStamina(end){ return D(end).times('5').plus(50); }   // base 50 + 5/END
+function calcStaminaRegen(end){ return D(end).times('0.02').plus('0.1'); } // base 0.1 + 0.02/END
+// Stamina drain per turn when overweight (scales with how far over)
+function calcStaminaDrain(carriedKg, limitKg){
+  const over = D(carriedKg).minus(limitKg);
+  if(over.lte(0)) return D(0);
+  return over.times('0.5').plus('0.2'); // 0.2 base drain + 0.5 per kg over
+}
 function calcDmg(weaponType, str, dex){
   if (!weaponType) return calcDmgFists(str,dex);
   const w = WEAPON_DEFS[weaponType];
   if (!w) return calcDmgFists(str,dex);
-  return parseFloat((w.base + (str * w.str) + (dex * w.dex)).toFixed(2));
+  return D(w.base).plus(D(str).times(w.str)).plus(D(dex).times(w.dex));
 }
-function calcDef(con){ return parseFloat((con*0.02).toFixed(2)); }
-function calcRegen(con){ return parseFloat((con*0.001).toFixed(4)); }
+function calcDef(con){ return D(con).times('0.05'); }
+function calcRegen(con){ return D(con).times('0.002'); }
 
 // ==================== GAME STATE ====================
 let G   = {};
@@ -1528,17 +1747,20 @@ function startGame(){
   const inputEl = document.getElementById('char-name-input');
   const enteredName = inputEl ? inputEl.value.trim() : '';
   const charName = enteredName || tmpl.name;
-  const con  = tmpl.baseCON + (allocValues.CON || 0);
-  const str  = tmpl.baseSTR + (allocValues.STR || 0);
-  const dex  = tmpl.baseDEX + (allocValues.DEX || 0);
+  const con  = D(tmpl.baseCON).plus(allocValues.CON || 0);
+  const str  = D(tmpl.baseSTR).plus(allocValues.STR || 0);
+  const dex  = D(tmpl.baseDEX).plus(allocValues.DEX || 0);
+  const end  = D(tmpl.baseEND).plus(allocValues.END || 0);
   const maxHP = con;
+  const maxSta = calcMaxStamina(end);
 
   G = {
     class: selectedClass, icon: tmpl.icon, name: charName,
     weaponType: tmpl.weaponType,
-    level:0, xp:0, xpNeeded:10,
-    hp: maxHP, maxHP,
-    con, str, dex,
+    level:D(0), xp:D(0), xpNeeded:D(10),
+    hp: D(maxHP), maxHP: D(maxHP),
+    stamina: D(maxSta), maxStamina: D(maxSta),
+    con, str, dex, end,
     baseDmg: calcDmg(tmpl.weaponType, str, dex),
     def: calcDef(con),
     regen: calcRegen(con),
@@ -1576,6 +1798,7 @@ function startGame(){
     weaponType: tmpl.weaponType,
     eslot: 'main',
     equipped: true,
+    kg: WEAPON_DEFS[tmpl.weaponType].kg,
     bonuses: {},
     desc: tmpl.weaponType === 'sword' ? 'A plain iron sword. Gets the job done.' : 'A nimble dagger. Quick and precise.',
   };
@@ -1718,19 +1941,19 @@ function generateDungeon(){
 }
 
 function makeRat(pos, base, statMult, xpReward=1, spawned=false){
-  const con = Math.max(1, Math.round(base.con * randFloat(0.7, 1.3) * statMult));
-  const str = Math.max(1, Math.round(base.str * randFloat(0.7, 1.3) * statMult));
-  const dex = Math.max(1, Math.round(base.dex * randFloat(0.7, 1.3) * statMult));
-  const hp  = con;
+  const con = D(Math.max(1, Math.round(base.con * randFloat(0.7, 1.3) * statMult)));
+  const str = D(Math.max(1, Math.round(base.str * randFloat(0.7, 1.3) * statMult)));
+  const dex = D(Math.max(1, Math.round(base.dex * randFloat(0.7, 1.3) * statMult)));
+  const hp  = D(con);
   // AI states: 'sleep' | 'chase' | 'telegraph' | 'hunt' | 'alert' | 'roam'
   const aiState = spawned ? 'roam' : 'sleep';
   return {
     id:++G._eid, type:'rat', x:pos.x, y:pos.y,
-    con, str, dex, hp, maxHP:hp, xp:xpReward, isFloorEnemy:!spawned,
+    con, str, dex, hp, maxHP:D(hp), xp:D(xpReward), isFloorEnemy:!spawned,
     aiState,
-    apRate:1,         // action points gained per turn cycle
-    ap:0,             // current action points
-    telegraphTile:null, // {x,y} when in 'telegraph' state
+    apRate:1,
+    ap:0,
+    telegraphTile:null,
     lastSeenX:null,
     lastSeenY:null,
     waitTurns:0,
@@ -1859,18 +2082,22 @@ function _ratDealBite(enemy){
   const tx = enemy.telegraphTile.x, ty = enemy.telegraphTile.y;
   enemy.telegraphTile = null;
   enemy.aiState = 'chase';
-  spawnSlash(tx, ty); // always show slash on the bitten tile
+  spawnSlash(tx, ty);
   if (G.player.x === tx && G.player.y === ty){
-    const baseDmg = (enemy.str*0.2)+(enemy.dex*0.1);
-    const spread  = baseDmg * 0.3;
-    let dmg = parseFloat(Math.max(0.1, randFloat(baseDmg-spread, baseDmg+spread)).toFixed(1));
-    const def = G.def||0;
-    dmg = parseFloat(Math.max(0.1, dmg*(1-def/(def+10))).toFixed(1));
-    if(!G.devGod){ G.hp = parseFloat((G.hp - dmg).toFixed(1)); }
-    addLog(`The ${enemy.type} bites you for ${dmg}!`, 'damage');
-    spawnFloat(G.player.x, G.player.y-0.5, `-${dmg}`, '#ff4444');
+    const baseDmg = D(enemy.str).times('0.2').plus(D(enemy.dex).times('0.1'));
+    const spread  = baseDmg.times('0.3');
+    const roll    = D(randFloat(0, 1)).times(spread.times(2)).minus(spread);
+    let dmg = baseDmg.plus(roll);
+    if(dmg.lt('0.1')) dmg = D('0.1');
+    const def = D(G.def||0);
+    dmg = dmg.times(D(1).minus(def.div(def.plus(10))));
+    if(dmg.lt('0.1')) dmg = D('0.1');
+    if(!G.devGod){ G.hp = G.hp.minus(dmg); if(G.hp.lt(0)) G.hp = D(0); }
+    const dmgStr = Dfmt(dmg);
+    addLog(`The ${enemy.type} bites you for ${dmgStr}!`, 'damage');
+    spawnFloat(G.player.x, G.player.y-0.5, `-${dmgStr}`, '#ff4444');
     flashCanvas('red'); triggerPlayerHpFlash();
-    if(!G.devGod && G.hp<=0){ G.hp=0; updateHUD(); G.killedBy={type:enemy.type,dmg,floor:depthLabel()}; die(); }
+    if(!G.devGod && G.hp.lte(0)){ G.hp=D(0); updateHUD(); G.killedBy={type:enemy.type,dmg:dmgStr,floor:depthLabel()}; die(); }
   } else {
     addLog(`The ${enemy.type} bites empty air!`, 'info');
   }
@@ -2004,7 +2231,7 @@ function enemyTurn(){
   const snapX = G.player.x, snapY = G.player.y;
 
   // ── Passive wake check for sleeping enemies (not an action, costs no AP) ──
-  G.enemies.filter(e => e.hp > 0 && e.aiState === 'sleep').forEach(enemy => {
+  G.enemies.filter(e => D(e.hp).gt(0) && e.aiState === 'sleep').forEach(enemy => {
     const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
     const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
     if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
@@ -2018,7 +2245,7 @@ function enemyTurn(){
   if(!G.player.ap) G.player.ap = 0;
   G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
 
-  const liveEnemies = G.enemies.filter(e => e.hp > 0);
+  const liveEnemies = G.enemies.filter(e => D(e.hp).gt(0));
   liveEnemies.forEach(e => {
     if(!e.apRate) e.apRate = 1;
     if(e.ap === undefined) e.ap = 0;
@@ -2032,7 +2259,7 @@ function enemyTurn(){
   let iterations = 0;
 
   while(iterations++ < MAX_ACTIONS){
-    if(G.hp <= 0) break;
+    if(D(G.hp).lte(0)) break;
 
     let best = null;
     let bestAP = -1;
@@ -2055,7 +2282,7 @@ function enemyTurn(){
     if(best === null) break;
 
     if(best === 'player'){
-      G.player.ap = parseFloat((G.player.ap - 1).toFixed(6));
+      G.player.ap = parseFloat((G.player.ap - playerMoveCost()).toFixed(6));
       break;
     } else {
       _ratDoAction(best, snapX, snapY);
@@ -2098,7 +2325,7 @@ function overlapsRoom(rx, ry, rw, rh){
 }
 function roomCenter(r){ return {x: Math.floor(r.x+r.w/2), y: Math.floor(r.y+r.h/2)}; }
 function randomInRoom(r){ return {x: randInt(r.x+1, r.x+r.w-2), y: randInt(r.y+1, r.y+r.h-2)}; }
-function enemyAt(x, y){ return G.enemies.find(e => e.x === x && e.y === y && e.hp > 0); }
+function enemyAt(x, y){ return G.enemies.find(e => e.x === x && e.y === y && D(e.hp).gt(0)); }
 function randInt(a, b){ return Math.floor(Math.random() * (b-a+1)) + a; }
 function randFloat(a, b){ return Math.random() * (b-a) + a; }
 
@@ -2274,11 +2501,13 @@ function updateTargetPanel(){
     const isPriority = (e === pt);
     const card = document.createElement('div');
     card.className = 'target-card' + (isPriority ? ' target-priority' : '');
-    const hpPct = Math.max(0, e.hp/e.maxHP*100).toFixed(0);
+    const hpD = D(e.hp), maxHPD = D(e.maxHP);
+    const hpPct = hpD.lte(0) ? 0 : Math.min(100, Dn(hpD.div(maxHPD).times(100)));
+    const hpNum = hpD.lt(0) ? D(0) : hpD;
     card.innerHTML = `<span class="target-icon">🐀</span>
       <div class="target-info">
         <div class="target-hpbar-bg"><div class="target-hpbar-fill" style="width:${hpPct}%"></div></div>
-        <div class="target-hp-text">${Math.max(0,e.hp).toFixed(1)}/${e.maxHP}</div>
+        <div class="target-hp-text">${Dfmt(hpNum)}/${Dfmt(maxHPD)}</div>
       </div>`;
     card.addEventListener('click', ev => {
       ev.stopPropagation();
@@ -2402,7 +2631,7 @@ function renderCanvas(){
     ctx.fillStyle='#400000'; ctx.fillRect(sx+2,sy,TILE-4,3);
     // Floor enemies: red bar. Spawned enemies: amber bar — easy visual tell.
     ctx.fillStyle=e.isFloorEnemy?'#c84040':'#c87820';
-    ctx.fillRect(sx+2,sy,Math.max(0,(TILE-4)*(e.hp/e.maxHP)),3);
+    ctx.fillRect(sx+2,sy,Math.max(0,(TILE-4)*Math.min(1,Dn(D(e.hp).div(D(e.maxHP))))),3);
 
     // ── State indicators ──────────────────────────────────────
     // ZZZ: sleeping — three small z's drifting slowly upward, low float height
@@ -2488,11 +2717,11 @@ function renderCanvas(){
   ctx.fillStyle=grd; ctx.fillRect(px-TILE,py-TILE,TILE*3,TILE*3);
 
   // HP bar above player (no text overlay when taking damage)
-  if (playerHpFlash>0||G.hp<G.maxHP){
+  if (playerHpFlash>0||D(G.hp).lt(G.maxHP)){
     if (playerHpFlash>0) playerHpFlash--;
     const barW=TILE-4, barH=3, bx=px+2, by=py-5;
     ctx.fillStyle='#002200'; ctx.fillRect(bx,by,barW,barH);
-    ctx.fillStyle='#40c870'; ctx.fillRect(bx,by,Math.max(0,barW*(Math.max(0,G.hp)/G.maxHP)),barH);
+    ctx.fillStyle='#40c870'; ctx.fillRect(bx,by,Math.max(0,barW*Math.min(1,Math.max(0,Dn(D(G.hp).div(D(G.maxHP)))))),barH);
     // NO HP text above head — removed as requested
   }
 
@@ -2759,10 +2988,10 @@ function doSpaceAction(){
   endTurn();
 }
 function useBonfire(){
-    const healed=parseFloat((G.maxHP-G.hp).toFixed(1));
-  G.hp=G.maxHP;
-  addLog(`You rest at the bonfire and recover ${healed} HP.`,'heal');
-  spawnFloat(G.player.x,G.player.y-0.5,`+${healed.toFixed(0)}HP`,'#40c870');
+    const healed = D(G.maxHP).minus(G.hp);
+  G.hp=D(G.maxHP);
+  addLog(`You rest at the bonfire and recover ${Dfmt(healed)} HP.`,'heal');
+  spawnFloat(G.player.x,G.player.y-0.5,`+${Dfmt(healed)}HP`,'#40c870');
   flashCanvas('gold'); triggerPlayerHpFlash();
   endTurn();
 }
@@ -2778,21 +3007,30 @@ function tryMove(dx, dy){
   tutMarkDone('move');
   return true;
 }
+function playerMoveCost(){ return 1; }
 
 function doAttackEnemy(enemy){
   tutMarkDone('attack');
   // Get actual weapon type from main slot
   const mainWeapon=G.equipment&&G.equipment.main;
   const wType=mainWeapon?mainWeapon.weaponType:null;
-  const baseDmg = G.devGod ? enemy.hp : calcDmg(wType, G.str, G.dex);
-  const spread  = G.devGod ? 0 : baseDmg * 0.4;
-  const dmg     = G.devGod ? enemy.hp : parseFloat(Math.max(0.1, randFloat(baseDmg-spread, baseDmg+spread)).toFixed(1));
-  enemy.hp = parseFloat((enemy.hp-dmg).toFixed(1));
-    addLog(`You hit the ${enemy.type} for ${dmg}!`,'damage');
-  spawnFloat(enemy.x,enemy.y-0.3,dmg.toFixed(1),'#ff6060');
+  const baseDmg = G.devGod ? D(enemy.hp) : calcDmg(wType, G.str, G.dex);
+  const spread  = G.devGod ? D(0) : baseDmg.times('0.4');
+  let dmg;
+  if(G.devGod){
+    dmg = D(enemy.hp);
+  } else {
+    const roll = D(randFloat(0,1)).times(spread.times(2)).minus(spread);
+    dmg = baseDmg.plus(roll);
+    if(dmg.lt('0.1')) dmg = D('0.1');
+  }
+  enemy.hp = D(enemy.hp).minus(dmg);
+  const dmgStr = Dfmt(dmg);
+  addLog(`You hit the ${enemy.type} for ${dmgStr}!`,'damage');
+  spawnFloat(enemy.x,enemy.y-0.3,dmgStr,'#ff6060');
   spawnSlash(enemy.x, enemy.y);
-  if (enemy.hp<=0){
-        addLog(`The ${enemy.type} dies!`,'damage');
+  if (D(enemy.hp).lte(0)){
+    addLog(`The ${enemy.type} dies!`,'damage');
     G.kills++;
     gainXP(enemy.xp);
     if (priorityTargetId===enemy.id) priorityTargetId=null;
@@ -2807,12 +3045,34 @@ function queueOrRun(fn){ if (turnPhase==='player') fn(); else _queuedAction=fn; 
 function endTurn(){
   G.turn++;
   document.getElementById('turn-label-left').textContent=G.turn;
+  // Per-turn stamina + apRate update
+  function _tickStamina(){
+    const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
+    const drain = calcStaminaDrain(carried, limit);
+    const regen = calcStaminaRegen(G.end||D(10));
+    if(drain.gt(0)){
+      // Overweight: drain stamina
+      G.stamina = D(G.stamina).minus(drain);
+      if(D(G.stamina).lt(0)) G.stamina = D(0);
+      // apRate penalty based on overweight
+      const pen = calcOverweightAPRatePenalty(carried, limit);
+      G.player.apRate = Math.max(0.4, parseFloat((1 - pen).toFixed(4)));
+    } else {
+      // Under limit: regen stamina, restore apRate
+      G.stamina = D(G.stamina).plus(regen);
+      if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
+      G.player.apRate = 1;
+    }
+  }
   if (SETTINGS.smoothEntities){
     turnPhase='anim_player';
     setTimeout(()=>{
       enemyTurn(); trySpawnEnemies();
-      // HP regen
-      if (G.regen&&G.hp<G.maxHP&&G.hp>0) G.hp=parseFloat(Math.min(G.maxHP,G.hp+(G.regen||0)).toFixed(3));
+      if (G.regen&&D(G.hp).lt(G.maxHP)&&D(G.hp).gt(0)){
+        G.hp = D(G.hp).plus(G.regen);
+        if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
+      }
+      _tickStamina();
       updateHUD(); checkFloorCleared();
       turnPhase='anim_enemy';
       setTimeout(()=>{
@@ -2823,7 +3083,11 @@ function endTurn(){
     },PLAYER_ANIM_MS);
   } else {
     enemyTurn(); trySpawnEnemies();
-    if (G.regen&&G.hp<G.maxHP&&G.hp>0) G.hp=parseFloat(Math.min(G.maxHP,G.hp+(G.regen||0)).toFixed(3));
+    if (G.regen&&D(G.hp).lt(G.maxHP)&&D(G.hp).gt(0)){
+      G.hp = D(G.hp).plus(G.regen);
+      if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
+    }
+    _tickStamina();
     updateHUD(); checkFloorCleared();
     turnPhase='player'; markPanelDirty(); renderCanvas();
     if (G.pendingLevelUps>0) setTimeout(showLevelUpModal,80);
@@ -2950,15 +3214,15 @@ function checkFloorCleared(){
 }
 
 function forceLevelUp(){
-  G.xp=0; G.level++; G.xpNeeded=10;
+  G.xp=D(0); G.level=D(G.level).plus(1); G.xpNeeded=D(G.xpNeeded).times('1.15').plus(5);
   G.pendingLevelUps++;
   const gains=CLASS_LEVEL_GAINS[G.class];
-  G.con+=gains.con; G.str+=gains.str; G.dex+=gains.dex;
-  G.maxHP+=gains.con;
-  G.hp=Math.min(G.hp+gains.con, G.maxHP);
+  G.con=D(G.con).plus(gains.con); G.str=D(G.str).plus(gains.str); G.dex=D(G.dex).plus(gains.dex);
+  G.maxHP=D(G.maxHP).plus(gains.con);
+  G.hp=D(G.hp).plus(gains.con); if(D(G.hp).gt(G.maxHP)) G.hp=D(G.maxHP);
   G.def=calcDef(G.con); G.regen=calcRegen(G.con);
   G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
-  addLog(`LEVEL UP! Upper floors cleared — you are now Level ${G.level}!`,'level');
+  addLog(`LEVEL UP! Upper floors cleared — you are now Level ${Dfmt(G.level)}!`,'level');
 }
 
 const SPAWN_INTERVAL=30, SPAWN_BASE=0.6;
@@ -3275,19 +3539,19 @@ function regenMap(dir='down'){
 }
 
 function gainXP(amount){
-  G.xp+=amount; addLog(`+${amount} XP`,'xp');
-  while (G.xp>=G.xpNeeded){
-    G.xp-=G.xpNeeded; G.level++; G.xpNeeded=10;
+  G.xp = D(G.xp).plus(amount); addLog(`+${Dfmt(amount)} XP`,'xp');
+  while (D(G.xp).gte(G.xpNeeded)){
+    G.xp = D(G.xp).minus(G.xpNeeded); G.level = D(G.level).plus(1); G.xpNeeded = D(G.xpNeeded).times('1.15').plus(5);
     G.pendingLevelUps++;
 
     const gains=CLASS_LEVEL_GAINS[G.class];
-    G.con+=gains.con; G.str+=gains.str; G.dex+=gains.dex;
-    G.maxHP+=gains.con;
-    G.hp=Math.min(G.hp+gains.con, G.maxHP);
+    G.con = D(G.con).plus(gains.con); G.str = D(G.str).plus(gains.str); G.dex = D(G.dex).plus(gains.dex);
+    G.maxHP = D(G.maxHP).plus(gains.con);
+    G.hp = D(G.hp).plus(gains.con); if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
     G.def=calcDef(G.con); G.regen=calcRegen(G.con);
     G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
 
-    addLog(`LEVEL UP! You are now level ${G.level}!`,'level');
+    addLog(`LEVEL UP! You are now level ${Dfmt(G.level)}!`,'level');
   }
 }
 
@@ -3302,7 +3566,7 @@ function showLevelUpModal(){
   G.pendingLevelUps--;
   luPointsRemaining=3; luAlloc={CON:0,STR:0,DEX:0};
   document.getElementById('levelup-modal').classList.add('active');
-  document.getElementById('levelup-msg').textContent=`You reached Level ${G.level}!`;
+  document.getElementById('levelup-msg').textContent=`You reached Level ${Dfmt(G.level)}!`;
   document.getElementById('lu-points').textContent=luPointsRemaining;
   const gains=CLASS_LEVEL_GAINS[G.class];
   document.getElementById('lu-base-stats').textContent=`CON+${gains.con}, STR+${gains.str}, DEX+${gains.dex}`;
@@ -3339,9 +3603,9 @@ function confirmLevelUp(){
   if (G.pendingLevelUps>0) setTimeout(showLevelUpModal,200);
 }
 function applyLUAlloc(){
-  if (luAlloc.CON){G.con+=luAlloc.CON;G.maxHP+=luAlloc.CON;G.hp=Math.min(G.hp+luAlloc.CON,G.maxHP);}
-  if (luAlloc.STR) G.str+=luAlloc.STR;
-  if (luAlloc.DEX) G.dex+=luAlloc.DEX;
+  if (luAlloc.CON){G.con=D(G.con).plus(luAlloc.CON);G.maxHP=D(G.maxHP).plus(luAlloc.CON);G.hp=D(G.hp).plus(luAlloc.CON);if(D(G.hp).gt(G.maxHP))G.hp=D(G.maxHP);}
+  if (luAlloc.STR) G.str=D(G.str).plus(luAlloc.STR);
+  if (luAlloc.DEX) G.dex=D(G.dex).plus(luAlloc.DEX);
   G.def=calcDef(G.con); G.regen=calcRegen(G.con);
   G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
 }
@@ -3351,20 +3615,26 @@ function renderCharTab(){ }
 
 function updateHUD(){
   if (!G.maxHP) return;
-  document.getElementById('hp-text').textContent  =`${Math.max(0,G.hp).toFixed(1)}/${G.maxHP}`;
-  document.getElementById('hp-bar').style.width   =`${(Math.max(0,G.hp)/G.maxHP)*100}%`;
-  document.getElementById('xp-text').textContent  =`${G.xp}/${G.xpNeeded}`;
-  document.getElementById('xp-bar').style.width   =`${(G.xp/G.xpNeeded)*100}%`;
-  document.getElementById('level-badge').textContent=`LVL ${G.level}`;
-  // Recalc baseDmg from current weapon state
+  const hpD = D(G.hp), maxHPD = D(G.maxHP);
+  const hpPct = hpD.lt(0) ? 0 : Dn(hpD.div(maxHPD).times(100));
+  document.getElementById('hp-text').textContent  =`${Dfmt(hpD.lt(0)?D(0):hpD)}/${Dfmt(maxHPD)}`;
+  document.getElementById('hp-bar').style.width   =`${Math.min(100,Math.max(0,hpPct))}%`;
+  // Stamina bar
+  if(G.maxStamina && document.getElementById('sta-bar')){
+    const staD = D(G.stamina||0), maxStaD = D(G.maxStamina);
+    const staPct = maxStaD.gt(0) ? Math.min(100, Math.max(0, Dn(staD.div(maxStaD).times(100)))) : 0;
+    document.getElementById('sta-text').textContent = `${Dfmt(staD.lt(0)?D(0):staD)}/${Dfmt(maxStaD)}`;
+    document.getElementById('sta-bar').style.width  = `${staPct}%`;
+  }
+  document.getElementById('xp-text').textContent  =`${Dfmt(G.xp)}/${Dfmt(G.xpNeeded)}`;
+  const xpPct = D(G.xpNeeded).gt(0) ? Math.min(100, Dn(D(G.xp).div(G.xpNeeded).times(100))) : 0;
+  document.getElementById('xp-bar').style.width   =`${xpPct}%`;
+  document.getElementById('level-badge').textContent=`LVL ${Dfmt(G.level)}`;
   G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
-  // show the same range as the character page (mid * 0.6 to mid * 1.4)
-  const lo = (G.baseDmg * 0.6).toFixed(1);
-  const hi = (G.baseDmg * 1.4).toFixed(1);
-  document.getElementById('stat-dmg').textContent = `${lo}–${hi}`;
-  document.getElementById('stat-maxhp').textContent=G.maxHP;
-  document.getElementById('stat-def').textContent  =(G.def||0).toFixed(2);
-  document.getElementById('stat-regen').textContent=(G.regen||0).toFixed(3);
+  document.getElementById('stat-dmg').textContent = Dfmt(G.baseDmg);
+  document.getElementById('stat-maxhp').textContent=Dfmt(G.maxHP);
+  document.getElementById('stat-def').textContent  =Dfmt(G.def||D(0));
+  document.getElementById('stat-regen').textContent=Dfmt(G.regen||D(0));
   document.getElementById('kill-count').textContent=G.kills;
   if(G.zone==='normal'&&!G.isBonfireFloor&&G.depth>(G.lowestDepth||0)) G.lowestDepth=G.depth;
   document.getElementById('depth-label').textContent=depthLabel();
@@ -3452,7 +3722,7 @@ function die(){
     document.getElementById('death-stats').innerHTML =
       sec('PLAYER',
         row('PLAYER', `${G.name} — ${(G.class||'?').charAt(0).toUpperCase()+(G.class||'?').slice(1)}`) +
-        row('LEVEL', G.level)
+        row('LEVEL', Dfmt(G.level))
       ) +
       sec('RUN INFO',
         row('DEEPEST FLOOR', deepest) +
@@ -3466,9 +3736,8 @@ function die(){
 
     // ── Full stats — two-col layout ───────────────────────────
     const dmgRange = (()=>{
-      const w = G.weaponType ? WEAPON_DEFS[G.weaponType] : null;
-      const mid = w ? (w.base + G.str*w.str + G.dex*w.dex) : G.baseDmg;
-      return `${(mid*0.6).toFixed(1)}–${(mid*1.4).toFixed(1)}`;
+      const mid = calcDmg(G.weaponType, G.str, G.dex);
+      return `${Dfmt(D(mid).times('0.6'))}–${Dfmt(D(mid).times('1.4'))}`;
     })();
     const cls = (G.class||'?').charAt(0).toUpperCase()+(G.class||'?').slice(1);
 
@@ -3479,7 +3748,7 @@ function die(){
           <div class="dstat-player-icon">${G.icon}</div>
           <div><div class="dstat-player-name">${G.name}</div><div class="dstat-player-class">${cls}</div></div>
         </div>` +
-        drow('LEVEL', G.level) +
+        drow('LEVEL', Dfmt(G.level)) +
       `</div>` +
       `<div class="dstat-blk">
         <div class="dstat-blk-t">RUN INFO</div>` +
@@ -3496,12 +3765,12 @@ function die(){
     document.getElementById('dstat-right').innerHTML =
       `<div class="dstat-blk">
         <div class="dstat-blk-t">BASE ATTRIBUTES</div>` +
-        drow('CON', G.con) +
-        drow('STR', G.str) +
-        drow('DEX', G.dex) +
-        drow('DEF', (G.def||0).toFixed(2)) +
-        drow('REGEN', (G.regen||0).toFixed(3)) +
-        drow('MAX HP', G.maxHP) +
+        drow('CON', Dfmt(G.con)) +
+        drow('STR', Dfmt(G.str)) +
+        drow('DEX', Dfmt(G.dex)) +
+        drow('DEF', Dfmt(G.def||D(0))) +
+        drow('REGEN', Dfmt(G.regen||D(0))) +
+        drow('MAX HP', Dfmt(G.maxHP)) +
         drow('DMG RANGE', dmgRange) +
       `</div>`;
 
@@ -3640,7 +3909,8 @@ const INV_ESLOTS = [
   {id:'charm2',  label:'CHARM'},
 ];
 
-function invSlotCount(){ return 10 + Math.floor((G.str||10)/10); }
+function invCarryLimit(){ return calcCarryWeight(G.str); }
+function invCarriedKg(){ return calcCarriedWeight(); }
 
 let invSelId   = null;
 let invFilter  = 'all';
@@ -3718,24 +3988,35 @@ function invFiltered(){
 function invRenderGrid(){
   const wrap = document.getElementById('inv-slots');
   if (!wrap||!G.inventory) return;
-  const total = invSlotCount();
   const items = invFiltered();
-  document.getElementById('inv-cap-lbl').textContent = `${G.inventory.length} / ${total} slots`;
-  document.getElementById('inv-cfill').style.width   = `${Math.min(100,G.inventory.length/total*100)}%`;
+  const carried = invCarriedKg();
+  const limit   = invCarryLimit();
+  const overweight = carried.gt(limit);
+  const carriedStr = Dfmt(carried);
+  const limitStr   = Dfmt(limit);
+  const pct = limit.gt(0) ? Math.min(100, Dn(carried.div(limit).times(100))) : 0;
+  document.getElementById('inv-cap-lbl').textContent = `${carriedStr} / ${limitStr} kg${overweight ? ' ⚠ OVER' : ''}`;
+  document.getElementById('inv-cap-lbl').style.color = overweight ? 'var(--red)' : '';
+  document.getElementById('inv-cfill').style.width   = `${pct}%`;
+  document.getElementById('inv-cfill').style.background = overweight ? 'var(--red)' : '';
   wrap.innerHTML='';
-  for (let i=0;i<total;i++){
-    const item=items[i];
-    const cell=document.createElement('div');
-    if (item){
-      cell.className='icell has-item'+(invSelId===item.id?' sel':'');
-      cell.innerHTML=item.icon+(item.stack?`<span class="sbadge">×${item.stack}</span>`:'');
-      cell.title=item.name;
-      cell.addEventListener('click',()=>invSelect(item.id));
-    } else {
-      cell.className='icell mt';
-    }
-    wrap.appendChild(cell);
+  // Show all inventory items (no empty padding cells — weight-based has no fixed slot count)
+  if(items.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'inv-empty-msg';
+    empty.textContent = 'No items';
+    wrap.appendChild(empty);
+    return;
   }
+  items.forEach(item => {
+    const cell=document.createElement('div');
+    cell.className='icell has-item'+(invSelId===item.id?' sel':'');
+    const kgBadge = item.kg != null ? `<span class="kgbadge">${item.kg}kg</span>` : '';
+    cell.innerHTML=item.icon+(item.stack?`<span class="sbadge">×${item.stack}</span>`:'')+kgBadge;
+    cell.title=item.name;
+    cell.addEventListener('click',()=>invSelect(item.id));
+    wrap.appendChild(cell);
+  });
 }
 function invRenderAll(){ invRenderEquip(); invRenderGrid(); }
 
@@ -3755,16 +4036,17 @@ function invShowDetail(item){
   const w = item.weaponType?WEAPON_DEFS[item.weaponType]:null;
   let statsHTML='';
   if (item.type==='weapon'&&w){
-    const mid=w.base+(G.str||0)*w.str+(G.dex||0)*w.dex;
-    const lo=(mid*0.6).toFixed(1), hi=(mid*1.4).toFixed(1);
+    const scaledDmg = Dfmt(D(w.base).plus(D(G.str||0).times(w.str)).plus(D(G.dex||0).times(w.dex)));
+    const catLine = (w.category&&w.subcategory)?`<div class="drow"><span class="dl">Category</span><span class="dv">${w.category}</span></div><div class="drow"><span class="dl">Type</span><span class="dv">${w.subcategory}</span></div>`:'';
     statsHTML=`<div class="dsec"><div class="dsec-t">WEAPON STATS</div>
-      <div class="drow"><span class="dl">Base DMG</span><span class="dv">${w.base}</span></div>
+      ${catLine}
+      <div class="drow"><span class="dl">Weight</span><span class="dv">${w.kg} kg</span></div>
+      <div class="drow"><span class="dl">Base DMG</span><span class="dv pos">${w.base}</span></div>
       <div class="drow"><span class="dl">STR ×</span><span class="dv">${w.str.toFixed(2)}</span></div>
       <div class="drow"><span class="dl">DEX ×</span><span class="dv">${w.dex.toFixed(2)}</span></div>
       <div class="drow" style="border-top:1px solid var(--border);margin-top:3px;padding-top:3px;">
-        <span class="dl">DMG range</span><span class="dv pos">${lo}–${hi}</span>
+        <span class="dl">DMG</span><span class="dv pos" id="det-dmg-val">${scaledDmg}</span><span class="dv" id="det-dmg-delta" style="margin-left:4px;font-size:9px"></span>
       </div>
-      <div class="drow"><span class="dl" style="font-size:11px;color:#504838">±40% spread</span></div>
     </div>`;
   }
   if (item.type==='consumable'){
@@ -3779,10 +4061,61 @@ function invShowDetail(item){
   </div>`:'';
   body.innerHTML=`
     <div class="dicon">${item.icon}</div>
-    <div><div class="dname">${item.name}</div><div class="dtype">${item.type.toUpperCase()}</div></div>
+    <div><div class="dname">${item.name}</div><div class="dtype">${item.type.toUpperCase()}${item.kg != null ? ` · ${item.kg} kg` : ''}</div></div>
     ${statsHTML}${bonusHTML}
     <div class="ddesc">"${item.desc}"</div>
     <div class="dacts">${invBuildActs(item)}</div>`;
+  // Attach hover listeners for equip/unequip delta
+  _invAttachDmgHover(item);
+}
+
+function _invAttachDmgHover(item){
+  if(!item.weaponType) return;
+  const w = WEAPON_DEFS[item.weaponType]; if(!w) return;
+  const dmgEl = document.getElementById('det-dmg-val');
+  const deltaEl = document.getElementById('det-dmg-delta');
+  if(!dmgEl||!deltaEl) return;
+  const itemScaledDmg = D(w.base).plus(D(G.str||0).times(w.str)).plus(D(G.dex||0).times(w.dex));
+  const currentDmg = D(G.baseDmg||0);
+
+  function resetDisplay(){
+    dmgEl.textContent = Dfmt(itemScaledDmg);
+    dmgEl.style.color = '';
+    dmgEl.classList.remove('hover-compare');
+    deltaEl.textContent = '';
+  }
+
+  function showEquipDelta(){
+    const diff = D(itemScaledDmg).minus(currentDmg);
+    const diffN = Dn(diff);
+    dmgEl.textContent = Dfmt(itemScaledDmg);
+    dmgEl.classList.add('hover-compare');
+    if(Math.abs(diffN)<0.001){ deltaEl.textContent='(=)'; deltaEl.style.color='var(--dim)'; }
+    else if(diffN>0){ deltaEl.textContent=`(+${Dfmt(diff)})`; deltaEl.style.color='var(--green)'; }
+    else { deltaEl.textContent=`(${Dfmt(diff)})`; deltaEl.style.color='var(--red)'; }
+  }
+
+  function showUnequipDelta(){
+    const fistDmg = calcDmgFists(G.str, G.dex);
+    const diff = D(fistDmg).minus(currentDmg);
+    const diffN = Dn(diff);
+    dmgEl.textContent = Dfmt(fistDmg);
+    dmgEl.classList.add('hover-compare');
+    if(Math.abs(diffN)<0.001){ deltaEl.textContent='(=)'; deltaEl.style.color='var(--dim)'; }
+    else if(diffN>0){ deltaEl.textContent=`(+${Dfmt(diff)})`; deltaEl.style.color='var(--green)'; }
+    else { deltaEl.textContent=`(${Dfmt(diff)})`; deltaEl.style.color='var(--red)'; }
+  }
+
+  const eqBtn = document.querySelector('.dact.eq');
+  const uqBtn = document.querySelector('.dact.uneq');
+  if(eqBtn){
+    eqBtn.addEventListener('mouseenter', showEquipDelta);
+    eqBtn.addEventListener('mouseleave', resetDisplay);
+  }
+  if(uqBtn){
+    uqBtn.addEventListener('mouseenter', showUnequipDelta);
+    uqBtn.addEventListener('mouseleave', resetDisplay);
+  }
 }
 
 function invBuildActs(item){
@@ -3847,9 +4180,9 @@ function invUnequipItem(id){
 function invUseItem(id){
   const item=G.inventory.find(i=>i.id===id); if (!item) return;
   if (item.effectVal&&item.effectVal>0){
-    const healed=Math.min(item.effectVal, G.maxHP-G.hp);
-    G.hp=Math.min(G.maxHP,G.hp+item.effectVal);
-    addLog(`Used ${item.name}. Restored ${healed.toFixed(1)} HP.`,'heal');
+    const healed = D(item.effectVal).lt(D(G.maxHP).minus(G.hp)) ? D(item.effectVal) : D(G.maxHP).minus(G.hp);
+    G.hp = D(G.hp).plus(item.effectVal); if(D(G.hp).gt(G.maxHP)) G.hp=D(G.maxHP);
+    addLog(`Used ${item.name}. Restored ${Dfmt(healed)} HP.`,'heal');
     updateHUD();
   }
   if (item.stack&&item.stack>1){ item.stack--; invRenderAll(); invShowDetail(item); }
@@ -3905,46 +4238,70 @@ function invSetFilter(btn,f){
 
 const ICP_ALLOC_DEFS=[
   {key:'CON',desc:'Last longer in fights.'},
-  {key:'STR',desc:'Hit harder in combat.'},
+  {key:'STR',desc:'Hit harder and carry more weight.'},
   {key:'DEX',desc:'Move faster and strike more accurately.'},
+  {key:'END',desc:'Boost stamina, recovery, and weight penalty resistance.'},
 ];
 function invRenderCharPage(){
   if (!G.maxHP) return;
-  invIcpAlloc={CON:0,STR:0,DEX:0};
-  const w=G.weaponType?WEAPON_DEFS[G.weaponType]:null;
-  const mid=w?(w.base+G.str*w.str+G.dex*w.dex):G.baseDmg;
-  const lo=(mid*0.6).toFixed(1), hi=(mid*1.4).toFixed(1);
+  invIcpAlloc={CON:0,STR:0,DEX:0,END:0};
+  const mid = calcDmg(G.weaponType, G.str, G.dex);
+  const wDef = G.weaponType ? WEAPON_DEFS[G.weaponType] : null;
+  const baseDmgVal = wDef ? D(wDef.base) : D(FISTS_DEF.base);
+  const lo=Dfmt(D(mid).times('0.6')), hi=Dfmt(D(mid).times('1.4'));
   document.getElementById('icp-icon').textContent=G.icon;
   document.getElementById('icp-name').textContent=G.name||'—';
   document.getElementById('icp-class').textContent=(G.class||'?').charAt(0).toUpperCase()+(G.class||'?').slice(1);
-  document.getElementById('icp-hp').textContent=`${Math.max(0,G.hp).toFixed(1)}/${G.maxHP}`;
-  document.getElementById('icp-hpbar').style.width=`${Math.max(0,G.hp)/G.maxHP*100}%`;
-  document.getElementById('icp-xp').textContent=`${G.xp}/${G.xpNeeded}`;
-  document.getElementById('icp-xpbar').style.width=`${G.xp/G.xpNeeded*100}%`;
-  document.getElementById('icp-lvl').textContent=G.level;
+  document.getElementById('icp-hp').textContent=`${Dfmt(D(G.hp).lt(0)?D(0):D(G.hp))}/${Dfmt(G.maxHP)}`;
+  document.getElementById('icp-hpbar').style.width=`${Math.min(100,Math.max(0,Dn(D(G.hp).div(D(G.maxHP)).times(100))))}%`;
+  document.getElementById('icp-xp').textContent=`${Dfmt(G.xp)}/${Dfmt(G.xpNeeded)}`;
+  document.getElementById('icp-xpbar').style.width=`${Math.min(100,Math.max(0,Dn(D(G.xp).div(D(G.xpNeeded)).times(100))))}%`;
+  document.getElementById('icp-lvl').textContent=Dfmt(G.level);
   document.getElementById('icp-diff').textContent=`${(RUN_CONFIG.difficulty||'normal').toUpperCase()} · ${(RUN_CONFIG.floorSize||'md').toUpperCase()}`;
   document.getElementById('icp-floor').textContent=depthLabel();
   document.getElementById('icp-kills').textContent=G.kills;
   document.getElementById('icp-depth').textContent=G.lowestDepth?`Depth ${G.lowestDepth}`:'—';
   document.getElementById('icp-turn').textContent=G.turn;
-  document.getElementById('icp-con').textContent=G.con;
-  document.getElementById('icp-str').textContent=G.str;
-  document.getElementById('icp-dex').textContent=G.dex;
-  document.getElementById('icp-maxhp').textContent=G.maxHP;
-  document.getElementById('icp-dmg').textContent=`${lo}–${hi}`;
-  if (document.getElementById('icp-def')) document.getElementById('icp-def').textContent=(G.def||0).toFixed(2);
-  if (document.getElementById('icp-regen')) document.getElementById('icp-regen').textContent=(G.regen||0).toFixed(3);
+  document.getElementById('icp-con').textContent=Dfmt(G.con);
+  document.getElementById('icp-str').textContent=Dfmt(G.str);
+  document.getElementById('icp-dex').textContent=Dfmt(G.dex);
+  if(document.getElementById('icp-end')) document.getElementById('icp-end').textContent=Dfmt(G.end||D(10));
+  document.getElementById('icp-maxhp').textContent=Dfmt(G.maxHP);
+  document.getElementById('icp-dmg').textContent=Dfmt(baseDmgVal);
+  if(document.getElementById('icp-cur-dmg')) document.getElementById('icp-cur-dmg').textContent=Dfmt(mid);
+  if(document.getElementById('icp-dmg-range')) document.getElementById('icp-dmg-range').textContent=`${lo}–${hi}`;
+  if (document.getElementById('icp-def')) document.getElementById('icp-def').textContent=Dfmt(G.def||D(0));
+  if (document.getElementById('icp-regen')) document.getElementById('icp-regen').textContent=Dfmt(G.regen||D(0));
+  // Stamina display
+  if(document.getElementById('icp-stamina')){
+    const staD = D(G.stamina||0), maxStaD = D(G.maxStamina||50);
+    document.getElementById('icp-stamina').textContent=`${Dfmt(staD.lt(0)?D(0):staD)}/${Dfmt(maxStaD)}`;
+  }
+  // Weight display
+  const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
+  const overweight = carried.gt(limit);
+  const apPen = calcOverweightAPRatePenalty(carried, limit);
+  if(document.getElementById('icp-weight')){
+    const wEl = document.getElementById('icp-weight');
+    wEl.textContent = `${Dfmt(carried)} / ${Dfmt(limit)} kg`;
+    wEl.style.color = overweight ? 'var(--red)' : '';
+  }
+  if(document.getElementById('icp-weight-pen')){
+    const pEl = document.getElementById('icp-weight-pen');
+    pEl.textContent = overweight ? `-${(apPen*100).toFixed(0)}% AP rate` : '—';
+    pEl.style.color = overweight ? 'var(--red)' : 'var(--dim)';
+  }
   document.getElementById('icp-unsp').textContent=G.unspentPoints||0;
   document.getElementById('icp-cfm').disabled=true;
   const cont=document.getElementById('icp-alrows'); cont.innerHTML='';
   ICP_ALLOC_DEFS.forEach(d=>{
+    const base=d.key==='CON'?G.con:d.key==='STR'?G.str:d.key==='DEX'?G.dex:(G.end||D(10));
     const row=document.createElement('div'); row.className='icp-alrow';
-    const base=d.key==='CON'?G.con:d.key==='STR'?G.str:G.dex;
     row.innerHTML=`<span class="icp-alkey">${d.key}</span>
       <span class="icp-aldesc">${d.desc}</span>
       <div class="icp-alctrl">
         <button class="icp-albtn" onclick="invChAlloc('${d.key}',-1)">−</button>
-        <span class="icp-alcur" id="ica-${d.key}">${base}</span>
+        <span class="icp-alcur" id="ica-${d.key}">${Dfmt(base)}</span>
         <button class="icp-albtn" onclick="invChAlloc('${d.key}',1)">+</button>
       </div>
       <span class="icp-aldelta" id="icad-${d.key}"></span>`;
@@ -3956,8 +4313,8 @@ function invChAlloc(key,delta){
   if (delta>0&&spent>=(G.unspentPoints||0)) return;
   if (delta<0&&(invIcpAlloc[key]||0)<=0) return;
   invIcpAlloc[key]=(invIcpAlloc[key]||0)+delta;
-  const base=key==='CON'?G.con:key==='STR'?G.str:G.dex;
-  document.getElementById('ica-'+key).textContent=base+invIcpAlloc[key];
+  const base=key==='CON'?G.con:key==='STR'?G.str:key==='DEX'?G.dex:(G.end||D(10));
+  document.getElementById('ica-'+key).textContent=Dfmt(D(base).plus(invIcpAlloc[key]));
   document.getElementById('icad-'+key).textContent=invIcpAlloc[key]>0?`+${invIcpAlloc[key]}`:'';
   const ns=Object.values(invIcpAlloc).reduce((a,b)=>a+b,0);
   document.getElementById('icp-unsp').textContent=(G.unspentPoints||0)-ns;
@@ -3966,13 +4323,21 @@ function invChAlloc(key,delta){
 function invApplyCharAlloc(){
   const spent=Object.values(invIcpAlloc).reduce((a,b)=>a+b,0);
   if (spent<=0) return;
-  if (invIcpAlloc.CON){G.con+=invIcpAlloc.CON;G.maxHP+=invIcpAlloc.CON;G.hp=Math.min(G.hp+invIcpAlloc.CON,G.maxHP);}
-  if (invIcpAlloc.STR) G.str+=invIcpAlloc.STR;
-  if (invIcpAlloc.DEX) G.dex+=invIcpAlloc.DEX;
+  if (invIcpAlloc.CON){G.con=D(G.con).plus(invIcpAlloc.CON);G.maxHP=D(G.maxHP).plus(invIcpAlloc.CON);G.hp=D(G.hp).plus(invIcpAlloc.CON);if(D(G.hp).gt(G.maxHP))G.hp=D(G.maxHP);}
+  if (invIcpAlloc.STR) G.str=D(G.str).plus(invIcpAlloc.STR);
+  if (invIcpAlloc.DEX) G.dex=D(G.dex).plus(invIcpAlloc.DEX);
+  if (invIcpAlloc.END){
+    G.end=D(G.end||10).plus(invIcpAlloc.END);
+    const newMaxSta = calcMaxStamina(G.end);
+    const staDiff = D(newMaxSta).minus(G.maxStamina||D(50));
+    G.maxStamina = newMaxSta;
+    G.stamina = D(G.stamina||0).plus(staDiff);
+    if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
+  }
   G.def=calcDef(G.con); G.regen=calcRegen(G.con);
   G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
   G.unspentPoints-=spent;
-  addLog(`Applied ${spent} pt${spent>1?'s':''}. CON:${G.con} STR:${G.str} DEX:${G.dex}`,'level');
+  addLog(`Applied ${spent} pt${spent>1?'s':''}. CON:${Dfmt(G.con)} STR:${Dfmt(G.str)} DEX:${Dfmt(G.dex)} END:${Dfmt(G.end||D(10))}`,'level');
   updateHUD(); invRenderCharPage();
 }
 
@@ -4000,24 +4365,33 @@ document.getElementById('game-menu-modal').addEventListener('click',function(e){
 });
 
 // ==================== DEV TOOLS ====================
-const DT_CODE = 'ZeroIsCool';
+const DT_CODE = 'ZeroIsTheBest';
 
 function _dtIsUnlocked(){ return !!(G && G.devUnlocked); }
 
-let _dtSecretTaps = 0, _dtSecretTimer = null;
-function _dtSecretTap(){
+// Secret keyword listener — type 'dev' while settings modal is open
+const _DT_SECRET_WORD = 'dev';
+let _dtSecretBuffer = '';
+let _dtSecretBufferTimer = null;
+document.addEventListener('keydown', function(e){
   if(_dtIsUnlocked()) return;
-  _dtSecretTaps++;
-  clearTimeout(_dtSecretTimer);
-  _dtSecretTimer = setTimeout(()=>{ _dtSecretTaps = 0; }, 5000);
-  if(_dtSecretTaps >= 5){
-    _dtSecretTaps = 0;
+  if(!document.getElementById('settings-modal').classList.contains('active')) return;
+  if(!(G && G.player)) return;
+  const tag = document.activeElement && document.activeElement.tagName;
+  if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+  _dtSecretBuffer += e.key.toLowerCase();
+  if(_dtSecretBuffer.length > _DT_SECRET_WORD.length)
+    _dtSecretBuffer = _dtSecretBuffer.slice(-_DT_SECRET_WORD.length);
+  clearTimeout(_dtSecretBufferTimer);
+  _dtSecretBufferTimer = setTimeout(()=>{ _dtSecretBuffer = ''; }, 2000);
+  if(_dtSecretBuffer === _DT_SECRET_WORD){
+    _dtSecretBuffer = '';
     document.getElementById('settings-modal').classList.remove('active');
     _settingsFromMenu = false;
     _showDevToolsCode();
     document.getElementById('devtools-modal').classList.add('active');
   }
-}
+});
 
 function openDevTools(){
   // Close settings first
@@ -4074,9 +4448,9 @@ function _dtNumRow(label, getVal, setVal, allowNeg){
 function _dtAdj(id, delta, allowNeg){
   if(!G||!G.player){return;}
   const el=document.getElementById(id); if(!el) return;
-  let v=(parseInt(el.value)||0)+delta;
-  if(!allowNeg&&v<0) v=0;
-  el.value=v; el.classList.toggle('zero',v===0);
+  let v=D(el.value||'0').plus(delta);
+  if(!allowNeg&&v.lt(0)) v=D(0);
+  el.value=v.toJSON(); el.classList.toggle('zero',v.eq(0));
   _dtApplyField(id, v);
 }
 function _dtInputChange(id){
@@ -4085,8 +4459,9 @@ function _dtInputChange(id){
 }
 function _dtInputBlur(id){
   const el=document.getElementById(id); if(!el) return;
-  let v=parseInt(el.value)||0;
-  el.value=v; el.classList.toggle('zero',v===0);
+  let v; try{ v=D(el.value); }catch(e){ v=D(0); }
+  if(!v.isFinite()||v.isNaN()) v=D(0);
+  el.value=v.toJSON(); el.classList.toggle('zero',v.eq(0));
   _dtApplyField(id, v);
 }
 function _dtApplyField(id, v){
@@ -4094,25 +4469,35 @@ function _dtApplyField(id, v){
   const key = id.replace('dt-v-','').replace(/_/g,' ');
   switch(key){
     case 'Level':
-      const prev=G.level;
-      if(v>prev){ // only grant gains on increase
-        const diff=v-prev;
+      const prev=D(G.level);
+      if(D(v).gt(prev)){
+        const diff=D(v).minus(prev);
         const gains=CLASS_LEVEL_GAINS[G.class]||{con:0,str:0,dex:0};
-        G.con+=gains.con*diff; G.str+=gains.str*diff; G.dex+=gains.dex*diff;
-        G.maxHP+=gains.con*diff; G.unspentPoints=(G.unspentPoints||0)+3*diff;
+        G.con=D(G.con).plus(D(gains.con).times(diff));
+        G.str=D(G.str).plus(D(gains.str).times(diff));
+        G.dex=D(G.dex).plus(D(gains.dex).times(diff));
+        G.maxHP=D(G.maxHP).plus(D(gains.con).times(diff));
+        G.unspentPoints=(G.unspentPoints||0)+D(3).times(diff).toNumber();
       }
-      G.level=v; G.xp=0;
-      document.getElementById('level-badge').textContent=`LVL ${v}`;
+      G.level=D(v); G.xp=D(0);
+      document.getElementById('level-badge').textContent=`LVL ${Dfmt(G.level)}`;
       break;
-    case 'CON': G.con=v; G.maxHP=v; G.hp=Math.min(G.hp,G.maxHP); G.def=calcDef(v); G.regen=calcRegen(v); break;
-    case 'STR': G.str=v; G.baseDmg=calcDmg(G.weaponType,v,G.dex); break;
-    case 'DEX': G.dex=v; G.baseDmg=calcDmg(G.weaponType,G.str,v); break;
-    case 'DEF': G.def=parseFloat(v)||0; break;
-    case 'REGEN': G.regen=parseFloat(v)||0; break;
-    case 'Base DMG': G.baseDmg=parseFloat(v)||1; break;
-    case 'FOV Radius': SETTINGS.fovRadius=Math.max(1,v); computeFOV(); break;
+    case 'CON': G.con=D(v); G.maxHP=D(v); G.hp=D(G.hp).gt(G.maxHP)?D(G.maxHP):D(G.hp); G.def=calcDef(D(v)); G.regen=calcRegen(D(v)); break;
+    case 'STR': G.str=D(v); G.baseDmg=calcDmg(G.weaponType,D(v),G.dex); break;
+    case 'DEX': G.dex=D(v); G.baseDmg=calcDmg(G.weaponType,G.str,D(v)); break;
+    case 'END': { G.end=D(v); const ms=calcMaxStamina(D(v)); G.maxStamina=ms; if(D(G.stamina).gt(ms)) G.stamina=D(ms); break; }
+    case 'DEF': G.def=D(v); break;
+    case 'REGEN': G.regen=D(v); break;
+    case 'Base DMG': G.baseDmg=D(v).lt('0.1')?D('0.1'):D(v); break;
+    case 'FOV Radius': SETTINGS.fovRadius=Math.max(1,D(v).toNumber()); computeFOV(); break;
   }
   updateHUD(); renderCanvas();
+  // Refresh any derived spinners that may have changed (DEF, REGEN, Base DMG, END)
+  const refresh = {'DEF': G.def, 'REGEN': G.regen, 'Base_DMG': G.baseDmg, 'END': G.end||D(10)};
+  Object.entries(refresh).forEach(([k, val])=>{
+    const el = document.getElementById('dt-v-'+k);
+    if(el) el.value = Dfmt(val);
+  });
 }
 function _dtToggleRow(label, flag, onToggle){
   const active = !!G[flag];
@@ -4139,13 +4524,14 @@ function _showDevToolsPanel(){
     <div class="dt-title">DEV TOOLS</div>
 
     <div class="dt-section">PROGRESSION</div>
-    ${_dtNumRow('Level', ()=>G.level, null, false)}
-    ${_dtNumRow('CON',  ()=>G.con,   null, false)}
-    ${_dtNumRow('STR',  ()=>G.str,   null, false)}
-    ${_dtNumRow('DEX',  ()=>G.dex,   null, false)}
-    ${_dtNumRow('DEF',  ()=>G.def,   null, false)}
-    ${_dtNumRow('REGEN',()=>G.regen, null, false)}
-    ${_dtNumRow('Base DMG', ()=>G.baseDmg, null, false)}
+    ${_dtNumRow('Level', ()=>Dfmt(G.level), null, false)}
+    ${_dtNumRow('CON',  ()=>Dfmt(G.con),   null, false)}
+    ${_dtNumRow('STR',  ()=>Dfmt(G.str),   null, false)}
+    ${_dtNumRow('DEX',  ()=>Dfmt(G.dex),   null, false)}
+    ${_dtNumRow('END',  ()=>Dfmt(G.end||D(10)), null, false)}
+    ${_dtNumRow('DEF',  ()=>Dfmt(G.def),   null, false)}
+    ${_dtNumRow('REGEN',()=>Dfmt(G.regen), null, false)}
+    ${_dtNumRow('Base DMG', ()=>Dfmt(G.baseDmg), null, false)}
 
     <div class="dt-section">VISION</div>
     ${_dtNumRow('FOV Radius', ()=>SETTINGS.fovRadius, null, false)}
@@ -4177,16 +4563,19 @@ function _nextSlotIndex(){
 }
 function _saveSlotKey(idx){return SAVE_KEY_PREFIX+idx;}
 function _buildSnap(){
-  return{version:1,savedAt:Date.now(),runConfig:{...RUN_CONFIG},G:{
+  return{version:2,savedAt:Date.now(),runConfig:{...RUN_CONFIG},G:{
     class:G.class,icon:G.icon,name:G.name,weaponType:G.weaponType,
-    level:G.level,xp:G.xp,xpNeeded:G.xpNeeded,hp:G.hp,maxHP:G.maxHP,
-    con:G.con,str:G.str,dex:G.dex,baseDmg:G.baseDmg,def:G.def,regen:G.regen,
+    level:Dser(G.level),xp:Dser(G.xp),xpNeeded:Dser(G.xpNeeded),hp:Dser(G.hp),maxHP:Dser(G.maxHP),
+    con:Dser(G.con),str:Dser(G.str),dex:Dser(G.dex),end:Dser(G.end||D(10)),
+    stamina:Dser(G.stamina||D(50)),maxStamina:Dser(G.maxStamina||D(50)),
+    baseDmg:Dser(G.baseDmg),def:Dser(G.def),regen:Dser(G.regen),
     kills:G.kills,turn:G.turn,depth:G.depth,zone:G.zone,lowestDepth:G.lowestDepth||0,
     enemySpawn:G.enemySpawn,pendingLevelUps:G.pendingLevelUps,unspentPoints:G.unspentPoints,
     _eid:G._eid,mapW:G.mapW,mapH:G.mapH,tiles:G.tiles,rooms:G.rooms,
     stairsDown:G.stairsDown,stairsUp:G.stairsUp,bonfire:G.bonfire,
     isBonfireFloor:G.isBonfireFloor,floorCleared:G.floorCleared,
-    player:{...G.player},enemies:G.enemies.map(e=>({...e})),
+    player:{...G.player},
+    enemies:G.enemies.map(e=>({...e,hp:Dser(e.hp),maxHP:Dser(e.maxHP),con:Dser(e.con),str:Dser(e.str),dex:Dser(e.dex),xp:Dser(e.xp)})),
     seen:[...G.seen],fov:[...G.fov],
     inventory:JSON.parse(JSON.stringify(G.inventory)),
     equipment:JSON.parse(JSON.stringify(G.equipment)),
@@ -4206,14 +4595,18 @@ function loadGameFromSlot(idx){
     const snap=JSON.parse(raw);if(!snap||!snap.G)return false;
     const s=snap.G;if(snap.runConfig)Object.assign(RUN_CONFIG,snap.runConfig);
     G={class:s.class,icon:s.icon,name:s.name,weaponType:s.weaponType,
-      level:s.level,xp:s.xp,xpNeeded:s.xpNeeded,hp:s.hp,maxHP:s.maxHP,
-      con:s.con,str:s.str,dex:s.dex,baseDmg:s.baseDmg,def:s.def,regen:s.regen,
+      level:Ddes(s.level),xp:Ddes(s.xp),xpNeeded:Ddes(s.xpNeeded||'10'),hp:Ddes(s.hp),maxHP:Ddes(s.maxHP),
+      con:Ddes(s.con),str:Ddes(s.str),dex:Ddes(s.dex),end:Ddes(s.end||'10'),
+      stamina:Ddes(s.stamina||'50'),maxStamina:Ddes(s.maxStamina||'50'),
+      baseDmg:Ddes(s.baseDmg),def:Ddes(s.def||'0'),regen:Ddes(s.regen||'0'),
       kills:s.kills,turn:s.turn,depth:s.depth,zone:s.zone,lowestDepth:s.lowestDepth||0,
       enemySpawn:s.enemySpawn,pendingLevelUps:s.pendingLevelUps||0,unspentPoints:s.unspentPoints||0,
       _eid:s._eid||0,mapW:s.mapW,mapH:s.mapH,tiles:s.tiles,rooms:s.rooms,
       stairsDown:s.stairsDown,stairsUp:s.stairsUp,bonfire:s.bonfire,
       isBonfireFloor:s.isBonfireFloor||false,floorCleared:s.floorCleared||false,
-      player:{apRate:1, ap:0, ...s.player},enemies:s.enemies.map(e=>({apRate:1,ap:0,telegraphTile:null,...e})),
+      player:{apRate:1, ap:0, ...s.player},
+      enemies:s.enemies.map(e=>({apRate:1,ap:0,telegraphTile:null,...e,
+        hp:Ddes(e.hp),maxHP:Ddes(e.maxHP),con:Ddes(e.con),str:Ddes(e.str),dex:Ddes(e.dex),xp:Ddes(e.xp||'1')})),
       seen:new Set(s.seen),fov:new Set(s.fov),
       inventory:JSON.parse(JSON.stringify(s.inventory||[])),
       equipment:JSON.parse(JSON.stringify(s.equipment||{})),
@@ -4277,7 +4670,7 @@ function renderPlaySlots(){
     const icon=s.icon||'⚔️';
     const name=(s.name||'UNKNOWN').toUpperCase();
     const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
-    card.innerHTML=`<div class="slot-icon">${icon}</div><div class="slot-name">${name}</div><div class="slot-meta">Lvl ${s.level||1} · ${depth}</div>`;
+    card.innerHTML=`<div class="slot-icon">${icon}</div><div class="slot-name">${name}</div><div class="slot-meta">Lvl ${s.level?Dfmt(Ddes(s.level)):1} · ${depth}</div>`;
     card.onclick=()=>selectPlaySlot(idx,card);
     col.appendChild(card);
   });
@@ -4438,6 +4831,24 @@ function closeSavesModal(){
   _exportMode=false;cancelImport();document.getElementById('saves-modal').classList.remove('active');
   if(_inGameSaves){_inGameSaves=false;closeGameMenu();}
 }
+function toggleAPDetail(btn){
+  const panel = document.getElementById('ap-detail-panel');
+  if (!panel) return;
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '+' : '−';
+  btn.style.borderColor = open ? '' : 'var(--gold)';
+  btn.style.color = open ? '' : 'var(--gold)';
+}
+function toggleV019Detail(btn){
+  const panel = document.getElementById('v019-detail-panel');
+  if (!panel) return;
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '+' : '−';
+  btn.style.borderColor = open ? '' : 'var(--gold)';
+  btn.style.color = open ? '' : 'var(--gold)';
+}
 document.getElementById('wipe-modal').addEventListener('click',function(e){
   if(e.target===this) closeWipeModal();
 });
@@ -4458,7 +4869,7 @@ function renderSaveSlots(){
     const card=document.createElement('div');
     card.className='play-slot-card';
     card.dataset.idx=idx;
-    card.innerHTML=`<div class="slot-icon">${s.icon||'⚔️'}</div><div class="slot-name">${(s.name||'?').toUpperCase()}</div><div class="slot-meta">Lvl ${s.level||1} · ${depth}</div>`;
+    card.innerHTML=`<div class="slot-icon">${s.icon||'⚔️'}</div><div class="slot-name">${(s.name||'?').toUpperCase()}</div><div class="slot-meta">Lvl ${s.level?Dfmt(Ddes(s.level)):1} · ${depth}</div>`;
     card.onclick=()=>{
       document.querySelectorAll('#save-slots-list .play-slot-card').forEach(c=>c.classList.remove('selected'));
       card.classList.add('selected');
@@ -4541,4 +4952,3 @@ function doImport(){const ta=document.getElementById('import-textarea');if(!ta)r
 
 </body>
 </html>
-
