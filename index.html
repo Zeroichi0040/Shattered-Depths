@@ -590,6 +590,7 @@
     <div class="title-menu">
       <button class="title-menu-btn" onclick="showScreen('play-screen');renderPlaySlots()">PLAY</button>
       <button class="title-menu-btn" onclick="showComingSoon(event)">UPGRADES</button>
+      <button class="title-menu-btn" onclick="showComingSoon(event)">ENCYCLOPEDIA</button>
       <button class="title-menu-btn" onclick="showScreen('menu-settings-screen')">SETTINGS</button>
       <button class="title-menu-btn" onclick="showScreen('changelog-screen')">CHANGELOGS</button>
       <div class="title-separator"></div>
@@ -636,12 +637,10 @@
     <div class="menu-sett-card" onclick="openSettingsFromTitle()">
       <div class="menu-sett-card-icon">⚙️</div>
       <div class="menu-sett-card-label">IN-GAME</div>
-      <div class="menu-sett-card-desc">Camera zoom, smooth movement, display options.</div>
     </div>
     <div class="menu-sett-card" onclick="showScreen('progress-screen')">
       <div class="menu-sett-card-icon">💾</div>
       <div class="menu-sett-card-label">PROGRESS</div>
-      <div class="menu-sett-card-desc">Import or export all save data.</div>
     </div>
   </div>
   <button class="btn sm secondary" onclick="showScreen('title-screen')">BACK</button>
@@ -781,43 +780,30 @@
 ═══════════════════════════════════════════════════════════════ -->
 
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.11 — Permadeath &amp; The Curse</div>
+      <div class="changelog-title">v1.4.2 — Changelog UI Behavior</div>
       <div class="changelog-date">2026-03-11</div>
       <hr class="changelog-divider">
-      <div class="changelog-sub">Save System — Reworked <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Saving is no longer in the player's hands. Characters are saved automatically on creation. Every bonfire interaction overwrites the save with current progress. There is no manual save, no overwrite, no export, and no import during a run. The save slot UI is gone from the in-game menu entirely.</div>
-      <div class="changelog-para">Dying permanently deletes the save. There is no loading from a previous state. The run ends when you do.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Safe Zones <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Bonfire floors are the only safe zones. Upper floors are also considered safe. Quitting from anywhere else carries consequences.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">The Curse <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Leaving the game from an unsafe zone — whether through the menu or closing the browser — applies a curse to the save. The save reverts to the last bonfire. All progress since then is lost, and every enemy in the dungeon permanently gains a <span style="color:#e07070;">×1.1 stat multiplier</span> on all stats (XP excluded). Curses stack multiplicatively: two curses means ×1.21, ten means ×2.59, fifty means ×117×. There is no cap.</div>
-      <div class="changelog-para">The curse is tied to the character. A new run starts clean. A dead run takes the curse with it.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Alleviating the Curse <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Each curse stack requires killing <span style="color:#e07070;">100 enemies</span> to remove one stack. With one stack, 100 kills removes it. With three stacks, 100 kills removes one stack — bringing you to two. Then another 100 kills to remove another, then 100 more to clear the last. The cost is always 100 kills per stack, regardless of how many stacks remain.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Curse Indicator <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">When cursed, a <span style="color:#e07070;">💀 CURSED ×N.NN</span> indicator appears in the HUD below the character name, showing the current cumulative multiplier. It is hidden when uncursed. On loading a cursed save, a modal informs the player of what happened and the current curse level before play resumes.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Quit Warning <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Attempting to quit from an unsafe zone now shows a warning modal before applying any punishment — showing the current curse level and what it will become if the player proceeds. The choice is theirs.</div>
+      <div class="changelog-sub">Balancing</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Floor Sizes Buffed</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Difficulty Increased</div>
     </div>
 
     <div class="changelog-entry">
-  <div class="changelog-title">v0.1.10 — Changelog UI Behavior</div>
-  <div class="changelog-date">2026-03-11</div>
-  <hr class="changelog-divider">
-  <div class="changelog-sub">Changelog Detail Panels</div>
-  <div class="changelog-para"><span class="changelog-tag new">NEW</span> Only one detail panel can be open at a time — opening a new one automatically closes the previous.</div>
-  <div class="changelog-para"><span class="changelog-tag new">NEW</span> Clicking anywhere in the changelog screen outside an open detail panel closes it.</div>
-  <div class="changelog-para"><span class="changelog-tag new">NEW</span> Leaving and returning to the changelog screen always resets it to a clean default state.</div>
+      <div class="changelog-title">v1.4.1 — Permadeath &amp; The Curse</div>
+      <div class="changelog-date">2026-03-11</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Save System Reworked <span class="changelog-tag new">NEW</span></div>
+      <div class="changelog-para">Creating a new character automatically creates a new save slot. There can only be one save slot per character. Bonfires autosave your progress and overwrites the existing slot.</div>
+      <div class="changelog-para">Dying permanently deletes the save.</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">The Curse <span class="changelog-tag new">NEW</span></div>
+      <div class="changelog-para">Leaving the game from an unsafe zone, whether through the menu or closing the browser, applies a curse to the character. The save reverts to the last bonfire. All progress since then is lost, and every enemy in the dungeon permanently gains a <span style="color:#e07070;">×1.1 stat multiplier</span> on all stats (XP excluded). Curses stack multiplicatively: two curses means x1.21, ten means x2.59, fifty means x117x. There is no cap.</div>
+      <div class="changelog-para">Each curse stack requires killing <span style="color:#e07070;">100 enemies</span> to remove one stack.</div>
     </div>
 
     <div class="changelog-entry">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="changelog-title" style="margin-bottom:0;">v0.1.9 — Precision Math &amp; Systems Update</div>
+        <div class="changelog-title" style="margin-bottom:0;">v1.4.0 — Precision Math &amp; Systems Update</div>
         <button onclick="event.stopPropagation(); toggleV019Detail(this)" style="font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--gold);color:var(--gold);cursor:pointer;flex-shrink:0;transition:all .15s;" title="Show technical details">+</button>
       </div>
       <div class="changelog-date">2026-03-10</div>
@@ -832,26 +818,19 @@
         </ul>
       </div>
       <hr class="changelog-divider">
-      <div class="changelog-sub">Arbitrary Precision Scaling</div>
+      <div class="changelog-sub">Arbitrary Precision Scaling &amp; Inventory system</div>
       <div class="changelog-para"><span class="changelog-tag new">NEW</span> All stats now use arbitrary-precision math under the hood, enabling numbers to scale infinitely without floating-point errors.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Inventory — Weight-Based System</div>
       <div class="changelog-para"><span class="changelog-tag new">NEW</span> Replaced slot-based inventory with a weight (kg) carry system. Base capacity: 20 kg; STR adds +0.5 kg per point.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Overweight penalty: reduces AP rate gain (−5% per kg over limit). Weight bar turns red and shows ⚠ OVER when exceeded. After exceeding -60% AP rate gain(for the weight based system), Player will start to lose HP.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Endurance Stat &amp; Stamina</div>
       <div class="changelog-para"><span class="changelog-tag new">NEW</span> New allocatable stat: END (Endurance). Determines Stamina, Stamina Recovery and Overweight penalties.</div>
       <div class="changelog-para"><span class="changelog-tag new">NEW</span> New resource: Stamina. Drains when overweight, regens passively otherwise. Reserved for active skills.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">UI CHANGES</div>
-      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Class cards now show only the name and a short description. A <strong>+</strong> button on each card opens a detail popup with more information.</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Class cards redesign.</div>
       <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Base DMG shows the weapon's raw base value. DMG shows the stat-scaled damage for your current build. Hovering EQUIP live-updates DMG to show what you'd deal with the weapon equipped, with a green/red delta. Hovering UNEQUIP shows what damage would revert to (unarmed).</div>
       <hr class="changelog-divider">
     </div>
 
     <div class="changelog-entry">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="changelog-title" style="margin-bottom:0;">v0.1.8 — Dynamic Combat</div>
+        <div class="changelog-title" style="margin-bottom:0;">v1.3.0 — Dynamic Combat</div>
         <button onclick="event.stopPropagation(); toggleAPDetail(this)" style="font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--gold);color:var(--gold);cursor:pointer;flex-shrink:0;transition:all .15s;" title="Show AP system details">+</button>
       </div>
       <div class="changelog-date">2026-03-09</div>
@@ -867,80 +846,79 @@
             <tr><td>Move</td><td class="cv">1</td></tr>
             <tr><td>Attack (player)</td><td class="cv">1</td></tr>
             <tr><td>Wait</td><td class="cv">1</td></tr>
-            <tr><td>Telegraph — rat targets a tile</td><td class="cv">1</td></tr>
-            <tr><td>Bite — rat attacks targeted tile</td><td class="cv">1</td></tr>
+            <tr><td>Telegraph - rat targets a tile</td><td class="cv">1</td></tr>
+            <tr><td>Bite - rat attacks targeted tile</td><td class="cv">1</td></tr>
           </tbody>
         </table>
-        <div class="changelog-note">Future tuning: Telegraph may cost 0.25 AP and Bite 0.75 AP, allowing enemies with rate ≥ 1.25 to target and strike in the same turn.</div>
 
-        <div class="changelog-sub">Telegraph &amp; Bite</div>
-        <div class="changelog-para">When a rat is adjacent to the player it enters a two-phase attack. Phase 1 — Telegraph: costs 1 AP, the rat locks onto the player's current tile. A red X and red border appear on that tile. Phase 2 — Bite: costs 1 AP on the following turn, the rat strikes that exact tile regardless of whether the player is still on it. Step off to dodge; stay and take the hit.</div>
+        <div class="changelog-sub">Targeting &amp; Attacking</div>
+        <div class="changelog-para">When a rat is adjacent to the player it enters a two-phase attack. Phase 1 - Targeting/Telegraph: costs 1 AP, the rat locks onto the player's current tile. A red X and red border appear on that tile. Phase 2 - Attacking: costs 1 AP on the following turn, the rat strikes that exact tile regardless of whether the player is still on it..</div>
 
         <div class="changelog-sub">Turn Order Within a Turn</div>
         <div class="changelog-para">Entities with the most AP act first. The <strong>player always wins ties against enemies</strong> — if the player and an enemy have identical AP, the player goes first. Among enemies tied with each other, the order is <strong>random</strong>. This is intentional: the dungeon is chaotic and unforgiving. Even when you've read the situation perfectly, a tied pack of enemies can resolve in any order.</div>
 
-        <div class="changelog-sub">Tiebreaker — Player vs Enemy</div>
+        <div class="changelog-sub">Tiebreaker - Player vs Enemy</div>
         <div class="changelog-para">Player always wins. At rate 1:1 the sequence is always P→E, never E→P. The player's agency is preserved — you always get to act before an equally-fast enemy.</div>
 
-        <div class="changelog-sub">Tiebreaker — Enemy vs Enemy (Random)</div>
+        <div class="changelog-sub">Tiebreaker - Enemy vs Enemy (Random)</div>
         <div class="changelog-para">When two or more enemies have identical AP and both outrank the player, one is chosen at random to act. This means the same scenario can play out differently each time. Examples below use R (random pick) to indicate the nondetermistic slot.</div>
 
-        <div class="changelog-sub">Example — 3 enemies all rate 1, player rate 1</div>
+        <div class="changelog-sub">Example - 3 enemies all rate 1, player rate 1</div>
         <div class="changelog-para">All start with 1 AP. Player wins the 4-way tie. After player acts, E1/E2/E3 are all tied at 1 — order among them is random each turn.</div>
         <ul class="changelog-ul">
           <li>P (wins tie) → R[E1|E2|E3] → R[remaining two] → R[last one]</li>
           <li>e.g. Turn 1: P→E2→E1→E3. Turn 2: P→E3→E2→E1. Turn 3: P→E1→E3→E2.</li>
         </ul>
 
-        <div class="changelog-sub">Example — 2 enemies both rate 2, player rate 1</div>
+        <div class="changelog-sub">Example - 2 enemies both rate 2, player rate 1</div>
         <div class="changelog-para">E1 and E2 start with 2 AP each, player has 1. Both enemies beat the player (2 &gt; 1), tied with each other — random pick.</div>
         <ul class="changelog-ul">
           <li>R[E1|E2] (2 AP) → R[other] (2 AP) → P (1 AP) → no AP left</li>
           <li>Order is always E→E→P, but which E goes first is random.</li>
         </ul>
 
-        <div class="changelog-sub">Example — P rate 1, E1 rate 1, E2 rate 1.5, E3 rate 2</div>
+        <div class="changelog-sub">Example - P rate 1, E1 rate 1, E2 rate 1.5, E3 rate 2</div>
         <div class="changelog-para"><strong>Turn 1:</strong> P:1, E1:1, E2:1.5, E3:2</div>
         <ul class="changelog-ul">
-          <li>E3 (2) — alone at top, no tie → E3 acts → E3:1</li>
-          <li>E2 (1.5) — alone at top → E2 acts → E2:0.5</li>
-          <li>P (1) ties E1 (1) — player wins → P acts → P:0</li>
-          <li>E1 (1) — acts → E1:0</li>
-          <li>E2 (0.5) — below cost threshold, done</li>
+          <li>E3 (2) - alone at top, no tie → E3 acts → E3:1</li>
+          <li>E2 (1.5) - alone at top → E2 acts → E2:0.5</li>
+          <li>P (1) ties E1 (1) - player wins → P acts → P:0</li>
+          <li>E1 (1) - acts → E1:0</li>
+          <li>E2 (0.5) - below cost threshold, done</li>
         </ul>
         <div class="changelog-para">Turn 1 order: <strong>E3 → E2 → P → E1</strong> (deterministic, no ties among enemies this turn)</div>
 
         <div class="changelog-para"><strong>Turn 2:</strong> P:0+1=1, E1:0+1=1, E2:0.5+1.5=2, E3:0+2=2</div>
         <ul class="changelog-ul">
-          <li>E2 (2) ties E3 (2) — random pick between them</li>
+          <li>E2 (2) ties E3 (2) - random pick between them</li>
           <li>R[E2|E3] acts → winner: 1 AP left</li>
-          <li>Other of E2/E3 (2) — now alone at top → acts → 1 AP left</li>
-          <li>P (1) ties E1 (1) ties the remaining E2/E3 (1) — player wins → P acts → P:0</li>
-          <li>E1 (1) ties remaining enemies (1) — random pick among them</li>
+          <li>Other of E2/E3 (2) - now alone at top → acts → 1 AP left</li>
+          <li>P (1) ties E1 (1) ties the remaining E2/E3 (1) - player wins → P acts → P:0</li>
+          <li>E1 (1) ties remaining enemies (1) - random pick among them</li>
           <li>Remaining acts in random order until all at 0</li>
         </ul>
         <div class="changelog-para">Turn 2 order: <strong>R[E2|E3] → R[other] → P → R[E1, E2, E3 in random order]</strong></div>
         <div class="changelog-para">Possible Turn 2 sequences: E2→E3→P→E1→E2→E3 or E3→E2→P→E3→E1→E2 or E2→E3→P→E3→E2→E1 ... and so on. The first two slots and the last three are independently randomized among their tied groups.</div>
 
-        <div class="changelog-sub">Example — 3 enemies all rate 2, player rate 1</div>
+        <div class="changelog-sub">Example - 3 enemies all rate 2, player rate 1</div>
         <div class="changelog-para">P:1, E1:2, E2:2, E3:2. All three enemies beat the player (2 &gt; 1), all tied with each other.</div>
         <ul class="changelog-ul">
           <li>Random pick among E1/E2/E3 → acts → 1 AP left</li>
           <li>Remaining two still tied at 2 → random pick → acts → 1 AP left</li>
           <li>Last enemy (2) alone → acts → 1 AP left</li>
-          <li>P (1) now ties all three enemies at 1 — player wins → P acts → P:0</li>
-          <li>Three enemies all at 1 — random order for remaining three actions</li>
+          <li>P (1) now ties all three enemies at 1 - player wins → P acts → P:0</li>
+          <li>Three enemies all at 1 - random order for remaining three actions</li>
         </ul>
         <div class="changelog-para">Pattern: <strong>R→R→E→P→R→R→R</strong> where R is random among the tied pool. Six enemy actions, one player action.</div>
 
         <div class="changelog-note">The randomness only applies to ties between enemies. The player always wins ties with enemies, and an enemy with strictly more AP than all others always goes first with no randomness involved.</div>
 
-        <div class="changelog-sub">Scenario — Rate 1 vs Rate 1</div>
+        <div class="changelog-sub">Scenario - Rate 1 vs Rate 1</div>
         <div class="changelog-para">Both player and rat start each turn with 1 AP.</div>
-        <div class="changelog-para"><strong>Turn 1:</strong> Player attacks rat (−1 AP). Rat telegraphs player's tile (−1 AP). Both at 0 AP. End of turn.</div>
-        <div class="changelog-para"><strong>Turn 2:</strong> Player moves off the marked tile (−1 AP). Rat bites the now-empty tile (−1 AP). End of turn. Attack missed.</div>
+        <div class="changelog-para"><strong>Turn 1:</strong> Player attacks rat (-1 AP). Rat telegraphs player's tile (-1 AP). Both at 0 AP. End of turn.</div>
+        <div class="changelog-para"><strong>Turn 2:</strong> Player moves off the marked tile (-1 AP). Rat bites the now-empty tile (-1 AP). End of turn. Attack missed.</div>
 
-        <div class="changelog-sub">Scenario — Rate 2 vs Rate 2</div>
+        <div class="changelog-sub">Scenario - Rate 2 vs Rate 2</div>
         <div class="changelog-para">Both start with 2 AP. Actions interleave one at a time:</div>
         <ul class="changelog-ul">
           <li>Player acts (1 AP left)</li>
@@ -949,7 +927,7 @@
           <li>Enemy acts (0 AP left)</li>
         </ul>
 
-        <div class="changelog-sub">Scenario — Player rate 2, Enemy rate 4</div>
+        <div class="changelog-sub">Scenario - Player rate 2, Enemy rate 4</div>
         <ul class="changelog-ul">
           <li>Enemy acts</li>
           <li>Enemy acts</li>
@@ -959,11 +937,11 @@
           <li>Player acts</li>
         </ul>
 
-        <div class="changelog-sub">Scenario — Player rate 1.5, Enemy rate 1 (multi-turn carry-over)</div>
+        <div class="changelog-sub">Scenario - Player rate 1.5, Enemy rate 1 (multi-turn carry-over)</div>
         <div class="changelog-para"><strong>Turn 1:</strong> Player has 1.5 AP (spends 1, 0.5 left). Rat has 1 AP (spends 1, 0 left). No valid moves remain. End of turn.</div>
         <div class="changelog-para"><strong>Turn 2:</strong> Player: 0.5 carried + 1.5 rate = 2 AP. Rat: 0 + 1 = 1 AP. Player acts twice, then rat acts once.</div>
 
-        <div class="changelog-sub">Action Order — Whole-Number Rate Reference</div>
+        <div class="changelog-sub">Action Order - Whole-Number Rate Reference</div>
         <table class="changelog-table">
           <thead><tr><th>Player rate</th><th>Enemy rate</th><th>Order within one turn</th></tr></thead>
           <tbody>
@@ -980,179 +958,161 @@
           </tbody>
         </table>
 
-        <div class="changelog-sub">Scenario — Future costs: Telegraph 0.25 AP, Bite 1 AP; Player rate 1, Enemy rate 1.25</div>
+        <div class="changelog-sub">Scenario: Telegraph 0.25 AP, Bite 1 AP; Player rate 1, Enemy rate 1.25</div>
         <div class="changelog-para">Player starts with 1 AP, enemy with 1.25 AP.</div>
         <ul class="changelog-ul">
-          <li>Enemy telegraphs (−0.25 AP → 1 left)</li>
-          <li>Enemy bites (−1 AP → 0 left)</li>
-          <li>Player moves (−1 AP → 0 left)</li>
+          <li>Enemy telegraphs (-0.25 AP → 1 left)</li>
+          <li>Enemy bites (-1 AP → 0 left)</li>
+          <li>Player moves (-1 AP → 0 left)</li>
         </ul>
         <div class="changelog-para">Enemy targeted and attacked in the same turn because 1.25 AP covered both costs (0.25 + 1.00).</div>
 
-        <div class="changelog-sub">Scenario — Future costs: Telegraph 0.25, Bite 1; Player rate 1, Enemy rate 1.5</div>
+        <div class="changelog-sub">Scenario: Telegraph 0.25, Bite 1; Player rate 1, Enemy rate 1.5</div>
         <div class="changelog-para">Player: 1 AP. Enemy: 1.5 AP.</div>
         <ul class="changelog-ul">
-          <li>Enemy telegraphs (−0.25 → 1.25 left)</li>
-          <li>Enemy bites (−1 → 0.25 left)</li>
-          <li>Enemy telegraphs (−0.25 → 0 left)</li>
-          <li>Player moves (−1 → 0 left)</li>
+          <li>Enemy telegraphs (-0.25 → 1.25 left)</li>
+          <li>Enemy bites (-1 → 0.25 left)</li>
+          <li>Enemy telegraphs (-0.25 → 0 left)</li>
+          <li>Player moves (-1 → 0 left)</li>
         </ul>
-        <div class="changelog-para">Simulates enemy:player 3:1 — enemy acts three times before the player acts once.</div>
+        <div class="changelog-para">Simulates enemy:player 3:1 - enemy acts three times before the player acts once.</div>
 
-        <div class="changelog-sub">Scenario — Future costs: Telegraph 0.5, Bite 0.75; Enemy rate 1.5 (multi-turn)</div>
+        <div class="changelog-sub">Scenario: Telegraph 0.5, Bite 0.75; Enemy rate 1.5 (multi-turn)</div>
         <div class="changelog-para"><strong>Turn 1:</strong> Enemy: 1.5 AP. Player: 1 AP.</div>
         <ul class="changelog-ul">
-          <li>Enemy telegraphs (−0.5 → 1 left)</li>
-          <li>Enemy bites (−0.75 → 0.25 left)</li>
+          <li>Enemy telegraphs (-0.5 → 1 left)</li>
+          <li>Enemy bites (-0.75 → 0.25 left)</li>
           <li>No valid enemy action (needs 0.5 for telegraph, only 0.25 left)</li>
-          <li>Player moves (−1 → 0 left)</li>
+          <li>Player moves (-1 → 0 left)</li>
         </ul>
         <div class="changelog-para"><strong>Turn 2:</strong> Enemy: 0.25 carried + 1.5 = 1.75 AP. Player: 1 AP.</div>
         <ul class="changelog-ul">
-          <li>Enemy telegraphs (−0.5 → 1.25 left)</li>
-          <li>Enemy bites (−0.75 → 0.5 left)</li>
-          <li>Enemy telegraphs (−0.5 → 0 left)</li>
-          <li>Player moves (−1 → 0 left)</li>
+          <li>Enemy telegraphs (-0.5 → 1.25 left)</li>
+          <li>Enemy bites (-0.75 → 0.5 left)</li>
+          <li>Enemy telegraphs (-0.5 → 0 left)</li>
+          <li>Player moves (-1 → 0 left)</li>
         </ul>
         <div class="changelog-para"><strong>Turn 3:</strong> Enemy: 0 + 1.5 = 1.5 AP. Player: 1 AP.</div>
         <ul class="changelog-ul">
-          <li>Enemy bites (−0.75 → 0.75 left) — note: bite is cheaper than telegraph here, fires first</li>
-          <li>Enemy telegraphs (−0.5 → 0.25 left)</li>
+          <li>Enemy bites (-0.75 → 0.75 left) - note: bite is cheaper than telegraph here, fires first</li>
+          <li>Enemy telegraphs (-0.5 → 0.25 left)</li>
           <li>No valid enemy action</li>
-          <li>Player moves (−1 → 0 left)</li>
+          <li>Player moves (-1 → 0 left)</li>
         </ul>
 
-        <div class="changelog-sub">Scenario — Future costs: Telegraph 0.25, Bite 0.75; Player rate 2, Enemy rate 4</div>
+        <div class="changelog-sub">Scenario: Telegraph 0.25, Bite 0.75; Player rate 2, Enemy rate 4</div>
         <div class="changelog-para">Player: 2 AP. Enemy: 4 AP.</div>
         <ul class="changelog-ul">
-          <li>Enemy telegraphs (−0.25 → 3.75 left)</li>
-          <li>Enemy bites (−0.75 → 3 left)</li>
-          <li>Player moves (−1 → 1 left)</li>
-          <li>Enemy telegraphs (−0.25 → 2.75 left)</li>
-          <li>Enemy bites (−0.75 → 2 left)</li>
-          <li>Player moves (−1 → 0 left)</li>
+          <li>Enemy telegraphs (-0.25 → 3.75 left)</li>
+          <li>Enemy bites (-0.75 → 3 left)</li>
+          <li>Player moves (-1 → 1 left)</li>
+          <li>Enemy telegraphs (-0.25 → 2.75 left)</li>
+          <li>Enemy bites (-0.75 → 2 left)</li>
+          <li>Player moves (-1 → 0 left)</li>
         </ul>
-        <div class="changelog-para">Simulates enemy:player 4:2 — enemy → enemy → player → enemy → enemy → player.</div>
+        <div class="changelog-para">Simulates enemy:player 4:2 - enemy → enemy → player → enemy → enemy → player.</div>
 
         <div class="changelog-note">Rates can be any decimal value (1.5, 2.75, 9.9999). The system naturally handles all combinations through AP accumulation and carry-over, without special-casing any ratio.</div>
       </div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Action Point System <span class="changelog-tag new">NEW</span></div>
       <div class="changelog-para">Every entity has a separate, invisible action counter. Each time the player acts, every entity gains AP equal to their <strong>rate</strong> (default: 1). Actions are resolved by a priority queue — whoever has the most AP acts next, with the player winning ties against enemies. When multiple enemies are tied with each other, the order among them is random. After each action, AP is spent and the queue re-evaluates. Leftover fractional AP carries over to the next cycle.</div>
-      <div class="changelog-para">The priority queue naturally produces the correct action order for any rate ratio — P→P→E at 2:1, E→E→P at 1:2, P→P→E→P→E at 3:2, and so on. No special-casing, the pattern emerges from the math. Rates can be any decimal; a rate of 1.5 gives 1 action on odd turns and 2 on even turns, averaging out over time. The random enemy tiebreaker is intentional — the dungeon is chaotic and unforgiving, not polite.</div>
-      <div class="changelog-para">Multiple enemies each compete independently by their own AP. All actions cost 1 AP currently — constants are in place for future per-action tuning (e.g. telegraph at 0.25, bite at 0.75).</div>
+      <div class="changelog-para">The priority queue naturally produces the correct action order for any rate ratio - P→P→E at 2:1, E→E→P at 1:2, P→P→E→P→E at 3:2, and so on. No special-casing, the pattern emerges from the math. Rates can be any decimal; a rate of 1.5 gives 1 action on odd turns and 2 on even turns, averaging out over time. The random enemy tiebreaker is intentional — the dungeon is chaotic and unforgiving, not polite.</div>
+      <div class="changelog-para">Multiple enemies each compete independently by their own AP. All actions cost 1 AP currently - constants are in place for future per-action tuning (e.g. telegraph at 0.25, bite at 0.75).</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Telegraph &amp; Bite <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Rats no longer deal instant damage when adjacent. Instead they spend 1 AP to enter a telegraph phase — locking onto the tile the player currently occupies and showing a pulsing red X with a red border. On their next AP slot the rat spends 1 AP to bite that exact tile, regardless of whether the player moved. Step off the marked tile to dodge; stay and take the hit.</div>
+      <div class="changelog-para">Rats no longer deal instant damage when adjacent. Instead they spend 1 AP to enter a telegraph phase, locking onto the tile the player currently occupies and showing a pulsing red X with a red border. On their next AP slot the rat spends 1 AP to attack that exact tile.</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Visual Feedback <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">A white slash particle appears on any attacked tile — both when the player strikes an enemy and when a rat bites a tile. Waiting (SPACE on an empty tile) now shows a <em>...</em> float above the player.</div>
+      <div class="changelog-para">A white slash appears on any attacked tile. Waiting (SPACE on an empty tile) now shows a <em>...</em> float above the player.</div>
     </div>
 
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.7 — Enemy Indicators &amp; UI Overhaul</div>
+      <div class="changelog-title">v1.2.4 — Enemy Indicators, Import/Export &amp; UI update</div>
       <div class="changelog-date">2026-03-08</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Enemy Visuals</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Spawned enemies now have an amber HP bar, distinct from floor enemies (red). Makes it easy to tell at a glance which rats were always there and which appeared over time.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Floor enemy counter in the dungeon header — shows how many enemies remain before the floor is cleared.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Spawned enemies have a yellow HP bar, distinct from floor enemies which is red.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Floor enemy counter.</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Save Data</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Export and import individual run slots. Share or back up a specific run without touching the others.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Export and import all save data at once from the Progress screen. Useful for moving between devices or browsers.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Export and import individual run slots.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Export and import all save data at once from the Progress screen.</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">UI</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Redesigned main menu with two-column layout — title and navigation on the left, animated ASCII dungeon preview on the right.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Death screen split into two views: a compact run summary with a randomised death flavour message, and a full stats breakdown.</div>
-      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Inventory UI updated. Character panel now shows class icon and player name at the top.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Character name input on the stat allocation screen. Defaults to class name if left empty.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Redesigned main menu.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Character name input on the stat allocation screen.</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Inventory UI updated.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.6 — Enemy State Indicators</div>
-      <div class="changelog-date">2026-03-08</div>
+      <div class="changelog-title">v1.2.3 — Enemy State Indicators</div>
+      <div class="changelog-date">2026-03-07</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">State Indicators</div>
       <ul class="changelog-ul">
-        <li><strong>ZZZ</strong> — enemy is sleeping. Three z's drift upward with staggered timing.</li>
-        <li><strong>!</strong> — enemy just woke up, surprised by the player.</li>
-        <li><strong>?</strong> — enemy is alert; lost sight of the player and is searching.</li>
+        <li><strong>ZZZ</strong> - enemy is sleeping, motionless.</li>
+        <li><strong>!</strong> - enemy just woke up, surprised by the player.</li>
+        <li><strong>?</strong> - enemy is alert, lost sight of the player and is searching.</li>
       </ul>
+      <hr class="changelog-divider">
       <div class="changelog-sub">Pathfinding</div>
-      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Improved enemy pathfinding. Rats no longer take large detours around each other unless the player is within line of sight — when hunting to a last-known position they walk through each other, preventing corridor gridlock.</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Improved enemy pathfinding.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.5 — Save Slots &amp; Bug Fixes</div>
-      <div class="changelog-date">2026-03-08</div>
+      <div class="changelog-title">v1.2.2 — Save Slots &amp; Bug Fixes</div>
+      <div class="changelog-date">2026-03-05</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Save System</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Unlimited save slots. Previously capped; now as many slots as you want, each with per-slot import and export.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Unlimited save slots.</div>
+      <hr class="changelog-divider">
       <div class="changelog-sub">Bug Fixes</div>
-      <div class="changelog-para"><span class="changelog-tag fix">FIX</span> XL floors with enemy respawn enabled can now be properly cleared. Spawned enemies no longer counted toward the kill requirement — only enemies that originated from floor generation do.</div>
-      <div class="changelog-para"><span class="changelog-tag fix">FIX</span> Various minor UI and logic fixes.</div>
+      <div class="changelog-para"><span class="changelog-tag fix">FIX</span> Minor UI and logic fixes.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.4 — Balancing</div>
-      <div class="changelog-date">2026-03-07</div>
+      <div class="changelog-title">v1.2.1 — Balancing</div>
+      <div class="changelog-date">2026-03-03</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Stat Scaling</div>
-      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> DEF and REGEN scaling off CON significantly buffed — both were too weak to feel meaningful at low levels.</div>
-      <table class="changelog-table">
-        <thead><tr><th>Stat</th><th>Old rate</th><th>New rate</th></tr></thead>
-        <tbody>
-          <tr><td>DEF per CON</td><td class="cv">0.002</td><td class="cv">0.05</td></tr>
-          <tr><td>REGEN per CON</td><td class="cv">0.0005</td><td class="cv">0.002</td></tr>
-        </tbody>
-      </table>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> DEF and REGEN scaling off CON is buffed.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.3 — Stats, Inventory &amp; Enemy AI</div>
-      <div class="changelog-date">2026-03-07</div>
+      <div class="changelog-title">v1.2.0 — Stats, Inventory &amp; Enemy AI</div>
+      <div class="changelog-date">2026-03-02</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">New Stats</div>
       <ul class="changelog-ul">
-        <li><strong>DEF</strong> (Defense) — reduces incoming damage. Scales with CON at 0.002 DEF per point.</li>
-        <li><strong>REGEN</strong> (Regeneration) — recovers HP each turn. Scales with CON at 0.0005 REGEN per point.</li>
+        <li><span class="changelog-tag new">NEW</span><strong>DEF</strong> (Defense) - reduces incoming damage.</li>
+        <li><span class="changelog-tag new">NEW</span><strong>REGEN</strong> (Regeneration) - recovers HP each turn.</li>
       </ul>
       <hr class="changelog-divider">
       <div class="changelog-sub">Inventory</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Full inventory system: equip, unequip, drop, and pick up items. Weight-based carry capacity (20 kg base, scales with STR). Currently only starting weapons are in the game.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Full inventory system: equip, unequip, drop, and pick up items. Weight-based carry capacity.</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Enemy AI States</div>
       <ul class="changelog-ul">
-        <li><strong>sleep</strong> — floor enemies are motionless until the player enters their FOV.</li>
-        <li><strong>chase</strong> — actively pursues the player while in sight.</li>
-        <li><strong>hunt</strong> — lost sight of player; walks to the last known tile.</li>
-        <li><strong>alert</strong> — reached last known tile; waits 2–10 turns before roaming.</li>
-        <li><strong>roam</strong> — wanders randomly. Once woken, enemies never return to sleep.</li>
+        <li><strong>sleep</strong> - Floor enemies are motionless until the player enters their FOV</li>
+        <li><strong>chase</strong> - Chases the player while in their FOV</li>
+        <li><strong>hunt</strong> - Lost sight of player, walks to the last known tile</li>
+        <li><strong>alert</strong> - Reached last known tile, waits 2-10 turns before roaming</li>
+        <li><strong>roam</strong> - Wanders randomly. Once woken, enemies never return to sleep</li>
       </ul>
       <div class="changelog-note">Spawned enemies start in roam state, never sleep.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Wake Chance by Distance</div>
-      <table class="changelog-table">
-        <thead><tr><th>Distance</th><th>Wake chance</th></tr></thead>
-        <tbody>
-          <tr><td>≤ 2 tiles</td><td class="cv">100%</td></tr>
-          <tr><td>3 tiles</td><td class="cv">~94%</td></tr>
-          <tr><td>4 tiles</td><td class="cv">~75%</td></tr>
-          <tr><td>5 tiles</td><td class="cv">~44%</td></tr>
-          <tr><td>6 tiles</td><td class="cv">~0%</td></tr>
-        </tbody>
-      </table>
       <hr class="changelog-divider">
       <div class="changelog-sub">QoL</div>
       <div class="changelog-para">Click a tile to auto-walk there. Click the player's tile to simulate SPACE (wait, interact, pick up). Bonfire glow now looks natural.</div>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.2 — Auto Navigation</div>
-      <div class="changelog-date">2026-03-06</div>
+      <div class="changelog-title">v1.1.1 — Auto Navigation</div>
+      <div class="changelog-date">2026-03-01</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Navigation Buttons</div>
       <ul class="changelog-ul">
-        <li><strong>Ascend</strong> — auto-walks to the up-stairs tile and ascends.</li>
-        <li><strong>Descend</strong> — auto-walks to the down-stairs tile and descends.</li>
-        <li><strong>Bonfire</strong> — auto-walks to the nearest adjacent bonfire tile and heals.</li>
+        <li><strong>Ascend</strong> - auto-walks to the up-stairs tile and ascends.</li>
+        <li><strong>Descend</strong> - auto-walks to the down-stairs tile and descends.</li>
+        <li><strong>Bonfire</strong> - auto-walks to the nearest adjacent bonfire tile and heals.</li>
       </ul>
       <div class="changelog-para">If the player is already standing at the destination, the action fires immediately without walking.</div>
+      <hr class="changelog-divider">
       <div class="changelog-sub">Auto-walk Behaviour</div>
       <ul class="changelog-ul">
         <li>Any key press cancels auto-walk.</li>
@@ -1161,54 +1121,34 @@
       </ul>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.1 — Level Scaling, Run Config &amp; Enemy Spawning</div>
-      <div class="changelog-date">2026-03-05</div>
+      <div class="changelog-title">v1.1.0 — Level Scaling, Run Config &amp; Enemy Spawning</div>
+      <div class="changelog-date">2026-03-01</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">Level Scaling</div>
-      <div class="changelog-para">Every level-up now increments all base stats (CON, STR, DEX, etc.) by 1 passively, in addition to any manually allocated points.</div>
+      <div class="changelog-para">Level up increases base stats passively, and gives stat points to allocate.</div>
       <hr class="changelog-divider">
-      <div class="changelog-sub">Run Config Screen</div>
-      <ul class="changelog-ul">
-        <li><strong>Difficulty</strong> — scales enemy stats and pacing.</li>
-        <li><strong>Floor size</strong> — XS through XL. Upper floors are always fixed size regardless of this setting.</li>
-        <li><strong>Enemy respawn</strong> — ON/OFF, defaulting based on difficulty. Can be overridden.</li>
-      </ul>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Floor Cleared System</div>
+      <div class="changelog-sub">Floor Clearing</div>
       <ul class="changelog-ul">
         <li>Floor cleared banner and indicator when all floor enemies are dead.</li>
         <li>Auto-navigation buttons appear on cleared floors.</li>
-        <li>No-respawn cleared floors: fog of war disabled, full map visible permanently.</li>
-        <li>Respawn-enabled cleared floors: layout stays explored but enemies may lurk in the dark.</li>
       </ul>
       <hr class="changelog-divider">
       <div class="changelog-sub">Enemy Spawning</div>
       <div class="changelog-para">Enemies spawn on normal floors when respawn is enabled. Upper floors never spawn enemies. Spawn attempts occur every 25 turns on unseen tiles only.</div>
       <div class="changelog-para">Spawn probability uses exponential diminishing returns: <strong>0.6^(n+1)</strong> where n is the number of currently alive enemies.</div>
-      <table class="changelog-table">
-        <thead><tr><th>Alive enemies</th><th>Spawn chance</th></tr></thead>
-        <tbody>
-          <tr><td>0</td><td class="cv">60%</td></tr>
-          <tr><td>1</td><td class="cv">36%</td></tr>
-          <tr><td>2</td><td class="cv">21.6%</td></tr>
-          <tr><td>3</td><td class="cv">12.9%</td></tr>
-          <tr><td>5</td><td class="cv">4.7%</td></tr>
-          <tr><td>10</td><td class="cv">0.36%</td></tr>
-          <tr><td>20</td><td class="cv">&lt;0.0001%</td></tr>
-        </tbody>
-      </table>
     </div>
     <div class="changelog-entry">
-      <div class="changelog-title">v0.1.0 — Initial Release</div>
-      <div class="changelog-date">2026-03-05</div>
+      <div class="changelog-title">v1.0.0 - Initial Release</div>
+      <div class="changelog-date">2026-02-28</div>
       <hr class="changelog-divider">
-      <div class="changelog-para">First playable build. The game at its core — movement, combat, leveling, and floor generation.</div>
+      <div class="changelog-para">First playable build. The game at its core: movement, combat, leveling, and floor generation.</div>
+      <hr class="changelog-divider">
       <div class="changelog-sub">What's in</div>
       <ul class="changelog-ul">
         <li>1 class: Warrior</li>
         <li>2 stats: CON and STR</li>
-        <li>1 enemy type: Rat</li>
-        <li>Procedurally generated dungeon floors</li>
+        <li>1 enemy type: Dire Rat</li>
+        <li>Procedurally generated dungeon floors(BSP)</li>
         <li>Turn-based movement and combat</li>
         <li>XP and level-up system</li>
       </ul>
@@ -1597,7 +1537,6 @@
   <div class="death-btn-bar">
     <button class="dbb main" onclick="showScreen('title-screen')">MAIN MENU</button>
     <button class="dbb stats" onclick="showScreen('death-detail-screen')">FULL STATS</button>
-    <button class="dbb load" id="death-load-btn" onclick="openSavesModal('load')" style="display:none">LOAD</button>
     <button class="dbb newrun" onclick="showScreen('config-screen')">NEW RUN</button>
   </div>
 </div>
@@ -1710,7 +1649,7 @@ function openSettings(){
   });
   // Dev Tools button only visible when a run is active and unlocked; secret btn hidden when unlocked
   const dtBtn = document.getElementById('dev-tools-btn');
-  const inRun = !!(G && G.player);
+  const inRun = document.getElementById('game-screen').classList.contains('active');
   const unlocked = _dtIsUnlocked();
   if(dtBtn) dtBtn.style.display = (inRun && unlocked) ? '' : 'none';
   document.getElementById('settings-modal').classList.add('active');
@@ -1854,15 +1793,15 @@ const DIFF_DESCS = {
   'extra-easy': 'Very few, very weak enemies.',
   easy:        'Fewer, weaker enemies.',
   normal:      'Normal enemy stats and pacing.',
-  hard:        'More, tougher enemies.',
-  'extra-hard':'Very Strong enemies and faster spawn rates.',
+  hard:        'Significantly tougher enemies. Nearly double the count.',
+  'extra-hard':'Brutal. Enemies are devastating and overwhelming in numbers.',
 };
 const DIFF_MODS = {
-  'extra-easy': {statMult:0.5, countMult:0.4},
-  easy:         {statMult:0.7, countMult:0.6},
-  normal:       {statMult:1.0, countMult:1.0},
-  hard:         {statMult:1.4, countMult:1.4},
-  'extra-hard': {statMult:1.8, countMult:2.0},
+  'extra-easy': {statMult:0.5,  countMult:0.4},
+  easy:         {statMult:0.7,  countMult:0.6},
+  normal:       {statMult:1.0,  countMult:1.0},
+  hard:         {statMult:1.8,  countMult:2.0},
+  'extra-hard': {statMult:2.8,  countMult:3.5},
 };
 
 const SIZE_DESCS = {
@@ -1873,7 +1812,7 @@ const SIZE_DESCS = {
   xl: 'Extra large floor',
 };
 const FLOOR_SIZES = {
-  xs:{w:22,h:16}, sm:{w:30,h:22}, md:{w:42,h:32}, lg:{w:56,h:42}, xl:{w:70,h:52},
+  xs:{w:30,h:22}, sm:{w:42,h:32}, md:{w:56,h:42}, lg:{w:70,h:52}, xl:{w:105,h:78},
 };
 function setDifficulty(diff){
   RUN_CONFIG.difficulty = diff;
@@ -2028,7 +1967,7 @@ function startGame(){
 
   camX = 0; camY = 0;
   turnPhase = 'player'; priorityTargetId = null; floatNums = []; slashParticles = []; playerHpFlash = 0;
-  _queuedAction = null; _panelDirty = true; _clearedBanner = 0;
+  _queuedAction = null; _panelDirty = true; _clearedBanner = 0; _playerActedThisCycle = false;
   _floorNotifier = {text:'', life:0, maxLife:0}; _autoWalkOnArrival = null;
   heldKeys.clear(); stopMoveLoop();
   Object.keys(floorCache).forEach(k => delete floorCache[k]);
@@ -2047,7 +1986,7 @@ function startGame(){
     renderCanvas();
   }, 50);
   addLog('You descend into the dungeon.', 'info');
-  addLog('Rats scurry in the darkness.', 'info');
+  addLog('Dire rats scurry in the darkness.', 'info');
   if (G.unspentPoints > 0) addLog(`${G.unspentPoints} unspent stat points — see CHAR tab!`, 'level');
   // Auto-save new character immediately
   G.curseStacks = 0;
@@ -2127,6 +2066,8 @@ function generateDungeon(){
 
   const baseRat = {con:10, str:10, dex:5};
 
+  const curseMult = _curseMultiplier(G.curseStacks||0);
+
   if (isUpper){
     const totalEnemies = G.depth === 1 ? 1 : G.depth === 2 ? 1 : 2;
     let placed = 0;
@@ -2139,7 +2080,7 @@ function generateDungeon(){
       if (placed >= totalEnemies) break;
       const pos = randomInRoom(room);
       if (!enemyAt(pos.x, pos.y)){
-        G.enemies.push(makeRat(pos, baseRat, diff.statMult * upperFloorFactor, 0));
+        G.enemies.push(makeRat(pos, baseRat, diff.statMult * upperFloorFactor * curseMult, 0));
         placed++;
       }
     }
@@ -2150,7 +2091,7 @@ function generateDungeon(){
       for (let j = 0; j < count; j++){
         const pos = randomInRoom(G.rooms[i]);
         if (!enemyAt(pos.x, pos.y) && !(pos.x === G.player.x && pos.y === G.player.y)){
-          G.enemies.push(makeRat(pos, baseRat, diff.statMult, randInt(1,2)));
+          G.enemies.push(makeRat(pos, baseRat, diff.statMult * curseMult, randInt(1,2)));
         }
       }
     }
@@ -2167,7 +2108,7 @@ function makeRat(pos, base, statMult, xpReward=1, spawned=false){
   // AI states: 'sleep' | 'chase' | 'telegraph' | 'hunt' | 'alert' | 'roam'
   const aiState = spawned ? 'roam' : 'sleep';
   return {
-    id:++G._eid, type:'rat', x:pos.x, y:pos.y,
+    id:++G._eid, type:'dire rat', x:pos.x, y:pos.y,
     con, str, dex, hp, maxHP:D(hp), xp:D(xpReward), isFloorEnemy:!spawned,
     aiState,
     apRate:1,
@@ -2450,27 +2391,33 @@ function enemyTurn(){
   // Snapshot player position — enemies react to where player WAS this turn
   const snapX = G.player.x, snapY = G.player.y;
 
-  // ── Passive wake check for sleeping enemies (not an action, costs no AP) ──
+  // ── Grant AP to all entities once per player action ──
+  // Only triggered when the player actually took an action (endTurn set the flag).
+  // Wake check runs AFTER this so enemies that wake this turn miss the grant.
+  if(!G.player.apRate) G.player.apRate = 1;
+  if(G.player.ap === undefined) G.player.ap = 0;
+
+  if(_playerActedThisCycle){
+    _playerActedThisCycle = false;
+    G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
+    G.enemies.forEach(e => {
+      if(D(e.hp).lte(0)) return;
+      if(!e.apRate) e.apRate = 1;
+      if(e.ap === undefined) e.ap = 0;
+      if(e.aiState === 'sleep'){ e.ap = 0; return; } // sleeping: hold AP at zero
+      e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
+    });
+  }
+
+  // ── Passive wake check — runs after AP grant so waking enemies act next turn ──
   G.enemies.filter(e => D(e.hp).gt(0) && e.aiState === 'sleep').forEach(enemy => {
     const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
     const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
     if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
       enemy.aiState = 'chase'; enemy.wakePopLife = 45;
       enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+      enemy.ap = 0; // ap zeroed — will receive its first grant next turn
     }
-  });
-
-  // ── Grant AP to all entities once per player action ──
-  if(!G.player.apRate) G.player.apRate = 1;
-  if(G.player.ap === undefined) G.player.ap = 0;
-  G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
-
-  G.enemies.forEach(e => {
-    if(D(e.hp).lte(0)) return;
-    if(!e.apRate) e.apRate = 1;
-    if(e.ap === undefined) e.ap = 0;
-    if(e.aiState === 'sleep') return; // sleeping enemies don't accrue AP
-    e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
   });
 
   // ── Priority queue: whoever has the most AP acts next, player wins ties ──
@@ -2686,6 +2633,7 @@ function triggerPlayerHpFlash(){
 }
 
 let turnPhase        = 'player';
+let _playerActedThisCycle = false; // set by endTurn, consumed by enemyTurn to trigger AP grant
 let priorityTargetId = null;
 const ATTACK_RANGE   = 1;
 
@@ -3194,9 +3142,6 @@ function _setupMouseHandlers(){
 function doSpaceAction(){
   tutMarkDone('wait');
   const {x,y}=G.player;
-  // Deduct AP for this player action
-  if(G.player.ap === undefined) G.player.ap = 0;
-  G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
   // Pick up ground items first
   if (G.groundItems&&G.groundItems.length){
     const idx=G.groundItems.findIndex(gi=>gi.x===x&&gi.y===y);
@@ -3237,14 +3182,12 @@ function tryMove(dx, dy){
   if (G.tiles[ny][nx]===0) return false;
   if (G.bonfire&&G.bonfire.x===nx&&G.bonfire.y===ny) return false;
   const enemy=enemyAt(nx,ny);
-  // Deduct player AP for this action
-  if(G.player.ap === undefined) G.player.ap = 0;
-  G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
   if (enemy){ doAttackEnemy(enemy); endTurn(); return true; }
   G.player.x=nx; G.player.y=ny; computeFOV(); endTurn();
   tutMarkDone('move');
   return true;
 }
+// AP cost of a player action — used by the priority queue in enemyTurn
 function playerMoveCost(){ return AP_COST_PLAYER_ACTION; }
 
 function doAttackEnemy(enemy){
@@ -3323,6 +3266,8 @@ function endTurn(){
   if (SETTINGS.smoothEntities){
     turnPhase='anim_player';
     setTimeout(()=>{
+      _playerActedThisCycle = true;
+      G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
       enemyTurn(); trySpawnEnemies();
       if (G.regen&&D(G.hp).lt(G.maxHP)&&D(G.hp).gt(0)){
         G.hp = D(G.hp).plus(G.regen);
@@ -3338,6 +3283,8 @@ function endTurn(){
       },ENEMY_ANIM_MS);
     },PLAYER_ANIM_MS);
   } else {
+    _playerActedThisCycle = true;
+    G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
     enemyTurn(); trySpawnEnemies();
     if (G.regen&&D(G.hp).lt(G.maxHP)&&D(G.hp).gt(0)){
       G.hp = D(G.hp).plus(G.regen);
@@ -3483,11 +3430,11 @@ function forceLevelUp(){
 
 const SPAWN_INTERVAL=30, SPAWN_BASE=0.6;
 const SIZE_SPAWN_PARAMS={
-  xs:{spawnMult:0.30, intervalMult:2.0, crowd:0.70},
-  sm:{spawnMult:0.60, intervalMult:1.4, crowd:0.78},
-  md:{spawnMult:1.00, intervalMult:1.0, crowd:0.85},
-  lg:{spawnMult:1.60, intervalMult:0.7, crowd:0.91},
-  xl:{spawnMult:2.50, intervalMult:0.5, crowd:0.96},
+  xs:{spawnMult:0.60, intervalMult:1.4, crowd:0.78},
+  sm:{spawnMult:1.00, intervalMult:1.0, crowd:0.85},
+  md:{spawnMult:1.60, intervalMult:0.7, crowd:0.91},
+  lg:{spawnMult:2.50, intervalMult:0.5, crowd:0.96},
+  xl:{spawnMult:4.00, intervalMult:0.3, crowd:0.98},
 };
 function trySpawnEnemies(){
   if (!floorHasSpawn()||G.isBonfireFloor) return;
@@ -3513,7 +3460,7 @@ function trySpawnEnemies(){
       }
     if (!candidates.length) break;
     const pos=candidates[randInt(0,candidates.length-1)];
-    G.enemies.push(makeRat(pos,{con:10,str:10,dex:5},diffMod.statMult,1,true));
+    G.enemies.push(makeRat(pos,{con:10,str:10,dex:5},diffMod.statMult * _curseMultiplier(G.curseStacks||0),1,true));
     spawned++;
     remainingChance -= 1.0;
   }
@@ -3949,17 +3896,17 @@ function die(){
     const kb = G.killedBy;
     const _pick = arr => arr[Math.floor(Math.random()*arr.length)];
     const DEATH_MSGS = {
-      rat: [
-        `A rat nibbled {name} to death. How embarrassing.`,
-        `Finished off by a rat. The dungeon will not mourn {name}.`,
-        `A rat saw an opening. {name} did not.`,
-        `{name} was gnawed into oblivion by a common rat.`,
-        `The rat was faster. {name} was not.`,
+      'dire rat': [
+        `A dire rat nibbled {name} to death. How embarrassing.`,
+        `Finished off by a dire rat. The dungeon will not mourn {name}.`,
+        `A dire rat saw an opening. {name} did not.`,
+        `{name} was gnawed into oblivion by a dire rat.`,
+        `The dire rat was faster. {name} was not.`,
         `Death by rodent. The dungeon has seen worse. Barely.`,
-        `{name} underestimated the rat. The rat did not underestimate {name}.`,
-        `Somewhere, a rat is licking its paws clean.`,
-        `The rat family will feast well tonight.`,
-        `{name} came looking for glory. A rat had other plans.`,
+        `{name} underestimated the dire rat. The dire rat did not underestimate {name}.`,
+        `Somewhere, a dire rat is licking its paws clean.`,
+        `The dire rat pack will feast well tonight.`,
+        `{name} came looking for glory. A dire rat had other plans.`,
       ],
       _default: [
         `{name} met their end in the depths.`,
@@ -3972,7 +3919,7 @@ function die(){
     const pool = (kb && DEATH_MSGS[kb.type]) || DEATH_MSGS._default;
     const flavorMsg = _pick(pool).replace(/{name}/g, G.name);
     const fixedKillMsg = kb
-      ? `Killed by ${kb.type.charAt(0).toUpperCase()+kb.type.slice(1)}.`
+      ? `Killed by ${kb.type.replace(/\b\w/g, c => c.toUpperCase())}.`
       : `Fell to the dungeon.`;
 
     const msgBlock = (txt) => `<div class="death-msg">${txt}</div>`;
@@ -3991,10 +3938,6 @@ function die(){
         row('ENEMIES SLAIN', G.kills) +
         msgBlock(flavorMsg)
       );
-
-    // Show LOAD button
-    const loadBtn = document.getElementById('death-load-btn');
-    if(loadBtn) loadBtn.style.display = '';
 
     // ── Full stats — two-col layout ───────────────────────────
     const dmgRange = (()=>{
@@ -4021,7 +3964,7 @@ function die(){
         drow('DEEPEST FLOOR', deepest) +
         drow('ENEMIES SLAIN', G.kills) +
         drow('TURNS SURVIVED', G.turn) +
-        drow('KILLED BY', kb ? kb.type.charAt(0).toUpperCase()+kb.type.slice(1) : '—') +
+        drow('KILLED BY', kb ? kb.type.replace(/\b\w/g, c => c.toUpperCase()) : '—') +
       `</div>`;
 
     document.getElementById('dstat-right').innerHTML =
@@ -4610,6 +4553,7 @@ const _GAME_MENU_INNER_HTML = `
     <div class="modal-title">MENU</div>
     <button class="gmenu-btn" onclick="closeGameMenu();openInvFromMenu();">INVENTORY</button>
     <button class="gmenu-btn" onclick="closeGameMenu();openSettingsFromMenu();">SETTINGS</button>
+    <button class="gmenu-btn" onclick="showComingSoon(event);">ENCYCLOPEDIA</button>
     <hr style="border-color:var(--border);margin:10px 0 12px;">
     <button class="gmenu-btn danger" id="gmenu-quit-btn" onclick="_onQuitToTitle()">QUIT TO TITLE</button>`;
 function openGameMenu(){
@@ -4893,9 +4837,20 @@ function loadGameFromSlot(idx){
       curseStacks:s.curseStacks||0,
       curseKills:s.curseKills||0,
     };
+    // Apply curse multiplier to all loaded enemies' stats
+    if(G.curseStacks > 0){
+      const cm = _curseMultiplier(G.curseStacks);
+      G.enemies.forEach(e => {
+        e.str = D(e.str).times(cm);
+        e.dex = D(e.dex).times(cm);
+        e.con = D(e.con).times(cm);
+        e.hp  = D(e.hp).times(cm);
+        e.maxHP = D(e.maxHP).times(cm);
+      });
+    }
     _activeSaveSlot = idx;
     camX=0;camY=0;turnPhase='player';priorityTargetId=null;floatNums=[];playerHpFlash=0;
-    _queuedAction=null;_panelDirty=true;_clearedBanner=0;
+    _queuedAction=null;_panelDirty=true;_clearedBanner=0;_playerActedThisCycle=false;
     _floorNotifier={text:'',life:0,maxLife:0};_autoWalkOnArrival=null;_autoWalkForced=false;_autoWalkPath=null;_autoWalkDir=null;
     heldKeys.clear();stopMoveLoop();
     Object.keys(floorCache).forEach(k=>delete floorCache[k]);floorCacheOrder.length=0;
