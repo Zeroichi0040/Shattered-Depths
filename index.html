@@ -1337,6 +1337,8 @@
       <div class="stat-section">
         <div class="stat-section-title">COMBAT</div>
         <div class="mini-stat"><span class="label">DMG range</span><span class="val" id="stat-dmg">—</span></div>
+        <div class="mini-stat"><span class="label">AP</span><span class="val" id="stat-ap">0</span></div>
+        <div class="mini-stat"><span class="label">AP gain</span><span class="val" id="stat-aprate">1.00</span></div>
       </div>
       <span id="stat-maxhp" style="display:none"></span>
       <span id="stat-def" style="display:none"></span>
@@ -1478,6 +1480,7 @@
           <div class="icpsr"><span class="il">END</span><span class="iv" id="icp-end">—</span></div>
           <div class="icpsr"><span class="il">DEF</span><span class="iv" id="icp-def">—</span></div>
           <div class="icpsr"><span class="il">REGEN</span><span class="iv" id="icp-regen">—</span></div>
+          <div class="icpsr"><span class="il">AP gain</span><span class="iv" id="icp-aprate" style="color:#80c0ff">—</span></div>
           <div class="icpsr" style="border-top:1px solid var(--border);margin-top:3px;padding-top:3px;">
             <span class="il">Max HP</span><span class="iv" id="icp-maxhp">—</span>
           </div>
@@ -2058,6 +2061,9 @@ const WEAPON_DEFS = {
 };
 // Base carry capacity + STR bonus (subject to tuning)
 function calcCarryWeight(str){ return D(20).plus(D(str).times('0.5')); }
+// Base AP rate from DEX: 1 + dex * 0.01 (100 DEX = 2.0 rate)
+function calcAPRate(dex){ return parseFloat((1 + Dn(dex) * 0.01).toFixed(4)); }
+
 // Overweight reduces apRate. Returns how much to subtract from apRate (0 if under limit).
 // Gradual: -0.05 apRate per kg over, capped at -0.6 (so minimum apRate = 0.4)
 function calcOverweightAPRatePenalty(carriedKg, limitKg){
@@ -2129,7 +2135,7 @@ function startGame(){
     stairsDown:null, stairsUp:null, bonfire:null,
     isBonfireFloor: false,
     floorCleared: false,
-    player: {x:0, y:0, apRate:1, ap:0},
+    player: {x:0, y:0, apRate:calcAPRate(dex), ap:calcAPRate(dex)},
     enemies: [],
     fov: new Set(), seen: new Set(),
     // inventory does NOT include equipped items — they live only in equipment
@@ -2177,6 +2183,10 @@ function startGame(){
   floorCacheOrder.length = 0;
 
   generateDungeon();
+  // Initialise curse fields before updateHUD reads them
+  G.curseStacks = 0;
+  G.curseKills = 0;
+  G.curseAcknowledged = false;
   updateHUD();
   _updateCurseIndicator();
   applyLogVisibility();
@@ -2192,8 +2202,6 @@ function startGame(){
   addLog('Dire rats scurry in the darkness.', 'info');
   if (G.unspentPoints > 0) addLog(`${G.unspentPoints} unspent stat points — see CHAR tab!`, 'level');
   // Auto-save new character immediately
-  G.curseStacks = 0;
-  G.curseKills = 0;
   _activeSaveSlot = null;
   saveGameNew();
 }
@@ -2263,7 +2271,7 @@ function generateDungeon(){
 
   const startC = roomCenter(G.rooms[0]);
   const lastC  = roomCenter(G.rooms[G.rooms.length-1]);
-  G.player     = {x:startC.x, y:startC.y};
+  G.player.x = startC.x; G.player.y = startC.y;
   G.stairsDown = {x:lastC.x,  y:lastC.y};
   G.stairsUp   = (G.depth > 1 || G.zone === 'normal') ? {x:startC.x+1, y:startC.y} : null;
 
@@ -2590,84 +2598,98 @@ function _ratDoAction(enemy, snapX, snapY){
   return false;
 }
 
-function enemyTurn(){
-  // Snapshot player position — enemies react to where player WAS this turn
-  const snapX = G.player.x, snapY = G.player.y;
-
-  // ── Grant AP to all entities once per player action ──
-  // Only triggered when the player actually took an action (endTurn set the flag).
-  // Wake check runs AFTER this so enemies that wake this turn miss the grant.
-  if(!G.player.apRate) G.player.apRate = 1;
-  if(G.player.ap === undefined) G.player.ap = 0;
-
-  if(_playerActedThisCycle){
-    _playerActedThisCycle = false;
-    G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
-    G.enemies.forEach(e => {
-      if(D(e.hp).lte(0)) return;
-      if(!e.apRate) e.apRate = 1;
-      if(e.ap === undefined) e.ap = 0;
-      if(e.aiState === 'sleep'){ e.ap = 0; return; } // sleeping: hold AP at zero
-      e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
-    });
-  }
-
-  // ── Passive wake check — runs after AP grant so waking enemies act next turn ──
-  G.enemies.filter(e => D(e.hp).gt(0) && e.aiState === 'sleep').forEach(enemy => {
-    const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
-    const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
-    if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
-      enemy.aiState = 'chase'; enemy.wakePopLife = 45;
-      enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
-      enemy.ap = 0; // ap zeroed — will receive its first grant next turn
-    }
-  });
-
-  // ── Priority queue: whoever has the most AP acts next, player wins ties ──
-  // Run all enemy actions that come before the player's next turn.
-  // Stop and return when it's the player's turn (highest AP) or nobody can act.
+function _runPriorityQueue(snapX, snapY){
   const MAX_ACTIONS = 200;
   let iterations = 0;
-
   while(iterations++ < MAX_ACTIONS){
     if(D(G.hp).lte(0)) break;
-
     let bestAP = -1;
-
-    // Player slot — player wins ties with enemies, so seed bestAP with player's AP
-    if(G.player.ap >= AP_COST_PLAYER_ACTION){
-      bestAP = G.player.ap;
-    }
-
-    // Collect all enemies that can match or beat the current bestAP
-    // Enemies must strictly exceed player AP to go before the player (player wins ties)
+    // Player slot — player wins ties
+    if(G.player.ap >= AP_COST_PLAYER_ACTION) bestAP = G.player.ap;
     let candidates = [];
     G.enemies.forEach(e => {
       if(D(e.hp).lte(0) || e.aiState === 'sleep') return;
       const minCost = e.aiState === 'telegraph' ? AP_COST_BITE : AP_COST_MOVE;
       if(e.ap < minCost) return;
-      if(e.ap > bestAP){
-        // This enemy beats the player — reset candidates to just this enemy
-        candidates = [e];
-        bestAP = e.ap;
-      } else if(e.ap === bestAP && candidates.length > 0){
-        // Tied with current best enemy — add to candidate pool for random pick
-        candidates.push(e);
-      }
+      if(e.ap > bestAP){ candidates = [e]; bestAP = e.ap; }
+      else if(e.ap === bestAP && candidates.length > 0) candidates.push(e);
     });
-
-    // Nobody can act — end of cycle, carry over AP
-    if(bestAP === -1) break;
-
-    // Player is next (no enemy beat the player's AP) — pause for input
-    if(candidates.length === 0) break;
-
-    // Pick randomly among tied enemies — the dungeon is chaotic, not fair
+    if(bestAP === -1) break;          // nobody can act
+    if(candidates.length === 0) break; // player is next
     const best = candidates[Math.floor(Math.random() * candidates.length)];
-
-    // Enemy acts — AP deducted inside _ratDoAction
     _ratDoAction(best, snapX, snapY);
   }
+}
+
+function enemyTurn(){
+  // Snapshot player position — enemies react to where player WAS this turn
+  const snapX = G.player.x, snapY = G.player.y;
+
+  if(!G.player.apRate) G.player.apRate = calcAPRate(G.dex||D(0));
+  if(G.player.ap === undefined) G.player.ap = 0;
+
+  // ── AP grant + turn tick: fires when the player has spent their last AP ──
+  // Structure: grant enemy AP → run priority queue (player has 0, so enemies go first)
+  //            → grant player AP → return to player input
+  // This ensures enemies act between turns BEFORE the player is refilled.
+  if(_playerActedThisCycle){
+    _playerActedThisCycle = false;
+    if(G.player.ap < AP_COST_PLAYER_ACTION){
+      // AP exhausted — world ticks
+      G.turn++;
+      const lbl = document.getElementById('turn-label-left');
+      if(lbl) lbl.textContent = G.turn;
+      // HP regen — once per turn
+      if(G.regen && D(G.hp).lt(G.maxHP) && D(G.hp).gt(0)){
+        G.hp = D(G.hp).plus(G.regen);
+        if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
+      }
+      // Stamina + apRate — once per turn
+      (function _tickStamina(){
+        const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
+        const drain = calcStaminaDrain(carried, limit);
+        const regen = calcStaminaRegen(G.end||D(10));
+        if(drain.gt(0)){
+          G.stamina = D(G.stamina).minus(drain);
+          if(D(G.stamina).lt(0)) G.stamina = D(0);
+          const pen = calcOverweightAPRatePenalty(carried, limit);
+          G.player.apRate = Math.max(0.4, parseFloat((calcAPRate(G.dex) - pen).toFixed(4)));
+        } else {
+          G.stamina = D(G.stamina).plus(regen);
+          if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
+          G.player.apRate = calcAPRate(G.dex);
+        }
+      })();
+      // Grant AP to enemies (not player yet)
+      G.enemies.forEach(e => {
+        if(D(e.hp).lte(0)) return;
+        if(!e.apRate) e.apRate = 1;
+        if(e.ap === undefined) e.ap = 0;
+        if(e.aiState === 'sleep'){ e.ap = 0; return; }
+        e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
+      });
+      // Wake check — only on tick, using final player position
+      G.enemies.filter(e => D(e.hp).gt(0) && e.aiState === 'sleep').forEach(enemy => {
+        const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
+        const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
+        if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
+          enemy.aiState = 'chase'; enemy.wakePopLife = 45;
+          enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+          enemy.ap = 0; // will receive first AP grant next tick
+        }
+      });
+      // Run priority queue while player AP is still 0 — enemies go first
+      // Then grant player AP so the loop terminates and returns to player input
+      _runPriorityQueue(snapX, snapY);
+      // Now refill player AP
+      G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
+      return; // priority queue already ran, skip the one below
+    }
+    // Player still has AP (>= 1) — no tick, fall through to priority queue
+  }
+
+  // ── Priority queue for mid-turn enemy actions (player has AP remaining) ──
+  _runPriorityQueue(snapX, snapY);
 }
 
 function generateBonfireFloor(){
@@ -2685,7 +2707,7 @@ function generateBonfireFloor(){
   G.stairsUp   = {x:rx+2,    y:ry+2};
   G.stairsDown = {x:rx+rw-3, y:ry+rh-3};
   G.bonfire    = {x:cx, y:cy};
-  G.player     = {x:rx+2, y:ry+3};
+  G.player.x = rx+2; G.player.y = ry+3;
   computeFOV();
   revealEntireFloor();
   G.fov = new Set(G.seen);
@@ -3445,38 +3467,15 @@ let _queuedAction=null;
 function queueOrRun(fn){ if (turnPhase==='player') fn(); else _queuedAction=fn; }
 
 function endTurn(){
-  G.turn++;
-  document.getElementById('turn-label-left').textContent=G.turn;
-  // Per-turn stamina + apRate update
-  function _tickStamina(){
-    const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
-    const drain = calcStaminaDrain(carried, limit);
-    const regen = calcStaminaRegen(G.end||D(10));
-    if(drain.gt(0)){
-      // Overweight: drain stamina
-      G.stamina = D(G.stamina).minus(drain);
-      if(D(G.stamina).lt(0)) G.stamina = D(0);
-      // apRate penalty based on overweight
-      const pen = calcOverweightAPRatePenalty(carried, limit);
-      G.player.apRate = Math.max(0.4, parseFloat((1 - pen).toFixed(4)));
-    } else {
-      // Under limit: regen stamina, restore apRate
-      G.stamina = D(G.stamina).plus(regen);
-      if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
-      G.player.apRate = 1;
-    }
-  }
+  // Guard: player must have enough AP to act
+  if(G.player.ap < AP_COST_PLAYER_ACTION) return;
+
   if (SETTINGS.smoothEntities){
     turnPhase='anim_player';
     setTimeout(()=>{
-      _playerActedThisCycle = true;
       G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
+      _playerActedThisCycle = true;
       enemyTurn(); trySpawnEnemies();
-      if (G.regen&&D(G.hp).lt(G.maxHP)&&D(G.hp).gt(0)){
-        G.hp = D(G.hp).plus(G.regen);
-        if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
-      }
-      _tickStamina();
       updateHUD(); checkFloorCleared();
       turnPhase='anim_enemy';
       setTimeout(()=>{
@@ -3486,14 +3485,9 @@ function endTurn(){
       },ENEMY_ANIM_MS);
     },PLAYER_ANIM_MS);
   } else {
-    _playerActedThisCycle = true;
     G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
+    _playerActedThisCycle = true;
     enemyTurn(); trySpawnEnemies();
-    if (G.regen&&D(G.hp).lt(G.maxHP)&&D(G.hp).gt(0)){
-      G.hp = D(G.hp).plus(G.regen);
-      if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
-    }
-    _tickStamina();
     updateHUD(); checkFloorCleared();
     turnPhase='player'; markPanelDirty(); renderCanvas();
     if (G.pendingLevelUps>0) setTimeout(showLevelUpModal,80);
@@ -3916,11 +3910,11 @@ function regenMap(dir='down'){
     if (dir === 'down'){
       // player arrives at the ascend stairs (stairsUp) of the destination floor
       const entry = G.stairsUp || G.stairsDown;
-      if (entry) G.player = {x: entry.x, y: entry.y};
+      if (entry) { G.player.x = entry.x; G.player.y = entry.y; }
     } else {
       // player arrives at the descend stairs (stairsDown) of the destination floor
       const entry = G.stairsDown || G.stairsUp;
-      if (entry) G.player = {x: entry.x, y: entry.y};
+      if (entry) { G.player.x = entry.x; G.player.y = entry.y; }
     }
     G.fov=new Set(); computeFOV();
     if (G.floorCleared) setTimeout(updateAutonav,50);
@@ -3930,9 +3924,9 @@ function regenMap(dir='down'){
     generateDungeon();
     // Position player on the correct stair for the travel direction
     if (dir === 'down' && G.stairsUp){
-      G.player = {x: G.stairsUp.x, y: G.stairsUp.y}; computeFOV();
+      G.player.x = G.stairsUp.x; G.player.y = G.stairsUp.y; computeFOV();
     } else if (dir === 'up' && G.stairsDown){
-      G.player = {x: G.stairsDown.x, y: G.stairsDown.y}; computeFOV();
+      G.player.x = G.stairsDown.x; G.player.y = G.stairsDown.y; computeFOV();
     }
   }
 
@@ -4021,6 +4015,15 @@ function renderCharTab(){ }
 
 function updateHUD(){
   if (!G.maxHP) return;
+  // Keep apRate in sync with current DEX (only if not overweight — endTurn handles the penalty)
+  if(G.player && G.dex && G.equipment){
+    try{
+      const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
+      if(!calcStaminaDrain(carried, limit).gt(0)){
+        G.player.apRate = calcAPRate(G.dex);
+      }
+    }catch(e){}
+  }
   const hpD = D(G.hp), maxHPD = D(G.maxHP);
   const hpPct = hpD.lt(0) ? 0 : Dn(hpD.div(maxHPD).times(100));
   document.getElementById('hp-text').textContent  =`${Dfmt(hpD.lt(0)?D(0):hpD)}/${Dfmt(maxHPD)}`;
@@ -4042,6 +4045,14 @@ function updateHUD(){
   document.getElementById('stat-def').textContent  =Dfmt(G.def||D(0));
   document.getElementById('stat-regen').textContent=Dfmt(G.regen||D(0));
   document.getElementById('kill-count').textContent=G.kills;
+  // AP display
+  if(G.player){
+    const apRate = G.player.apRate || calcAPRate(G.dex||D(0));
+    const apEl = document.getElementById('stat-ap');
+    const aprEl = document.getElementById('stat-aprate');
+    if(apEl) apEl.textContent = parseFloat(G.player.ap.toFixed(2));
+    if(aprEl) aprEl.textContent = parseFloat(apRate.toFixed(2));
+  }
   if(G.zone==='normal'&&!G.isBonfireFloor&&G.depth>(G.lowestDepth||0)) G.lowestDepth=G.depth;
   document.getElementById('depth-label').textContent=depthLabel();
   updateClearedBadge(); updateEnemyCounter(); updateAutonav(); updateTutorial();
@@ -4683,6 +4694,7 @@ function invRenderCharPage(){
   if(document.getElementById('icp-dmg-range')) document.getElementById('icp-dmg-range').textContent=`${lo}–${hi}`;
   if (document.getElementById('icp-def')) document.getElementById('icp-def').textContent=Dfmt(G.def||D(0));
   if (document.getElementById('icp-regen')) document.getElementById('icp-regen').textContent=Dfmt(G.regen||D(0));
+  if (document.getElementById('icp-aprate')) document.getElementById('icp-aprate').textContent=parseFloat((G.player?.apRate||calcAPRate(G.dex||D(0))).toFixed(2));
   // Stamina display
   if(document.getElementById('icp-stamina')){
     const staD = D(G.stamina||0), maxStaD = D(G.maxStamina||50);
@@ -4997,6 +5009,7 @@ function _buildSnap(){
     curseStacks:G.curseStacks||0,
     curseKills:G.curseKills||0,
     cursesEnabled:G.cursesEnabled!==false,
+    curseAcknowledged:G.curseAcknowledged||false,
   }};
 }
 function saveGameToSlot(idx){
@@ -5044,6 +5057,7 @@ function loadGameFromSlot(idx){
       curseStacks:s.curseStacks||0,
       curseKills:s.curseKills||0,
       cursesEnabled:s.cursesEnabled!==false,
+      curseAcknowledged:s.curseAcknowledged||false,
     };
     // Apply curse multiplier to all loaded enemies' stats
     if(G.curseStacks > 0){
@@ -5068,8 +5082,8 @@ function loadGameFromSlot(idx){
     updateTutorial();updateHUD();_updateCurseIndicator();applyLogVisibility();showScreen('game-screen');
     setTimeout(()=>{setupCanvas();snapVizToLogical();if(SETTINGS.smoothEntities)startEntityLoop();if(SETTINGS.smoothCam&&!SETTINGS.smoothEntities)smoothCamLoop();renderCanvas();},50);
     addLog(`Welcome back, ${G.name}!`,'info');
-    // Show curse load modal if cursed
-    if(G.curseStacks > 0){
+    // Show curse load modal only if cursed AND not yet acknowledged since last new stack
+    if(G.curseStacks > 0 && !G.curseAcknowledged){
       setTimeout(()=>_showCurseLoadModal(), 200);
     }
     return true;
@@ -5101,6 +5115,7 @@ function _applyCurseToSave(){
   try{
     const snap = JSON.parse(raw);
     snap.G.curseStacks = (snap.G.curseStacks||0) + 1;
+    snap.G.curseAcknowledged = false; // new stack — player must see the modal again
     localStorage.setItem(_saveSlotKey(_activeSaveSlot), JSON.stringify(snap));
   }catch(e){ console.error('Failed to apply curse to save.', e); }
 }
@@ -5170,6 +5185,14 @@ function _showCurseLoadModal(){
 
 function _closeCurseLoadModal(){
   document.getElementById('curse-load-modal').classList.remove('active');
+  // Mark acknowledged so the modal won't reshow until a new curse stack is added
+  if(G) G.curseAcknowledged = true;
+  if(_activeSaveSlot !== null){
+    try{
+      const raw = localStorage.getItem(_saveSlotKey(_activeSaveSlot));
+      if(raw){ const snap=JSON.parse(raw); snap.G.curseAcknowledged=true; localStorage.setItem(_saveSlotKey(_activeSaveSlot),JSON.stringify(snap)); }
+    }catch(e){}
+  }
 }
 
 // beforeunload: best-effort curse on unexpected close from unsafe zone
