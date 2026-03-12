@@ -390,11 +390,16 @@
   /* match size button dimensions so difficulty buttons aren’t so massive */
   .diff-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 8px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
   .diff-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .diff-btn.active-extra-easy{border-color:#80c0ff;color:#80c0ff;background:rgba(128,192,255,.10);}
   .diff-btn.active-easy{border-color:#40c870;color:#40c870;background:rgba(64,200,112,.12);}
   .diff-btn.active-normal{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,.12);}
-  .diff-btn.active-hard{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
-.diff-btn.active-extra-easy{border-color:#40c870;color:#40c870;background:rgba(64,200,112,.08);}
-.diff-btn.active-extra-hard{border-color:#c84040;color:#c84040;background:rgba(200,64,64,.20);}
+  .diff-btn.active-hard{border-color:#e08030;color:#e08030;background:rgba(224,128,48,.12);}
+  .diff-btn.active-extra-hard{border-color:#c84040;color:#c84040;background:rgba(200,64,64,.20);}
+  .size-btn.active-xs{border-color:#80c0ff;color:#80c0ff;background:rgba(128,192,255,.10);}
+  .size-btn.active-sm{border-color:#40c870;color:#40c870;background:rgba(64,200,112,.12);}
+  .size-btn.active-md{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,.12);}
+  .size-btn.active-lg{border-color:#e08030;color:#e08030;background:rgba(224,128,48,.12);}
+  .size-btn.active-xl{border-color:#c84040;color:#c84040;background:rgba(200,64,64,.20);}
   .size-btns{display:flex;gap:5px;flex-wrap:wrap;}
   .size-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 8px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
   .size-btn:hover{border-color:var(--blue);color:#80c0f0;}
@@ -402,6 +407,24 @@
   .spawn-toggle{font-family:'Press Start 2P',monospace;font-size:8px;padding:7px 14px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;min-width:72px;text-align:center;}
   .spawn-toggle.on{border-color:var(--green);color:var(--green);background:rgba(64,200,112,.12);}
   .spawn-toggle.off{border-color:var(--red);color:var(--red);background:rgba(200,64,64,.12);}
+  /* Preset mode buttons */
+  .preset-btns{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:100%;}
+  .preset-btn{font-family:'Press Start 2P',monospace;font-size:8px;padding:10px 14px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;flex:1;min-width:80px;text-align:center;}
+  .preset-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .preset-btn.active-baby{border-color:#80c0ff;color:#80c0ff;background:rgba(128,192,255,.10);}
+  .preset-btn.active-easier{border-color:#40c870;color:#40c870;background:rgba(64,200,112,.12);}
+  .preset-btn.active-classic{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,.12);}
+  .preset-btn.active-harder{border-color:#e08030;color:#e08030;background:rgba(224,128,48,.12);}
+  .preset-btn.active-hardcore{border-color:#c84040;color:#c84040;background:rgba(200,64,64,.22);}
+  .preset-desc-box{width:100%;background:var(--bg);border:1px solid var(--border);padding:12px 16px;min-height:52px;box-sizing:border-box;}
+  .preset-desc-name{font-family:'Press Start 2P',monospace;font-size:8px;margin-bottom:6px;}
+  .preset-desc-text{font-size:15px;color:var(--dim);line-height:1.5;}
+  .preset-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+  .preset-tag{font-family:'Press Start 2P',monospace;font-size:6px;padding:3px 6px;border:1px solid var(--border);color:var(--dim);}
+  .adv-link{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--dim);background:none;border:none;cursor:pointer;padding:2px 0;letter-spacing:1px;text-decoration:underline;}
+  .adv-link:hover{color:var(--text);}
+  .adv-panel{display:none;flex-direction:column;gap:0;border-top:1px solid var(--border);margin-top:8px;padding-top:4px;}
+  .adv-panel.open{display:flex;}
 
   /* Floating transparent D-pad overlay */
   #dpad{display:none;position:absolute;bottom:14px;right:14px;z-index:30;user-select:none;-webkit-user-select:none;touch-action:none;flex-direction:column;align-items:center;gap:0;background:none;border:none;padding:0;}
@@ -778,6 +801,15 @@
     <hr class="changelog-divider">
 
 ═══════════════════════════════════════════════════════════════ -->
+
+    <div class="changelog-entry">
+      <div class="changelog-title">v1.4.3 — Run Mode Presets</div>
+      <div class="changelog-date">2026-03-12</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Run Settings Reworked</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span>The run configuration screen now uses presets</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Advanced run configuration</div>
+    </div>
 
     <div class="changelog-entry">
       <div class="changelog-title">v1.4.2 — Changelog UI Behavior</div>
@@ -1217,39 +1249,65 @@
 <div class="screen" id="config-screen">
   <div class="screen-title">RUN SETTINGS</div>
   <div class="config-container">
-    <div class="config-section-title">DIFFICULTY</div>
-    <div class="config-row">
-      <div class="config-lhs">
-        <div class="config-label">DIFFICULTY</div>
-        <div class="config-desc" id="diff-desc">Normal enemy stats and pacing.</div>
+    <div class="config-section-title">SELECT MODE</div>
+    <div class="config-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <div class="preset-btns">
+        <button class="preset-btn" id="preset-baby"     onclick="setPreset('baby')">BABY</button>
+        <button class="preset-btn" id="preset-easier"   onclick="setPreset('easier')">EASIER</button>
+        <button class="preset-btn active-classic" id="preset-classic" onclick="setPreset('classic')">CLASSIC</button>
+        <button class="preset-btn" id="preset-harder"   onclick="setPreset('harder')">HARDER</button>
+        <button class="preset-btn" id="preset-hardcore" onclick="setPreset('hardcore')">HARDCORE</button>
       </div>
-      <div class="diff-btns">
-        <button class="diff-btn" id="diff-extra-easy" onclick="setDifficulty('extra-easy')">EXTRA EASY</button>
-        <button class="diff-btn" id="diff-easy"        onclick="setDifficulty('easy')">EASY</button>
-        <button class="diff-btn active-normal" id="diff-normal" onclick="setDifficulty('normal')">NORMAL</button>
-        <button class="diff-btn" id="diff-hard"        onclick="setDifficulty('hard')">HARD</button>
-        <button class="diff-btn" id="diff-extra-hard" onclick="setDifficulty('extra-hard')">EXTRA HARD</button>
+      <div class="preset-desc-box" id="preset-desc-box">
+        <div class="preset-desc-name" id="preset-desc-name" style="color:var(--gold);">CLASSIC</div>
+        <div class="preset-desc-text" id="preset-desc-text">Normal floors, normal enemies, standard rules.</div>
+        <div class="preset-tags" id="preset-tags"></div>
       </div>
     </div>
-    <div class="config-row">
-      <div class="config-lhs">
-        <div class="config-label">ENEMY SPAWNING</div>
-        <div class="config-desc">Enemies spawn on normal floors over time.</div>
-      </div>
-      <button class="spawn-toggle on" id="spawn-toggle" onclick="toggleSpawn()">ON</button>
+    <div style="padding:10px 0 4px;display:flex;justify-content:center;">
+      <button class="adv-link" id="adv-toggle-btn" onclick="toggleAdvPanel()">&#9658; ADVANCED SETTINGS</button>
     </div>
-    <div class="config-section-title" style="margin-top:8px;">FLOOR SIZE</div>
-    <div class="config-row">
-      <div class="config-lhs">
-        <div class="config-label">NORMAL FLOOR SIZE</div>
-        <div class="config-desc" id="size-desc">Upper floors are always fixed size.</div>
+    <div class="adv-panel" id="adv-panel">
+      <div class="config-section-title" style="margin-top:4px;">ADVANCED CONFIGURATION</div>
+      <div class="config-row">
+        <div class="config-lhs">
+          <div class="config-label">DIFFICULTY</div>
+          <div class="config-desc" id="diff-desc">Normal enemy stats and pacing.</div>
+        </div>
+        <div class="diff-btns">
+          <button class="diff-btn" id="diff-extra-easy" onclick="setDiffAdv('extra-easy')">EXTRA EASY</button>
+          <button class="diff-btn" id="diff-easy"        onclick="setDiffAdv('easy')">EASY</button>
+          <button class="diff-btn active-normal" id="diff-normal" onclick="setDiffAdv('normal')">NORMAL</button>
+          <button class="diff-btn" id="diff-hard"        onclick="setDiffAdv('hard')">HARD</button>
+          <button class="diff-btn" id="diff-extra-hard" onclick="setDiffAdv('extra-hard')">EXTRA HARD</button>
+        </div>
       </div>
-      <div class="size-btns">
-        <button class="size-btn" id="size-xs"  onclick="setFloorSize('xs')">XS</button>
-        <button class="size-btn" id="size-sm"  onclick="setFloorSize('sm')">S</button>
-        <button class="size-btn active" id="size-md" onclick="setFloorSize('md')">M</button>
-        <button class="size-btn" id="size-lg"  onclick="setFloorSize('lg')">L</button>
-        <button class="size-btn" id="size-xl"  onclick="setFloorSize('xl')">XL</button>
+      <div class="config-row">
+        <div class="config-lhs">
+          <div class="config-label">FLOOR SIZE</div>
+          <div class="config-desc" id="size-desc">Upper floors are always fixed size.</div>
+        </div>
+        <div class="size-btns">
+          <button class="size-btn" id="size-xs"  onclick="setSizeAdv('xs')">XS</button>
+          <button class="size-btn" id="size-sm"  onclick="setSizeAdv('sm')">S</button>
+          <button class="size-btn active-md" id="size-md" onclick="setSizeAdv('md')">M</button>
+          <button class="size-btn" id="size-lg"  onclick="setSizeAdv('lg')">L</button>
+          <button class="size-btn" id="size-xl"  onclick="setSizeAdv('xl')">XL</button>
+        </div>
+      </div>
+      <div class="config-row">
+        <div class="config-lhs">
+          <div class="config-label">ENEMY SPAWNING</div>
+          <div class="config-desc">Enemies spawn on normal floors over time.</div>
+        </div>
+        <button class="spawn-toggle on" id="spawn-toggle" onclick="toggleSpawnAdv()">ON</button>
+      </div>
+      <div class="config-row">
+        <div class="config-lhs">
+          <div class="config-label">CURSES</div>
+          <div class="config-desc">Quitting from an unsafe zone curses the run.</div>
+        </div>
+        <button class="spawn-toggle on" id="curse-toggle" onclick="toggleCurseAdv()">ON</button>
       </div>
     </div>
   </div>
@@ -1683,9 +1741,12 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'config-screen'){
-    setDifficulty(RUN_CONFIG.difficulty);
-    setFloorSize(RUN_CONFIG.floorSize);
-    updateSpawnBtn();
+    setPreset(RUN_CONFIG.preset || 'classic');
+    // close advanced panel on each visit
+    const ap = document.getElementById('adv-panel');
+    const ab = document.getElementById('adv-toggle-btn');
+    if(ap) ap.classList.remove('open');
+    if(ab) ab.innerHTML = '&#9658; ADVANCED SETTINGS';
   }
   if(window._dpadSetVisible) window._dpadSetVisible(id === 'game-screen');
 }
@@ -1788,7 +1849,7 @@ function changeAlloc(key, delta){
 }
 
 // ==================== RUN CONFIG ====================
-const RUN_CONFIG = {difficulty:'normal', floorSize:'md', enemySpawn:true};
+const RUN_CONFIG = {difficulty:'normal', floorSize:'md', enemySpawn:true, cursesEnabled:true, preset:'classic'};
 const DIFF_DESCS = {
   'extra-easy': 'Very few, very weak enemies.',
   easy:        'Fewer, weaker enemies.',
@@ -1803,7 +1864,6 @@ const DIFF_MODS = {
   hard:         {statMult:1.8,  countMult:2.0},
   'extra-hard': {statMult:2.8,  countMult:3.5},
 };
-
 const SIZE_DESCS = {
   xs: 'Very small floor',
   sm: 'Small floor',
@@ -1814,30 +1874,172 @@ const SIZE_DESCS = {
 const FLOOR_SIZES = {
   xs:{w:30,h:22}, sm:{w:42,h:32}, md:{w:56,h:42}, lg:{w:70,h:52}, xl:{w:105,h:78},
 };
-function setDifficulty(diff){
-  RUN_CONFIG.difficulty = diff;
+
+// Preset definitions — each maps to a difficulty+size+flags combo
+const PRESETS = {
+  baby: {
+    label:'BABY', color:'#80c0ff',
+    desc:'Tiny floors, very weak enemies, very few of them. No enemy spawning. No curses.',
+    difficulty:'extra-easy', floorSize:'xs', enemySpawn:false, cursesEnabled:false,
+    tags:[{t:'XS FLOORS',c:'#80c0ff'},{t:'WEAKEST ENEMIES',c:'#80c0ff'}],
+  },
+  easier: {
+    label:'EASIER', color:'#40c870',
+    desc:'Smaller floors, weaker enemies, fewer of them. No enemy spawning. No curses.',
+    difficulty:'easy', floorSize:'sm', enemySpawn:false, cursesEnabled:false,
+    tags:[{t:'SMALL FLOORS',c:'#40c870'},{t:'WEAK ENEMIES',c:'#40c870'}],
+  },
+  classic: {
+    label:'CLASSIC', color:'#c8a84b',
+    desc:'Normal floors, normal enemies, standard rules. Enemies spawn over time. Curses apply.',
+    difficulty:'normal', floorSize:'md', enemySpawn:true, cursesEnabled:true,
+    tags:[{t:'NORMAL FLOORS',c:'#c8a84b'},{t:'NORMAL ENEMIES',c:'#c8a84b'},{t:'SPAWNING',c:'#c84040'},{t:'CURSES',c:'#c84040'}],
+  },
+  harder: {
+    label:'HARDER', color:'#e08030',
+    desc:'Larger floors, tougher enemies, more of them. Higher spawn rate. Curses are active.',
+    difficulty:'hard', floorSize:'lg', enemySpawn:true, cursesEnabled:true,
+    tags:[{t:'LARGE FLOORS',c:'#e08030'},{t:'TOUGH ENEMIES',c:'#e08030'},{t:'FAST SPAWNING',c:'#c84040'},{t:'CURSES',c:'#c84040'}],
+  },
+  hardcore: {
+    label:'HARDCORE', color:'#ff4040',
+    desc:'Huge floors, devastating enemies, overwhelming numbers. Brutal spawn rate. Curses active.',
+    difficulty:'extra-hard', floorSize:'xl', enemySpawn:true, cursesEnabled:true,
+    tags:[{t:'XL FLOORS',c:'#ff4040'},{t:'BRUTAL ENEMIES',c:'#ff4040'},{t:'RELENTLESS SPAWNING',c:'#c84040'},{t:'CURSES',c:'#c84040'}],
+  },
+};
+
+function setPreset(key){
+  const p = PRESETS[key]; if(!p) return;
+  RUN_CONFIG.preset = key;
+  RUN_CONFIG._lastPreset = key;
+  RUN_CONFIG.difficulty   = p.difficulty;
+  RUN_CONFIG.floorSize    = p.floorSize;
+  RUN_CONFIG.enemySpawn   = p.enemySpawn;
+  RUN_CONFIG.cursesEnabled= p.cursesEnabled;
+  // Update preset buttons
+  ['baby','easier','classic','harder','hardcore'].forEach(k => {
+    const btn = document.getElementById('preset-'+k);
+    if(btn) btn.className = 'preset-btn' + (k===key ? ` active-${k}` : '');
+  });
+  // Update description box
+  const nameEl = document.getElementById('preset-desc-name');
+  const textEl = document.getElementById('preset-desc-text');
+  const tagsEl = document.getElementById('preset-tags');
+  if(nameEl){ nameEl.textContent = p.label; nameEl.style.color = p.color; }
+  if(textEl) textEl.textContent = p.desc;
+  if(tagsEl){
+    tagsEl.innerHTML = p.tags.map(tag =>
+      `<span class="preset-tag" style="border-color:${tag.c};color:${tag.c};">${tag.t}</span>`
+    ).join('');
+  }
+  // Sync advanced controls without deselecting preset
+  _syncAdvControls();
+}
+function _syncAdvControls(){
+  // Sync difficulty buttons
   ['extra-easy','easy','normal','hard','extra-hard'].forEach(d => {
     const btn = document.getElementById('diff-'+d);
-    if (btn){ btn.className = 'diff-btn' + (d===diff ? ` active-${d}` : ''); }
+    if(btn) btn.className = 'diff-btn' + (d===RUN_CONFIG.difficulty ? ` active-${d}` : '');
   });
-  document.getElementById('diff-desc').textContent = DIFF_DESCS[diff];
-  RUN_CONFIG.enemySpawn = (diff !== 'easy' && diff !== 'extra-easy');
-  updateSpawnBtn();
+  const diffDesc = document.getElementById('diff-desc');
+  if(diffDesc) diffDesc.textContent = DIFF_DESCS[RUN_CONFIG.difficulty]||'';
+  // Sync size buttons — each size has its own color class
+  document.querySelectorAll('.size-btn').forEach(b => b.className = 'size-btn');
+  document.getElementById('size-'+RUN_CONFIG.floorSize)?.classList.add('active-'+RUN_CONFIG.floorSize);
+  const sizeDesc = document.getElementById('size-desc');
+  if(sizeDesc) sizeDesc.textContent = SIZE_DESCS[RUN_CONFIG.floorSize]||'';
+  // Sync spawn toggle
+  const spawnBtn = document.getElementById('spawn-toggle');
+  if(spawnBtn){ spawnBtn.textContent = RUN_CONFIG.enemySpawn?'ON':'OFF'; spawnBtn.className='spawn-toggle '+(RUN_CONFIG.enemySpawn?'on':'off'); }
+  // Sync curse toggle
+  const curseBtn = document.getElementById('curse-toggle');
+  if(curseBtn){ curseBtn.textContent = RUN_CONFIG.cursesEnabled?'ON':'OFF'; curseBtn.className='spawn-toggle '+(RUN_CONFIG.cursesEnabled?'on':'off'); }
 }
-function toggleSpawn(){ RUN_CONFIG.enemySpawn = !RUN_CONFIG.enemySpawn; updateSpawnBtn(); }
-function updateSpawnBtn(){
-  const btn = document.getElementById('spawn-toggle');
-  btn.textContent = RUN_CONFIG.enemySpawn ? 'ON' : 'OFF';
-  btn.className   = 'spawn-toggle ' + (RUN_CONFIG.enemySpawn ? 'on' : 'off');
+function _checkPresetMatch(){
+  // After an advanced change, see if the current config exactly matches any preset
+  const match = Object.keys(PRESETS).find(k => {
+    const p = PRESETS[k];
+    return p.difficulty === RUN_CONFIG.difficulty &&
+           p.floorSize   === RUN_CONFIG.floorSize  &&
+           p.enemySpawn  === RUN_CONFIG.enemySpawn  &&
+           p.cursesEnabled === RUN_CONFIG.cursesEnabled;
+  });
+  if(match){
+    // Silently activate the matched preset (update UI without re-applying values)
+    RUN_CONFIG.preset = match;
+    RUN_CONFIG._lastPreset = match;
+    ['baby','easier','classic','harder','hardcore'].forEach(k => {
+      const btn = document.getElementById('preset-'+k);
+      if(btn) btn.className = 'preset-btn' + (k===match ? ` active-${k}` : '');
+    });
+    const p = PRESETS[match];
+    const nameEl = document.getElementById('preset-desc-name');
+    const textEl = document.getElementById('preset-desc-text');
+    const tagsEl = document.getElementById('preset-tags');
+    if(nameEl){ nameEl.textContent = p.label; nameEl.style.color = p.color; }
+    if(textEl) textEl.textContent = p.desc;
+    if(tagsEl){
+      tagsEl.innerHTML = p.tags.map(tag =>
+        `<span class="preset-tag" style="border-color:${tag.c};color:${tag.c};">${tag.t}</span>`
+      ).join('');
+    }
+  } else {
+    // No match — show CUSTOM
+    RUN_CONFIG.preset = null;
+    ['baby','easier','classic','harder','hardcore'].forEach(k => {
+      const btn = document.getElementById('preset-'+k);
+      if(btn) btn.className = 'preset-btn';
+    });
+    const nameEl = document.getElementById('preset-desc-name');
+    const textEl = document.getElementById('preset-desc-text');
+    const tagsEl = document.getElementById('preset-tags');
+    if(nameEl){ nameEl.textContent = 'CUSTOM'; nameEl.style.color = 'var(--dim)'; }
+    if(textEl) textEl.textContent = 'Custom configuration.';
+    if(tagsEl) tagsEl.innerHTML = '';
+  }
 }
-function setFloorSize(sz){
+function toggleAdvPanel(){
+  const panel = document.getElementById('adv-panel');
+  const btn   = document.getElementById('adv-toggle-btn');
+  if(!panel) return;
+  const open = panel.classList.toggle('open');
+  if(btn) btn.innerHTML = (open ? '&#9660;' : '&#9658;') + ' ADVANCED SETTINGS';
+  if(open){
+    _syncAdvControls();
+  } else {
+    // Closing — if no preset matched the custom config, snap back to last known preset
+    if(!RUN_CONFIG.preset){
+      setPreset(RUN_CONFIG._lastPreset || 'classic');
+    }
+  }
+}
+// Advanced control setters — these override the preset
+function setDiffAdv(diff){
+  RUN_CONFIG.difficulty = diff;
+  _checkPresetMatch();
+  _syncAdvControls();
+}
+function setSizeAdv(sz){
   RUN_CONFIG.floorSize = sz;
-  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('size-'+sz)?.classList.add('active');
-  // update description text
-  const descEl = document.getElementById('size-desc');
-  if (descEl) descEl.textContent = SIZE_DESCS[sz] || '';
+  _checkPresetMatch();
+  _syncAdvControls();
 }
+function toggleSpawnAdv(){
+  RUN_CONFIG.enemySpawn = !RUN_CONFIG.enemySpawn;
+  _checkPresetMatch();
+  _syncAdvControls();
+}
+function toggleCurseAdv(){
+  RUN_CONFIG.cursesEnabled = !RUN_CONFIG.cursesEnabled;
+  _checkPresetMatch();
+  _syncAdvControls();
+}
+// Legacy aliases (used internally)
+function setDifficulty(diff){ setDiffAdv(diff); }
+function setFloorSize(sz){ setSizeAdv(sz); }
+function toggleSpawn(){ toggleSpawnAdv(); }
+function updateSpawnBtn(){ _syncAdvControls(); }
 
 // ==================== CLASS & WEAPON DEFS ====================
 const CLASS_TEMPLATES = {
@@ -1918,6 +2120,7 @@ function startGame(){
     regen: calcRegen(con),
     kills:0, turn:1, depth:1, zone:'upper', lowestDepth:0, killedBy:null, dead:false,
     enemySpawn: RUN_CONFIG.enemySpawn,
+    cursesEnabled: RUN_CONFIG.cursesEnabled,
     pendingLevelUps: 0,
     unspentPoints: allocPoints,
     _eid: 0,
@@ -4462,7 +4665,10 @@ function invRenderCharPage(){
   document.getElementById('icp-xp').textContent=`${Dfmt(G.xp)}/${Dfmt(G.xpNeeded)}`;
   document.getElementById('icp-xpbar').style.width=`${Math.min(100,Math.max(0,Dn(D(G.xp).div(D(G.xpNeeded)).times(100))))}%`;
   document.getElementById('icp-lvl').textContent=Dfmt(G.level);
-  document.getElementById('icp-diff').textContent=`${(RUN_CONFIG.difficulty||'normal').toUpperCase()} · ${(RUN_CONFIG.floorSize||'md').toUpperCase()}`;
+  const _presetLabel = RUN_CONFIG.preset ? (PRESETS[RUN_CONFIG.preset]?.label || RUN_CONFIG.preset.toUpperCase()) : null;
+  document.getElementById('icp-diff').textContent = _presetLabel
+    ? _presetLabel
+    : `${(RUN_CONFIG.difficulty||'normal').toUpperCase()} · ${(RUN_CONFIG.floorSize||'md').toUpperCase()}`;
   document.getElementById('icp-floor').textContent=depthLabel();
   document.getElementById('icp-kills').textContent=G.kills;
   document.getElementById('icp-depth').textContent=G.lowestDepth?`Depth ${G.lowestDepth}`:'—';
@@ -4790,6 +4996,7 @@ function _buildSnap(){
     devUnlocked:G.devUnlocked||false,devNoFog:G.devNoFog||false,devNoWake:G.devNoWake||false,devAlwaysNav:G.devAlwaysNav||false,devGod:G.devGod||false,
     curseStacks:G.curseStacks||0,
     curseKills:G.curseKills||0,
+    cursesEnabled:G.cursesEnabled!==false,
   }};
 }
 function saveGameToSlot(idx){
@@ -4836,6 +5043,7 @@ function loadGameFromSlot(idx){
       devUnlocked:s.devUnlocked||false,devNoFog:s.devNoFog||false,devNoWake:s.devNoWake||false,devAlwaysNav:s.devAlwaysNav||false,devGod:s.devGod||false,
       curseStacks:s.curseStacks||0,
       curseKills:s.curseKills||0,
+      cursesEnabled:s.cursesEnabled!==false,
     };
     // Apply curse multiplier to all loaded enemies' stats
     if(G.curseStacks > 0){
@@ -4874,7 +5082,8 @@ function refreshLoadButton(){const btn=document.getElementById('load-game-btn');
 
 // ==================== CURSE SYSTEM ====================
 function _isUnsafeZone(){
-  // Unsafe = normal zone, non-bonfire floor. Upper floors and bonfire floors are safe.
+  // Unsafe = normal zone, non-bonfire floor, AND curses are enabled for this run
+  if(!G.cursesEnabled) return false;
   return G.zone === 'normal' && !G.isBonfireFloor;
 }
 
