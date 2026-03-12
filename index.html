@@ -803,6 +803,16 @@
 ═══════════════════════════════════════════════════════════════ -->
 
     <div class="changelog-entry">
+      <div class="changelog-title">v1.4.3 — AP System Tweaks and Additions</div>
+      <div class="changelog-date">2026-03-12</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">AP-Related Improvements</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>DEX now increases AP gain.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>AP and AP gain indicators.</div>
+      <div class="changelog-para"><span class="changelog-tag fix">FIX</span>Fixed AP system. Should now work as expected.</div>
+    </div>
+
+    <div class="changelog-entry">
       <div class="changelog-title">v1.4.3 — Run Mode Presets</div>
       <div class="changelog-date">2026-03-12</div>
       <hr class="changelog-divider">
@@ -2046,7 +2056,7 @@ function updateSpawnBtn(){ _syncAdvControls(); }
 
 // ==================== CLASS & WEAPON DEFS ====================
 const CLASS_TEMPLATES = {
-  warrior: {icon:'⚔️', name:'Warrior', baseCON:30, baseSTR:20, baseDEX:10, baseEND:12, weaponType:'sword'},
+  warrior: {icon:'⚔️', name:'Warrior', baseCON:30, baseSTR:20, baseDEX:10, baseEND:15, weaponType:'sword'},
   rogue:   {icon:'🗡️', name:'Rogue',   baseCON:20, baseSTR:10, baseDEX:15, baseEND:10, weaponType:'dagger'},
 };
 const CLASS_LEVEL_GAINS = {
@@ -2056,8 +2066,8 @@ const CLASS_LEVEL_GAINS = {
 const FISTS_DEF = {base:1, str:0.10, dex:0.10};
 function calcDmgFists(str,dex){ return D(FISTS_DEF.base).plus(D(str).times(FISTS_DEF.str)).plus(D(dex).times(FISTS_DEF.dex)); }
 const WEAPON_DEFS = {
-  sword:  {name:'Simple Sword',  icon:'⚔️', base:2, str:0.25, dex:0.10, kg:1.2, category:'Melee Weapons', subcategory:'One-Handed Sword'},
-  dagger: {name:'Simple Dagger', icon:'🗡️', base:1, str:0.10, dex:0.25, kg:0.4, category:'Melee Weapons', subcategory:'Dagger'},
+  sword:  {name:'Simple One-Handed Sword',  icon:'⚔️', base:5, str:0.20, dex:0.10, kg:1.2, category:'Melee Weapons', subcategory:'One-Handed Sword'},
+  dagger: {name:'Simple Dagger', icon:'🗡️', base:3, str:0.10, dex:0.15, kg:0.4, category:'Melee Weapons', subcategory:'Dagger'},
 };
 // Base carry capacity + STR bonus (subject to tuning)
 function calcCarryWeight(str){ return D(20).plus(D(str).times('0.5')); }
@@ -2161,7 +2171,7 @@ function startGame(){
     equipped: true,
     kg: WEAPON_DEFS[tmpl.weaponType].kg,
     bonuses: {},
-    desc: tmpl.weaponType === 'sword' ? 'A plain iron sword. Gets the job done.' : 'A nimble dagger. Quick and precise.',
+    desc: tmpl.weaponType === 'sword' ? 'A one-handed iron sword.' : 'A dagger.',
   };
   G.equipment.main = startWeapon;
   // inventory starts empty
@@ -3614,7 +3624,7 @@ function checkFloorCleared(){
 }
 
 function forceLevelUp(){
-  G.xp=D(0); G.level=D(G.level).plus(1); G.xpNeeded=D(G.xpNeeded).times('1.15').plus(5);
+  G.xp=D(0); G.level=D(G.level).plus(1); G.xpNeeded=D(10)
   G.pendingLevelUps++;
   const gains=CLASS_LEVEL_GAINS[G.class];
   G.con=D(G.con).plus(gains.con); G.str=D(G.str).plus(gains.str); G.dex=D(G.dex).plus(gains.dex);
@@ -5010,6 +5020,15 @@ function _buildSnap(){
     curseKills:G.curseKills||0,
     cursesEnabled:G.cursesEnabled!==false,
     curseAcknowledged:G.curseAcknowledged||false,
+    floorCache: (()=>{
+      const out={};
+      Object.entries(floorCache).forEach(([k,f])=>{
+        out[k]={...f, seen:[...f.seen],
+          enemies:JSON.parse(JSON.stringify(f.enemies))};
+      });
+      return out;
+    })(),
+    floorCacheOrder:[...floorCacheOrder],
   }};
 }
 function saveGameToSlot(idx){
@@ -5075,7 +5094,15 @@ function loadGameFromSlot(idx){
     _queuedAction=null;_panelDirty=true;_clearedBanner=0;_playerActedThisCycle=false;
     _floorNotifier={text:'',life:0,maxLife:0};_autoWalkOnArrival=null;_autoWalkForced=false;_autoWalkPath=null;_autoWalkDir=null;
     heldKeys.clear();stopMoveLoop();
-    Object.keys(floorCache).forEach(k=>delete floorCache[k]);floorCacheOrder.length=0;
+    // Restore floor cache from save
+    Object.keys(floorCache).forEach(k=>delete floorCache[k]); floorCacheOrder.length=0;
+    if(s.floorCache){
+      Object.entries(s.floorCache).forEach(([k,f])=>{
+        floorCache[k]={...f, seen:new Set(f.seen),
+          enemies:JSON.parse(JSON.stringify(f.enemies))};
+      });
+      if(s.floorCacheOrder) s.floorCacheOrder.forEach(k=>{ if(floorCache[k]) floorCacheOrder.push(k); });
+    }
     document.getElementById('hero-portrait').textContent=G.icon;
     document.getElementById('hero-name').textContent=G.name;
     const tp=document.getElementById('tutorial-panel');if(tp)tp.style.display=G.tutHidden?'none':'flex';
