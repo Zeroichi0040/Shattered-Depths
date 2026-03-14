@@ -803,7 +803,7 @@
 ═══════════════════════════════════════════════════════════════ -->
 
     <div class="changelog-entry">
-      <div class="changelog-title">v1.4.3 — AP System Tweaks and Additions</div>
+      <div class="changelog-title">v1.4.4 — AP System Tweaks and Additions</div>
       <div class="changelog-date">2026-03-12</div>
       <hr class="changelog-divider">
       <div class="changelog-sub">AP-Related Improvements</div>
@@ -834,239 +834,29 @@
       <div class="changelog-title">v1.4.1 — Permadeath &amp; The Curse</div>
       <div class="changelog-date">2026-03-11</div>
       <hr class="changelog-divider">
-      <div class="changelog-sub">Save System Reworked <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Creating a new character automatically creates a new save slot. There can only be one save slot per character. Bonfires autosave your progress and overwrites the existing slot.</div>
-      <div class="changelog-para">Dying permanently deletes the save.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">The Curse <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Leaving the game from an unsafe zone, whether through the menu or closing the browser, applies a curse to the character. The save reverts to the last bonfire. All progress since then is lost, and every enemy in the dungeon permanently gains a <span style="color:#e07070;">×1.1 stat multiplier</span> on all stats (XP excluded). Curses stack multiplicatively: two curses means x1.21, ten means x2.59, fifty means x117x. There is no cap.</div>
-      <div class="changelog-para">Each curse stack requires killing <span style="color:#e07070;">100 enemies</span> to remove one stack.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Save system reworked. One slot per character, auto-saves at bonfires.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Dying permanently deletes the save.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>The Curse — leaving from an unsafe zone applies a stacking enemy buff. 100 kills removes one stack.</div>
     </div>
 
     <div class="changelog-entry">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="changelog-title" style="margin-bottom:0;">v1.4.0 — Precision Math &amp; Systems Update</div>
-        <button onclick="event.stopPropagation(); toggleV019Detail(this)" style="font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--gold);color:var(--gold);cursor:pointer;flex-shrink:0;transition:all .15s;" title="Show technical details">+</button>
-      </div>
+      <div class="changelog-title">v1.4.0 — Precision Math &amp; Systems Update</div>
       <div class="changelog-date">2026-03-10</div>
-      <div id="v019-detail-panel" style="display:none;background:var(--bg2);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;">
-        <div class="changelog-sub">Arbitrary Precision Math (Decimal.js)</div>
-        <div class="changelog-para">Added Decimal.js 10.4.3 for infinite stat scaling. All player and enemy stats (hp, str, con, dex, def, regen, xp, etc.) converted from native JS numbers to Decimal objects. calcDmg, calcDef, calcRegen, gainXP, doAttackEnemy, and rat bite damage all rewritten to use Decimal arithmetic. Save format bumped to version 2.</div>
-        <ul class="changelog-ul">
-          <li><strong>D(x)</strong> — convert anything to a Decimal</li>
-          <li><strong>Dn(x)</strong> — convert Decimal to native number (rendering only)</li>
-          <li><strong>Dfmt(x)</strong> — format a Decimal as a compact human-readable string</li>
-          <li><strong>Dser/Ddes</strong> — serialize/deserialize Decimals for save data</li>
-        </ul>
-      </div>
       <hr class="changelog-divider">
-      <div class="changelog-sub">Arbitrary Precision Scaling &amp; Inventory system</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> All stats now use arbitrary-precision math under the hood, enabling numbers to scale infinitely without floating-point errors.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Replaced slot-based inventory with a weight (kg) carry system. Base capacity: 20 kg; STR adds +0.5 kg per point.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> New allocatable stat: END (Endurance). Determines Stamina, Stamina Recovery and Overweight penalties.</div>
-      <div class="changelog-para"><span class="changelog-tag new">NEW</span> New resource: Stamina. Drains when overweight, regens passively otherwise. Reserved for active skills.</div>
-      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Class cards redesign.</div>
-      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Base DMG shows the weapon's raw base value. DMG shows the stat-scaled damage for your current build. Hovering EQUIP live-updates DMG to show what you'd deal with the weapon equipped, with a green/red delta. Hovering UNEQUIP shows what damage would revert to (unarmed).</div>
-      <hr class="changelog-divider">
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>All stats use arbitrary-precision math, enabling infinite scaling.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Weight-based carry system. STR increases carry limit.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>New stat: END. Controls Stamina and overweight penalties.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>New resource: Stamina. Drains when overweight, regens otherwise.</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span>Class cards redesigned.</div>
     </div>
 
     <div class="changelog-entry">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="changelog-title" style="margin-bottom:0;">v1.3.0 — Dynamic Combat</div>
-        <button onclick="event.stopPropagation(); toggleAPDetail(this)" style="font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--gold);color:var(--gold);cursor:pointer;flex-shrink:0;transition:all .15s;" title="Show AP system details">+</button>
-      </div>
+      <div class="changelog-title">v1.3.0 — Dynamic Combat</div>
       <div class="changelog-date">2026-03-09</div>
-      <!-- AP Detail Panel (hidden by default) -->
-      <div id="ap-detail-panel" style="display:none;background:var(--bg2);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;">
-        <div class="changelog-sub">Overview</div>
-        <div class="changelog-para">Each entity has a separate, invisible action counter. Every turn cycle, the counter increases by that entity's <strong>rate</strong> (default: 1). The accumulated value is how many action points (AP) the entity has to spend that turn. Spending 1 AP performs one action — move, attack, wait, etc. Leftover fractional AP carries over to the next turn.</div>
-
-        <div class="changelog-sub">Action Costs (Current)</div>
-        <table class="changelog-table">
-          <thead><tr><th>Action</th><th>AP Cost</th></tr></thead>
-          <tbody>
-            <tr><td>Move</td><td class="cv">1</td></tr>
-            <tr><td>Attack (player)</td><td class="cv">1</td></tr>
-            <tr><td>Wait</td><td class="cv">1</td></tr>
-            <tr><td>Telegraph - rat targets a tile</td><td class="cv">1</td></tr>
-            <tr><td>Bite - rat attacks targeted tile</td><td class="cv">1</td></tr>
-          </tbody>
-        </table>
-
-        <div class="changelog-sub">Targeting &amp; Attacking</div>
-        <div class="changelog-para">When a rat is adjacent to the player it enters a two-phase attack. Phase 1 - Targeting/Telegraph: costs 1 AP, the rat locks onto the player's current tile. A red X and red border appear on that tile. Phase 2 - Attacking: costs 1 AP on the following turn, the rat strikes that exact tile regardless of whether the player is still on it..</div>
-
-        <div class="changelog-sub">Turn Order Within a Turn</div>
-        <div class="changelog-para">Entities with the most AP act first. The <strong>player always wins ties against enemies</strong> — if the player and an enemy have identical AP, the player goes first. Among enemies tied with each other, the order is <strong>random</strong>. This is intentional: the dungeon is chaotic and unforgiving. Even when you've read the situation perfectly, a tied pack of enemies can resolve in any order.</div>
-
-        <div class="changelog-sub">Tiebreaker - Player vs Enemy</div>
-        <div class="changelog-para">Player always wins. At rate 1:1 the sequence is always P→E, never E→P. The player's agency is preserved — you always get to act before an equally-fast enemy.</div>
-
-        <div class="changelog-sub">Tiebreaker - Enemy vs Enemy (Random)</div>
-        <div class="changelog-para">When two or more enemies have identical AP and both outrank the player, one is chosen at random to act. This means the same scenario can play out differently each time. Examples below use R (random pick) to indicate the nondetermistic slot.</div>
-
-        <div class="changelog-sub">Example - 3 enemies all rate 1, player rate 1</div>
-        <div class="changelog-para">All start with 1 AP. Player wins the 4-way tie. After player acts, E1/E2/E3 are all tied at 1 — order among them is random each turn.</div>
-        <ul class="changelog-ul">
-          <li>P (wins tie) → R[E1|E2|E3] → R[remaining two] → R[last one]</li>
-          <li>e.g. Turn 1: P→E2→E1→E3. Turn 2: P→E3→E2→E1. Turn 3: P→E1→E3→E2.</li>
-        </ul>
-
-        <div class="changelog-sub">Example - 2 enemies both rate 2, player rate 1</div>
-        <div class="changelog-para">E1 and E2 start with 2 AP each, player has 1. Both enemies beat the player (2 &gt; 1), tied with each other — random pick.</div>
-        <ul class="changelog-ul">
-          <li>R[E1|E2] (2 AP) → R[other] (2 AP) → P (1 AP) → no AP left</li>
-          <li>Order is always E→E→P, but which E goes first is random.</li>
-        </ul>
-
-        <div class="changelog-sub">Example - P rate 1, E1 rate 1, E2 rate 1.5, E3 rate 2</div>
-        <div class="changelog-para"><strong>Turn 1:</strong> P:1, E1:1, E2:1.5, E3:2</div>
-        <ul class="changelog-ul">
-          <li>E3 (2) - alone at top, no tie → E3 acts → E3:1</li>
-          <li>E2 (1.5) - alone at top → E2 acts → E2:0.5</li>
-          <li>P (1) ties E1 (1) - player wins → P acts → P:0</li>
-          <li>E1 (1) - acts → E1:0</li>
-          <li>E2 (0.5) - below cost threshold, done</li>
-        </ul>
-        <div class="changelog-para">Turn 1 order: <strong>E3 → E2 → P → E1</strong> (deterministic, no ties among enemies this turn)</div>
-
-        <div class="changelog-para"><strong>Turn 2:</strong> P:0+1=1, E1:0+1=1, E2:0.5+1.5=2, E3:0+2=2</div>
-        <ul class="changelog-ul">
-          <li>E2 (2) ties E3 (2) - random pick between them</li>
-          <li>R[E2|E3] acts → winner: 1 AP left</li>
-          <li>Other of E2/E3 (2) - now alone at top → acts → 1 AP left</li>
-          <li>P (1) ties E1 (1) ties the remaining E2/E3 (1) - player wins → P acts → P:0</li>
-          <li>E1 (1) ties remaining enemies (1) - random pick among them</li>
-          <li>Remaining acts in random order until all at 0</li>
-        </ul>
-        <div class="changelog-para">Turn 2 order: <strong>R[E2|E3] → R[other] → P → R[E1, E2, E3 in random order]</strong></div>
-        <div class="changelog-para">Possible Turn 2 sequences: E2→E3→P→E1→E2→E3 or E3→E2→P→E3→E1→E2 or E2→E3→P→E3→E2→E1 ... and so on. The first two slots and the last three are independently randomized among their tied groups.</div>
-
-        <div class="changelog-sub">Example - 3 enemies all rate 2, player rate 1</div>
-        <div class="changelog-para">P:1, E1:2, E2:2, E3:2. All three enemies beat the player (2 &gt; 1), all tied with each other.</div>
-        <ul class="changelog-ul">
-          <li>Random pick among E1/E2/E3 → acts → 1 AP left</li>
-          <li>Remaining two still tied at 2 → random pick → acts → 1 AP left</li>
-          <li>Last enemy (2) alone → acts → 1 AP left</li>
-          <li>P (1) now ties all three enemies at 1 - player wins → P acts → P:0</li>
-          <li>Three enemies all at 1 - random order for remaining three actions</li>
-        </ul>
-        <div class="changelog-para">Pattern: <strong>R→R→E→P→R→R→R</strong> where R is random among the tied pool. Six enemy actions, one player action.</div>
-
-        <div class="changelog-note">The randomness only applies to ties between enemies. The player always wins ties with enemies, and an enemy with strictly more AP than all others always goes first with no randomness involved.</div>
-
-        <div class="changelog-sub">Scenario - Rate 1 vs Rate 1</div>
-        <div class="changelog-para">Both player and rat start each turn with 1 AP.</div>
-        <div class="changelog-para"><strong>Turn 1:</strong> Player attacks rat (-1 AP). Rat telegraphs player's tile (-1 AP). Both at 0 AP. End of turn.</div>
-        <div class="changelog-para"><strong>Turn 2:</strong> Player moves off the marked tile (-1 AP). Rat bites the now-empty tile (-1 AP). End of turn. Attack missed.</div>
-
-        <div class="changelog-sub">Scenario - Rate 2 vs Rate 2</div>
-        <div class="changelog-para">Both start with 2 AP. Actions interleave one at a time:</div>
-        <ul class="changelog-ul">
-          <li>Player acts (1 AP left)</li>
-          <li>Enemy acts (1 AP left)</li>
-          <li>Player acts (0 AP left)</li>
-          <li>Enemy acts (0 AP left)</li>
-        </ul>
-
-        <div class="changelog-sub">Scenario - Player rate 2, Enemy rate 4</div>
-        <ul class="changelog-ul">
-          <li>Enemy acts</li>
-          <li>Enemy acts</li>
-          <li>Player acts</li>
-          <li>Enemy acts</li>
-          <li>Enemy acts</li>
-          <li>Player acts</li>
-        </ul>
-
-        <div class="changelog-sub">Scenario - Player rate 1.5, Enemy rate 1 (multi-turn carry-over)</div>
-        <div class="changelog-para"><strong>Turn 1:</strong> Player has 1.5 AP (spends 1, 0.5 left). Rat has 1 AP (spends 1, 0 left). No valid moves remain. End of turn.</div>
-        <div class="changelog-para"><strong>Turn 2:</strong> Player: 0.5 carried + 1.5 rate = 2 AP. Rat: 0 + 1 = 1 AP. Player acts twice, then rat acts once.</div>
-
-        <div class="changelog-sub">Action Order - Whole-Number Rate Reference</div>
-        <table class="changelog-table">
-          <thead><tr><th>Player rate</th><th>Enemy rate</th><th>Order within one turn</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>1</td><td class="cv">P → E</td></tr>
-            <tr><td>2</td><td>1</td><td class="cv">P → P → E</td></tr>
-            <tr><td>1</td><td>2</td><td class="cv">E → E → P</td></tr>
-            <tr><td>2</td><td>2</td><td class="cv">P → E → P → E</td></tr>
-            <tr><td>3</td><td>1</td><td class="cv">P → P → P → E</td></tr>
-            <tr><td>1</td><td>3</td><td class="cv">E → E → E → P</td></tr>
-            <tr><td>3</td><td>2</td><td class="cv">P → P → E → P → E</td></tr>
-            <tr><td>7</td><td>5</td><td class="cv">P → P → E → P → P → E → P → E → P → E → P → E</td></tr>
-            <tr><td>10</td><td>5</td><td class="cv">P → P → E → P → P → E → P → P → E → P → P → E → P → P → E</td></tr>
-            <tr><td>5</td><td>6</td><td class="cv">E → E → P → E → P → E → P → E → P → E → P</td></tr>
-          </tbody>
-        </table>
-
-        <div class="changelog-sub">Scenario: Telegraph 0.25 AP, Bite 1 AP; Player rate 1, Enemy rate 1.25</div>
-        <div class="changelog-para">Player starts with 1 AP, enemy with 1.25 AP.</div>
-        <ul class="changelog-ul">
-          <li>Enemy telegraphs (-0.25 AP → 1 left)</li>
-          <li>Enemy bites (-1 AP → 0 left)</li>
-          <li>Player moves (-1 AP → 0 left)</li>
-        </ul>
-        <div class="changelog-para">Enemy targeted and attacked in the same turn because 1.25 AP covered both costs (0.25 + 1.00).</div>
-
-        <div class="changelog-sub">Scenario: Telegraph 0.25, Bite 1; Player rate 1, Enemy rate 1.5</div>
-        <div class="changelog-para">Player: 1 AP. Enemy: 1.5 AP.</div>
-        <ul class="changelog-ul">
-          <li>Enemy telegraphs (-0.25 → 1.25 left)</li>
-          <li>Enemy bites (-1 → 0.25 left)</li>
-          <li>Enemy telegraphs (-0.25 → 0 left)</li>
-          <li>Player moves (-1 → 0 left)</li>
-        </ul>
-        <div class="changelog-para">Simulates enemy:player 3:1 - enemy acts three times before the player acts once.</div>
-
-        <div class="changelog-sub">Scenario: Telegraph 0.5, Bite 0.75; Enemy rate 1.5 (multi-turn)</div>
-        <div class="changelog-para"><strong>Turn 1:</strong> Enemy: 1.5 AP. Player: 1 AP.</div>
-        <ul class="changelog-ul">
-          <li>Enemy telegraphs (-0.5 → 1 left)</li>
-          <li>Enemy bites (-0.75 → 0.25 left)</li>
-          <li>No valid enemy action (needs 0.5 for telegraph, only 0.25 left)</li>
-          <li>Player moves (-1 → 0 left)</li>
-        </ul>
-        <div class="changelog-para"><strong>Turn 2:</strong> Enemy: 0.25 carried + 1.5 = 1.75 AP. Player: 1 AP.</div>
-        <ul class="changelog-ul">
-          <li>Enemy telegraphs (-0.5 → 1.25 left)</li>
-          <li>Enemy bites (-0.75 → 0.5 left)</li>
-          <li>Enemy telegraphs (-0.5 → 0 left)</li>
-          <li>Player moves (-1 → 0 left)</li>
-        </ul>
-        <div class="changelog-para"><strong>Turn 3:</strong> Enemy: 0 + 1.5 = 1.5 AP. Player: 1 AP.</div>
-        <ul class="changelog-ul">
-          <li>Enemy bites (-0.75 → 0.75 left) - note: bite is cheaper than telegraph here, fires first</li>
-          <li>Enemy telegraphs (-0.5 → 0.25 left)</li>
-          <li>No valid enemy action</li>
-          <li>Player moves (-1 → 0 left)</li>
-        </ul>
-
-        <div class="changelog-sub">Scenario: Telegraph 0.25, Bite 0.75; Player rate 2, Enemy rate 4</div>
-        <div class="changelog-para">Player: 2 AP. Enemy: 4 AP.</div>
-        <ul class="changelog-ul">
-          <li>Enemy telegraphs (-0.25 → 3.75 left)</li>
-          <li>Enemy bites (-0.75 → 3 left)</li>
-          <li>Player moves (-1 → 1 left)</li>
-          <li>Enemy telegraphs (-0.25 → 2.75 left)</li>
-          <li>Enemy bites (-0.75 → 2 left)</li>
-          <li>Player moves (-1 → 0 left)</li>
-        </ul>
-        <div class="changelog-para">Simulates enemy:player 4:2 - enemy → enemy → player → enemy → enemy → player.</div>
-
-        <div class="changelog-note">Rates can be any decimal value (1.5, 2.75, 9.9999). The system naturally handles all combinations through AP accumulation and carry-over, without special-casing any ratio.</div>
-      </div>
       <hr class="changelog-divider">
-      <div class="changelog-sub">Action Point System <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Every entity has a separate, invisible action counter. Each time the player acts, every entity gains AP equal to their <strong>rate</strong> (default: 1). Actions are resolved by a priority queue — whoever has the most AP acts next, with the player winning ties against enemies. When multiple enemies are tied with each other, the order among them is random. After each action, AP is spent and the queue re-evaluates. Leftover fractional AP carries over to the next cycle.</div>
-      <div class="changelog-para">The priority queue naturally produces the correct action order for any rate ratio - P→P→E at 2:1, E→E→P at 1:2, P→P→E→P→E at 3:2, and so on. No special-casing, the pattern emerges from the math. Rates can be any decimal; a rate of 1.5 gives 1 action on odd turns and 2 on even turns, averaging out over time. The random enemy tiebreaker is intentional — the dungeon is chaotic and unforgiving, not polite.</div>
-      <div class="changelog-para">Multiple enemies each compete independently by their own AP. All actions cost 1 AP currently - constants are in place for future per-action tuning (e.g. telegraph at 0.25, bite at 0.75).</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Telegraph &amp; Bite <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">Rats no longer deal instant damage when adjacent. Instead they spend 1 AP to enter a telegraph phase, locking onto the tile the player currently occupies and showing a pulsing red X with a red border. On their next AP slot the rat spends 1 AP to attack that exact tile.</div>
-      <hr class="changelog-divider">
-      <div class="changelog-sub">Visual Feedback <span class="changelog-tag new">NEW</span></div>
-      <div class="changelog-para">A white slash appears on any attacked tile. Waiting (SPACE on an empty tile) now shows a <em>...</em> float above the player.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Action Point (AP) system. Entities act based on accumulated AP, enabling variable speed.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Rat two-phase attack: telegraph then bite.</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span>Slash and wait visual feedback.</div>
     </div>
 
     <div class="changelog-entry">
