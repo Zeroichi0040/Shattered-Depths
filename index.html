@@ -51,7 +51,7 @@
   .play-slots-col{flex:1;padding:18px;overflow-y:auto;border-right:1px solid var(--border);display:flex;flex-wrap:wrap;align-content:flex-start;gap:12px;}
   .play-slots-col::-webkit-scrollbar{width:3px;}
   .play-slots-col::-webkit-scrollbar-thumb{background:var(--border);}
-  .play-detail-col{width:260px;flex-shrink:0;padding:22px 20px;display:flex;flex-direction:column;}
+  .play-detail-col{width:260px;flex-shrink:0;padding:22px 20px;display:flex;flex-direction:column;overflow-y:auto;}
   .play-slot-card{width:100px;height:100px;border:2px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .15s;position:relative;}
   .play-slot-card:hover,.play-slot-card.selected{border-color:var(--gold);box-shadow:0 0 14px #c8a84b33;}
   .play-slot-card .slot-icon{font-size:26px;}
@@ -236,7 +236,7 @@
 
   /* GAME */
   #game-screen{flex-direction:row;align-items:stretch;height:100vh;width:100vw;}
-  #left-panel{width:190px;min-width:190px;background:var(--panel);border-right:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  #left-panel{width:190px;min-width:190px;background:var(--panel);border-right:2px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
   .panel-body{flex:1;padding:10px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
   .panel-body::-webkit-scrollbar{width:3px;}
   .panel-body::-webkit-scrollbar-thumb{background:var(--border);}
@@ -599,6 +599,51 @@
   #import-paste-area textarea:focus{border-color:var(--blue);}
   #import-paste-area .import-btns{display:flex;gap:8px;margin-top:6px;justify-content:flex-end;}
 
+
+  /* ── Encyclopedia ─────────────────────────────────────────────── */
+  #encyclopedia-screen{flex-direction:column;align-items:center;background:radial-gradient(ellipse at center,#1a1a30 0%,#05050f 70%);padding:28px 20px;}
+  .enc-menu{display:flex;flex-direction:column;gap:10px;width:min(480px,92vw);margin-top:8px;}
+  .enc-menu-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:16px 22px;background:var(--bg2);border:1px solid var(--border);color:var(--text);cursor:pointer;text-align:left;letter-spacing:1px;transition:all .12s;width:100%;}
+  .enc-menu-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,168,75,.06);}
+  .enc-section{display:none;flex-direction:column;width:min(680px,96vw);max-height:78vh;overflow-y:auto;}
+  .enc-section.active{display:flex;}
+  .enc-section::-webkit-scrollbar{width:3px;}
+  .enc-section::-webkit-scrollbar-thumb{background:var(--border);}
+  .enc-back{font-family:'Press Start 2P',monospace;font-size:7px;padding:7px 14px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;margin-bottom:14px;align-self:flex-start;transition:all .12s;}
+  .enc-back:hover{border-color:var(--gold);color:var(--gold);}
+  .enc-entry{background:var(--bg2);border:1px solid var(--border);padding:14px 16px;margin-bottom:8px;}
+  .enc-entry-name{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gold);margin-bottom:6px;}
+  .enc-entry-tag{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);letter-spacing:1px;margin-bottom:8px;}
+  .enc-entry-desc{font-size:16px;color:var(--text);line-height:1.55;margin-bottom:8px;}
+  .enc-entry-row{display:flex;justify-content:space-between;font-size:15px;padding:2px 0;border-bottom:1px solid rgba(42,42,64,.5);}
+  .enc-entry-row:last-child{border-bottom:none;}
+  .enc-entry-row .el{color:var(--dim);}
+  .enc-entry-row .ev{color:var(--text);}
+  .enc-entry-row .ev.good{color:var(--green);}
+  .enc-entry-row .ev.gold{color:var(--gold2);}
+
+  /* ── Encyclopedia stat cards ───── */
+  .enc-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:4px 0;}
+  .enc-card{width:160px;border:1px solid var(--border);background:var(--panel);padding:14px 12px;cursor:pointer;transition:all .15s;position:relative;}
+  .enc-card:hover{border-color:var(--gold);box-shadow:0 0 12px #c8a84b22;}
+  .enc-card-icon{font-size:28px;margin-bottom:8px;}
+  .enc-card-name{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);margin-bottom:4px;letter-spacing:1px;}
+  .enc-card-tag{font-size:12px;color:var(--dim);margin-bottom:6px;}
+  .enc-card-short{font-size:14px;color:var(--text);line-height:1.4;}
+  .enc-card-plus{position:absolute;top:6px;right:6px;font-family:'Press Start 2P',monospace;font-size:9px;width:20px;height:20px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0;}
+  .enc-card-plus:hover{border-color:var(--gold);color:var(--gold);}
+  /* Detail modal */
+  #enc-detail-modal .modal-box{width:min(480px,94vw);max-height:82vh;overflow-y:auto;}
+  .enc-det-title{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--gold);margin-bottom:4px;}
+  .enc-det-tag{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--dim);letter-spacing:1px;margin-bottom:14px;}
+  .enc-det-desc{font-size:16px;color:var(--text);line-height:1.6;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .enc-det-sub{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold2);letter-spacing:1px;margin:12px 0 6px;}
+  .enc-det-row{display:flex;justify-content:space-between;font-size:16px;padding:3px 0;border-bottom:1px solid rgba(42,42,64,.4);}
+  .enc-det-row:last-child{border-bottom:none;}
+  .enc-det-row .el{color:var(--dim);}
+  .enc-det-row .ev{color:var(--text);}
+  .enc-det-row .ev.good{color:var(--green);}
+  .enc-det-row .ev.gold{color:var(--gold2);}
 </style>
 </head>
 <!-- Arbitrary precision math for infinite stat scaling -->
@@ -613,7 +658,7 @@
     <div class="title-menu">
       <button class="title-menu-btn" onclick="showScreen('play-screen');renderPlaySlots()">PLAY</button>
       <button class="title-menu-btn" onclick="showComingSoon(event)">UPGRADES</button>
-      <button class="title-menu-btn" onclick="showComingSoon(event)">ENCYCLOPEDIA</button>
+      <button class="title-menu-btn" onclick="showEncyclopedia()">ENCYCLOPEDIA</button>
       <button class="title-menu-btn" onclick="showScreen('menu-settings-screen')">SETTINGS</button>
       <button class="title-menu-btn" onclick="showScreen('changelog-screen')">CHANGELOGS</button>
       <div class="title-separator"></div>
@@ -724,7 +769,7 @@
     <div class="modal-title" style="color:#c04040;text-shadow:0 0 12px #c0404088;">UNSAFE ZONE</div>
     <div style="font-size:15px;color:var(--dim);margin-bottom:10px;line-height:1.6;">You are not in a safe zone.<br>Leaving now will <span style="color:#e07070;">curse your run</span>.</div>
     <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#e07070;margin-bottom:6px;letter-spacing:1px;">PUNISHMENT</div>
-    <div style="font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.6;">All enemies permanently gain <span style="color:#e07070;">×1.1</span> to all stats.<br>Curses stack. Only blood can lift them.</div>
+    <div style="font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.6;">All enemies permanently gain <span style="color:#e07070;">x1.1</span> to all stats.<br>Curses stack. Only blood can lift them.</div>
     <div id="curse-warn-current" style="font-size:13px;color:var(--dim);margin-bottom:18px;font-style:italic;"></div>
     <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--dim);margin-bottom:22px;">Your progress since the last bonfire will be lost.</div>
     <div style="display:flex;gap:10px;justify-content:center;">
@@ -1126,6 +1171,95 @@
     <button class="btn" onclick="showClassSelect()">NEXT</button>
   </div>
 </div>
+
+<!-- ENCYCLOPEDIA -->
+<div class="screen" id="encyclopedia-screen">
+  <div class="screen-title" style="margin-bottom:4px;">ENCYCLOPEDIA</div>
+
+  <!-- Main menu -->
+  <div class="enc-menu" id="enc-menu">
+    <button class="enc-menu-btn" onclick="encOpenSection('stats')">CHARACTER STATS</button>
+    <button class="enc-menu-btn" onclick="showComingSoon(event)">GEAR</button>
+    <button class="enc-menu-btn" onclick="showComingSoon(event)">ENEMIES</button>
+    <button class="enc-menu-btn" onclick="showComingSoon(event)">MECHANICS</button>
+    <button class="btn sm secondary" style="margin-top:8px;" onclick="encBack()">BACK</button>
+  </div>
+
+  <!-- CHARACTER STATS section -->
+  <div class="enc-section" id="enc-sec-stats">
+    <button class="enc-back" onclick="encCloseSection()">BACK</button>
+    <div class="enc-cards">
+
+      <div class="enc-card" onclick="encShowDetail('con')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('con')">+</button>
+        <div class="enc-card-name">CON</div>
+        <div class="enc-card-tag">CORE · ALLOCATABLE</div>
+        <div class="enc-card-short">Durability. Determines your maximum HP.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('str')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('str')">+</button>
+        <div class="enc-card-name">STR</div>
+        <div class="enc-card-tag">CORE · ALLOCATABLE</div>
+        <div class="enc-card-short">Power. Determines damage and carry capacity.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('dex')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('dex')">+</button>
+        <div class="enc-card-name">DEX</div>
+        <div class="enc-card-tag">CORE · ALLOCATABLE</div>
+        <div class="enc-card-short">Speed. Determines AP gain and damage.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('end')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('end')">+</button>
+        <div class="enc-card-name">END</div>
+        <div class="enc-card-tag">CORE · LEVEL-UP ONLY</div>
+        <div class="enc-card-short">Endurance. Determines stamina pool and recovery.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('def')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('def')">+</button>
+        <div class="enc-card-name">DEF</div>
+        <div class="enc-card-tag">DERIVED · FROM CON</div>
+        <div class="enc-card-short">Defense. Subtracts physical damage from every hit.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('regen')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('regen')">+</button>
+        <div class="enc-card-name">REGEN</div>
+        <div class="enc-card-tag">DERIVED · FROM CON</div>
+        <div class="enc-card-short">Regeneration. Passively restores HP each turn.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('apgain')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('apgain')">+</button>
+        <div class="enc-card-name">AP GAIN</div>
+        <div class="enc-card-tag">DERIVED · FROM DEX</div>
+        <div class="enc-card-short">Action speed. How much AP you gain per turn cycle.</div>
+      </div>
+
+      <div class="enc-card" onclick="encShowDetail('stamina')">
+        <button class="enc-card-plus" onclick="event.stopPropagation();encShowDetail('stamina')">+</button>
+        <div class="enc-card-name">STAMINA</div>
+        <div class="enc-card-tag">RESOURCE · FROM END</div>
+        <div class="enc-card-short">Energy reserve. Drains when overweight.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ENCYCLOPEDIA DETAIL MODAL -->
+<div class="modal-overlay" id="enc-detail-modal" onclick="if(event.target===this)encCloseDetail()">
+  <div class="modal-box">
+    <div id="enc-det-inner"></div>
+    <div style="text-align:center;margin-top:18px;">
+      <button class="btn sm secondary" onclick="encCloseDetail()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- GAME SCREEN -->
 <div class="screen" id="game-screen">
@@ -1598,7 +1732,7 @@ function openClassDetail(cls){
   const t = CLASS_TEMPLATES[cls];
   const w = WEAPON_DEFS[info.weapon];
   const wDmgBase = w ? `Base DMG ${w.base}` : '';
-  const wScaling = w ? `STR ×${w.str.toFixed(2)} · DEX ×${w.dex.toFixed(2)}` : '';
+  const wScaling = w ? `STR x${w.str.toFixed(2)} · DEX x${w.dex.toFixed(2)}` : '';
   document.getElementById('class-detail-inner').innerHTML = `
     <div class="class-detail-title">${cls.toUpperCase()}</div>
     <div class="class-detail-desc">${info.fullDesc}</div>
@@ -1610,7 +1744,7 @@ function openClassDetail(cls){
       <div class="class-detail-gear-icon">${w?w.icon:''}</div>
       <div class="class-detail-gear-info">
         <div class="class-detail-gear-name">${w?w.name:''}</div>
-        <div class="class-detail-gear-meta">${w?w.subcategory:''} · ${w?w.kg+' kg':''} · ${wDmgBase} · ${w?'DEX ×'+w.dex.toFixed(2):''}</div>
+        <div class="class-detail-gear-meta">${w?w.subcategory:''} · ${w?w.kg+' kg':''} · ${wDmgBase} · ${w?'DEX x'+w.dex.toFixed(2):''}</div>
       </div>
     </div>`;
   document.getElementById('class-detail-modal').classList.add('active');
@@ -1957,7 +2091,7 @@ function startGame(){
     // ground items: array of {item, x, y}
     groundItems: [],
     // dev tools flags — reset every new run
-    devNoFog: false, devNoWake: false, devAlwaysNav: false, devGod: false, devUnlocked: false,
+    devNoFog: false, devNoWake: false, devAlwaysNav: false, devGod: false, devUnlocked: false, devAPRate: false,
   };
 
   // Starting weapon goes directly into equipment, NOT into inventory
@@ -2011,9 +2145,8 @@ function startGame(){
   addLog('You descend into the dungeon.', 'info');
   addLog('Dire rats scurry in the darkness.', 'info');
   if (G.unspentPoints > 0) addLog(`${G.unspentPoints} unspent stat points — see CHAR tab!`, 'level');
-  // Auto-save new character immediately
+  // Save slot assigned but not written until first bonfire
   _activeSaveSlot = null;
-  saveGameNew();
 }
 
 function depthLabel(){
@@ -2276,7 +2409,7 @@ function _ratDealBite(enemy){
     let dmg = baseDmg.plus(roll);
     if(dmg.lt('0.1')) dmg = D('0.1');
     const def = D(G.def||0);
-    dmg = dmg.times(D(1).minus(def.div(def.plus(10))));
+    dmg = dmg.minus(def);
     if(dmg.lt('0.1')) dmg = D('0.1');
     if(!G.devGod){ G.hp = G.hp.minus(dmg); if(G.hp.lt(0)) G.hp = D(0); }
     const dmgStr = Dfmt(dmg);
@@ -2473,12 +2606,14 @@ function enemyTurn(){
           if(drain.gt(0)){
             G.stamina = D(G.stamina).minus(drain);
             if(D(G.stamina).lt(0)) G.stamina = D(0);
-            const pen = calcOverweightAPRatePenalty(carried, limit);
-            G.player.apRate = Math.max(0.4, parseFloat((calcAPRate(G.dex) - pen).toFixed(4)));
+            if(!G.devAPRate){
+              const pen = calcOverweightAPRatePenalty(carried, limit);
+              G.player.apRate = Math.max(0.4, parseFloat((calcAPRate(G.dex) - pen).toFixed(4)));
+            }
           } else {
             G.stamina = D(G.stamina).plus(regen);
             if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
-            G.player.apRate = calcAPRate(G.dex);
+            if(!G.devAPRate) G.player.apRate = calcAPRate(G.dex);
           }
         })();
         // Grant AP to enemies
@@ -3348,7 +3483,7 @@ function doAttackEnemy(enemy){
         _autoSave();
         if(G.curseStacks > 0){
           const mult = _curseMultiplier(G.curseStacks);
-          addLog(`The curse weakens. Enemy power: ×${mult.toFixed(2)}`, 'info');
+          addLog(`The curse weakens. Enemy power: x${mult.toFixed(2)}`, 'info');
         } else {
           addLog(`The curse has been lifted!`, 'info');
           spawnFloat(G.player.x, G.player.y-0.5, 'CURSE LIFTED', '#e07070');
@@ -3947,15 +4082,6 @@ function renderCharTab(){ }
 
 function updateHUD(){
   if (!G.maxHP) return;
-  // Keep apRate in sync with current DEX (only if not overweight — endTurn handles the penalty)
-  if(G.player && G.dex && G.equipment){
-    try{
-      const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
-      if(!calcStaminaDrain(carried, limit).gt(0)){
-        G.player.apRate = calcAPRate(G.dex);
-      }
-    }catch(e){}
-  }
   const hpD = D(G.hp), maxHPD = D(G.maxHP);
   const hpPct = hpD.lt(0) ? 0 : Dn(hpD.div(maxHPD).times(100));
   document.getElementById('hp-text').textContent  =`${Dfmt(hpD.lt(0)?D(0):hpD)}/${Dfmt(maxHPD)}`;
@@ -3971,7 +4097,6 @@ function updateHUD(){
   const xpPct = D(G.xpNeeded).gt(0) ? Math.min(100, Dn(D(G.xp).div(G.xpNeeded).times(100))) : 0;
   document.getElementById('xp-bar').style.width   =`${xpPct}%`;
   document.getElementById('level-badge').textContent=`LVL ${Dfmt(G.level)}`;
-  G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
   document.getElementById('stat-dmg').textContent = Dfmt(G.baseDmg);
   document.getElementById('stat-maxhp').textContent=Dfmt(G.maxHP);
   document.getElementById('stat-def').textContent  =Dfmt(G.def||D(0));
@@ -4363,7 +4488,7 @@ function invRenderGrid(){
     const cell=document.createElement('div');
     cell.className='icell has-item'+(invSelId===item.id?' sel':'');
     const kgBadge = item.kg != null ? `<span class="kgbadge">${item.kg}kg</span>` : '';
-    cell.innerHTML=item.icon+(item.stack?`<span class="sbadge">×${item.stack}</span>`:'')+kgBadge;
+    cell.innerHTML=item.icon+(item.stack?`<span class="sbadge">x${item.stack}</span>`:'')+kgBadge;
     cell.title=item.name;
     cell.addEventListener('click',()=>invSelect(item.id));
     wrap.appendChild(cell);
@@ -4393,8 +4518,8 @@ function invShowDetail(item){
       ${catLine}
       <div class="drow"><span class="dl">Weight</span><span class="dv">${w.kg} kg</span></div>
       <div class="drow"><span class="dl">Base DMG</span><span class="dv pos">${w.base}</span></div>
-      <div class="drow"><span class="dl">STR ×</span><span class="dv">${w.str.toFixed(2)}</span></div>
-      <div class="drow"><span class="dl">DEX ×</span><span class="dv">${w.dex.toFixed(2)}</span></div>
+      <div class="drow"><span class="dl">STR x</span><span class="dv">${w.str.toFixed(2)}</span></div>
+      <div class="drow"><span class="dl">DEX x</span><span class="dv">${w.dex.toFixed(2)}</span></div>
       <div class="drow" style="border-top:1px solid var(--border);margin-top:3px;padding-top:3px;">
         <span class="dl">DMG</span><span class="dv pos" id="det-dmg-val">${scaledDmg}</span><span class="dv" id="det-dmg-delta" style="margin-left:4px;font-size:9px"></span>
       </div>
@@ -4403,7 +4528,7 @@ function invShowDetail(item){
   if (item.type==='consumable'){
     statsHTML=`<div class="dsec"><div class="dsec-t">EFFECT</div>
       ${item.effectVal?`<div class="drow"><span class="dl">HEAL</span><span class="dv pos">+${item.effectVal} HP</span></div>`:''}
-      ${item.stack?`<div class="drow"><span class="dl">STACK</span><span class="dv">×${item.stack}</span></div>`:''}
+      ${item.stack?`<div class="drow"><span class="dl">STACK</span><span class="dv">x${item.stack}</span></div>`:''}
     </div>`;
   }
   const bonusKeys=Object.keys(item.bonuses||{}).filter(k=>item.bonuses[k]!==0);
@@ -4473,9 +4598,9 @@ function invBuildActs(item){
   const b=[];
   // Item is in inventory (not equipped) → show equip button
   const inInventory = G.inventory.find(i => i.id === item.id);
-  if (inInventory && item.eslot && !item.equipped) b.push(`<button class="dact eq" onclick="invEquipItem(${item.id})">▶ EQUIP</button>`);
-  if (item.equipped) b.push(`<button class="dact uneq" onclick="invUnequipItem(${item.id})">◀ UNEQUIP</button>`);
-  if (item.type==='consumable') b.push(`<button class="dact eq" onclick="invUseItem(${item.id})">▶ USE</button>`);
+  if (inInventory && item.eslot && !item.equipped) b.push(`<button class="dact eq" onclick="invEquipItem(${item.id})">EQUIP</button>`);
+  if (item.equipped) b.push(`<button class="dact uneq" onclick="invUnequipItem(${item.id})">UNEQUIP</button>`);
+  if (item.type==='consumable') b.push(`<button class="dact eq" onclick="invUseItem(${item.id})">USE</button>`);
   // Drop: works for both inventory items and equipped items
   b.push(`<button class="dact drop" onclick="invDropItem(${item.id})">✕ DROP</button>`);
   return b.join('');
@@ -4697,7 +4822,7 @@ const _GAME_MENU_INNER_HTML = `
     <div class="modal-title">MENU</div>
     <button class="gmenu-btn" onclick="closeGameMenu();openInvFromMenu();">INVENTORY</button>
     <button class="gmenu-btn" onclick="closeGameMenu();openSettingsFromMenu();">SETTINGS</button>
-    <button class="gmenu-btn" onclick="showComingSoon(event);">ENCYCLOPEDIA</button>
+    <button class="gmenu-btn" onclick="showEncyclopedia();">ENCYCLOPEDIA</button>
     <hr style="border-color:var(--border);margin:10px 0 12px;">
     <button class="gmenu-btn danger" id="gmenu-quit-btn" onclick="_onQuitToTitle()">QUIT TO TITLE</button>`;
 function openGameMenu(){
@@ -4714,7 +4839,7 @@ document.getElementById('game-menu-modal').addEventListener('click',function(e){
 });
 
 // ==================== DEV TOOLS ====================
-const DT_CODE = 'ZeroIsTheBest';
+const DT_CODE = 'Zero';
 
 function _dtIsUnlocked(){ return !!(G && G.devUnlocked); }
 
@@ -4788,8 +4913,10 @@ function _dtNumRow(label, getVal, setVal, allowNeg){
   return `<div class="dt-row">
     <span class="dt-label">${label}</span>
     <div class="dt-ctrl">
-      <button class="dt-btn" onclick="_dtAdj('${id}',${allowNeg?-1:-1},${!!allowNeg})">−</button>
-      <input class="dt-val${getVal()===0?' zero':''}" id="${id}" type="text" value="${getVal()}" oninput="_dtInputChange('${id}')" onblur="_dtInputBlur('${id}')">
+      <button class="dt-btn" onclick="_dtAdj('${id}',-1,${!!allowNeg})">−</button>
+      <input class="dt-val${getVal()===0?' zero':''}" id="${id}" type="text" value="${getVal()}"
+        onblur="_dtInputBlur('${id}')"
+        onkeydown="if(event.key==='Enter'){_dtInputBlur('${id}');this.blur();}">
       <button class="dt-btn" onclick="_dtAdj('${id}',1,${!!allowNeg})">+</button>
     </div>
   </div>`;
@@ -4809,7 +4936,7 @@ function _dtInputChange(id){
 function _dtInputBlur(id){
   const el=document.getElementById(id); if(!el) return;
   let v; try{ v=D(el.value); }catch(e){ v=D(0); }
-  if(!v.isFinite()||v.isNaN()) v=D(0);
+  if(!v.isFinite()||v.isNaN()||v.lt(0)) v=D(0);
   el.value=v.toJSON(); el.classList.toggle('zero',v.eq(0));
   _dtApplyField(id, v);
 }
@@ -4817,7 +4944,7 @@ function _dtApplyField(id, v){
   if(!G||!G.player) return;
   const key = id.replace('dt-v-','').replace(/_/g,' ');
   switch(key){
-    case 'Level':
+    case 'Level': {
       const prev=D(G.level);
       if(D(v).gt(prev)){
         const diff=D(v).minus(prev);
@@ -4833,23 +4960,21 @@ function _dtApplyField(id, v){
       G.level=D(v); G.xp=D(0);
       document.getElementById('level-badge').textContent=`LVL ${Dfmt(G.level)}`;
       break;
+    }
     case 'CON': G.con=D(v); G.maxHP=D(v); G.hp=D(G.hp).gt(G.maxHP)?D(G.maxHP):D(G.hp); G.def=calcDef(D(v)); G.regen=calcRegen(D(v)); break;
     case 'STR': G.str=D(v); G.baseDmg=calcDmg(G.weaponType,D(v),G.dex); break;
     case 'DEX': G.dex=D(v); G.baseDmg=calcDmg(G.weaponType,G.str,D(v)); break;
     case 'END': { G.end=D(v); const ms=calcMaxStamina(D(v)); G.maxStamina=ms; if(D(G.stamina).gt(ms)) G.stamina=D(ms); break; }
-    case 'DEF': G.def=D(v); break;
-    case 'REGEN': G.regen=D(v); break;
     case 'Base DMG': G.baseDmg=D(v).lt('0.1')?D('0.1'):D(v); break;
-    case 'FOV Radius': SETTINGS.fovRadius=Math.max(1,D(v).toNumber()); computeFOV(); break;
-    case 'Player AP Gain': G.player.apRate=Math.max(0.1, parseFloat(D(v).toFixed(4))); break;
+    case 'Player AP Gain': G.player.apRate=Math.max(0.01, parseFloat(D(v).toFixed(4))); G.devAPRate=true; break;
     case 'Player AP': G.player.ap=Math.max(0, parseFloat(D(v).toFixed(6))); break;
   }
   updateHUD(); renderCanvas();
-  // Refresh any derived spinners that may have changed (DEF, REGEN, Base DMG, END)
-  const refresh = {'DEF': G.def, 'REGEN': G.regen, 'Base_DMG': G.baseDmg, 'END': G.end||D(10)};
+  // Refresh derived spinners after any change
+  const refresh = {'Base_DMG': G.baseDmg, 'END': G.end||D(10), 'Player_AP_Gain': G.player?.apRate||1, 'Player_AP': G.player?.ap||0};
   Object.entries(refresh).forEach(([k, val])=>{
     const el = document.getElementById('dt-v-'+k);
-    if(el) el.value = Dfmt(val);
+    if(el) el.value = typeof val === 'number' ? val : Dfmt(val);
   });
 }
 function _dtToggleRow(label, flag, onToggle){
@@ -4899,8 +5024,6 @@ function _showDevToolsPanel(){
     <div class="dt-section">AP SYSTEM</div>
     ${_dtNumRow('Player AP Gain', ()=>parseFloat((G.player.apRate||1).toFixed(4)), null, false)}
     ${_dtNumRow('Player AP', ()=>parseFloat((G.player.ap||0).toFixed(4)), null, false)}
-    <div class="dt-row"><span class="dt-label">Give Heavy Sword [TEST]</span>
-      <button class="dt-btn" style="width:auto;padding:0 10px;" onclick="_dtGiveHeavySword()">GIVE</button></div>
 
     <div class="dt-section">PROGRESSION</div>
     ${_dtNumRow('Level', ()=>Dfmt(G.level), null, false)}
@@ -4908,12 +5031,8 @@ function _showDevToolsPanel(){
     ${_dtNumRow('STR',  ()=>Dfmt(G.str),   null, false)}
     ${_dtNumRow('DEX',  ()=>Dfmt(G.dex),   null, false)}
     ${_dtNumRow('END',  ()=>Dfmt(G.end||D(10)), null, false)}
-    ${_dtNumRow('DEF',  ()=>Dfmt(G.def),   null, false)}
-    ${_dtNumRow('REGEN',()=>Dfmt(G.regen), null, false)}
     ${_dtNumRow('Base DMG', ()=>Dfmt(G.baseDmg), null, false)}
 
-    <div class="dt-section">VISION</div>
-    ${_dtNumRow('FOV Radius', ()=>SETTINGS.fovRadius, null, false)}
 
     <div class="dt-section">TOGGLES</div>
     ${_dtToggleRow('Disable Fog of War','devNoFog')}
@@ -4989,7 +5108,7 @@ function saveGameNew(){
   if(saveGameToSlot(idx)){ _activeSaveSlot=idx; return idx; }
   return null;
 }
-// Auto-save to the active slot (bonfire saves, curse saves)
+// Auto-save to the active slot. If no slot yet, create one (first bonfire creates the save).
 function _autoSave(){
   if(_activeSaveSlot===null){ saveGameNew(); return; }
   saveGameToSlot(_activeSaveSlot);
@@ -5104,7 +5223,7 @@ function _updateCurseIndicator(){
   if(stacks <= 0){ el.style.display='none'; return; }
   const mult = _curseMultiplier(stacks);
   el.style.display = 'block';
-  el.textContent = `💀 CURSED ×${mult.toFixed(2)}`;
+  el.textContent = `💀 CURSED x${mult.toFixed(2)}`;
 }
 
 function _onQuitToTitle(){
@@ -5125,7 +5244,7 @@ function _openCurseWarnModal(){
     if(stacks > 0){
       const curr = _curseMultiplier(stacks);
       const next = _curseMultiplier(stacks+1);
-      el.textContent = `Current curse: ×${curr.toFixed(2)} → After: ×${next.toFixed(2)}`;
+      el.textContent = `Current curse: x${curr.toFixed(2)} → After: x${next.toFixed(2)}`;
     } else {
       el.textContent = 'This will be your first curse.';
     }
@@ -5153,7 +5272,7 @@ function _showCurseLoadModal(){
   if(el){
     el.innerHTML = `
       <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#e07070;margin-bottom:8px;letter-spacing:1px;">ACTIVE CURSE</div>
-      <div style="font-size:15px;color:var(--text);margin-bottom:4px;">Enemy stats: <span style="color:#e07070;">×${mult.toFixed(3)}</span></div>
+      <div style="font-size:15px;color:var(--text);margin-bottom:4px;">Enemy stats: <span style="color:#e07070;">x${mult.toFixed(3)}</span></div>
       <div style="font-size:13px;color:var(--dim);">(${stacks} curse${stacks===1?'':'s'} stacked)</div>
     `;
   }
@@ -5218,7 +5337,7 @@ function renderPlaySlots(){
     const name=(s.name||'UNKNOWN').toUpperCase();
     const depth=s.zone==='upper'?`Upper ${s.depth}`:`Depth ${s.depth}`;
     const curseStacks = s.curseStacks||0;
-    const curseLine = curseStacks > 0 ? `<div class="slot-meta" style="color:#e07070;">💀 ×${Math.pow(1.1,curseStacks).toFixed(2)}</div>` : '';
+    const curseLine = curseStacks > 0 ? `<div class="slot-meta" style="color:#e07070;">💀 x${Math.pow(1.1,curseStacks).toFixed(2)}</div>` : '';
     card.innerHTML=`<div class="slot-icon">${icon}</div><div class="slot-name">${name}</div><div class="slot-meta">Lvl ${s.level?Dfmt(Ddes(s.level)):1} · ${depth}</div>${curseLine}`;
     card.onclick=()=>selectPlaySlot(idx,card);
     col.appendChild(card);
@@ -5272,7 +5391,7 @@ function _renderPlayDetail(data){
   if(data==='new'){
     col.innerHTML=`<div class="play-new-panel">
       <div class="play-new-title">NEW RUN</div>
-      <button class="play-det-btn primary" onclick="showScreen('config-screen')">▶ START NEW RUN</button>
+      <button class="play-det-btn primary" onclick="showScreen('config-screen')">START NEW RUN</button>
     </div>`;
     return;
   }
@@ -5524,6 +5643,161 @@ function _showExportFeedback(msg){const btn=document.getElementById('export-btn'
 function toggleImportArea(){const area=document.getElementById('import-paste-area');if(!area)return;_exportMode=false;document.getElementById('export-btn')?.classList.remove('active');const showing=area.style.display==='block';area.style.display=showing?'none':'block';document.getElementById('import-btn')?.classList.toggle('active',!showing);if(!showing){const ta=document.getElementById('import-textarea');if(ta){ta.value='';ta.focus();}}}
 function cancelImport(){const area=document.getElementById('import-paste-area');if(area)area.style.display='none';document.getElementById('import-btn')?.classList.remove('active');document.getElementById('export-btn')?.classList.remove('active');}
 function doImport(){const ta=document.getElementById('import-textarea');if(!ta)return;const code=ta.value.trim();if(!code){alert('Nothing to import.');return;}try{const raw=decodeURIComponent(escape(atob(code)));const snap=JSON.parse(raw);if(!snap||!snap.G)throw new Error('bad');localStorage.setItem(_saveSlotKey(_nextSlotIndex()),raw);refreshLoadButton();cancelImport();ta.value='';renderSaveSlots();_showExportFeedback('IMPORTED!');}catch(e){alert('Invalid save code.');}}
+
+// ── Encyclopedia stat detail data ────────────────────────────────
+const ENC_STAT_DATA = {
+  con: {
+    name: 'CON — Constitution', tag: 'CORE STAT · ALLOCATABLE',
+    desc: 'The foundation of your survival. Constitution directly sets your maximum HP — every point of CON is one point of HP. It also determines your passive defenses through DEF and REGEN, making it the primary defensive stat for any build.',
+    sections: [
+      { title: 'WHAT IT DOES', rows: [
+        ['Max HP', '= CON (1:1)', 'good'],
+        ['DEF', 'CON x 0.05', 'gold'],
+        ['REGEN', 'CON x 0.002', 'gold'],
+      ]},
+    ]
+  },
+  str: {
+    name: 'STR — Strength', tag: 'CORE STAT · ALLOCATABLE',
+    desc: 'Raw physical power. Strength increases how hard you hit with STR-scaling weapons and determines how much you can carry. Overloading your carry limit drains Stamina and reduces AP Gain — STR keeps you mobile under a heavy load.',
+    sections: [
+      { title: 'WHAT IT DOES', rows: [
+        ['Damage bonus', 'weapon STR scaling x STR', 'gold'],
+        ['Carry limit', '20 kg + STR x 0.5 kg', 'good'],
+      ]},
+    ]
+  },
+  dex: {
+    name: 'DEX — Dexterity', tag: 'CORE STAT · ALLOCATABLE',
+    desc: 'Speed and precision. Dexterity controls how often you act relative to enemies. A high DEX means your AP refills faster — at 100 DEX you gain 2 AP per turn, letting you act twice while a standard enemy acts once. It also slightly improves damage with finesse weapons.',
+    sections: [
+      { title: 'WHAT IT DOES', rows: [
+        ['AP Gain', '1 + DEX x 0.01', 'gold'],
+        ['Damage bonus', 'weapon DEX scaling x DEX', 'good'],
+      ]},
+      { title: 'AP GAIN EXAMPLES', rows: [
+        ['0 DEX', '1.00 AP/turn', 'good'],
+        ['10 DEX', '1.10 AP/turn', 'good'],
+        ['50 DEX', '1.50 AP/turn', 'gold'],
+        ['100 DEX', '2.00 AP/turn (double speed)', 'gold'],
+      ]},
+    ]
+  },
+  end: {
+    name: 'END — Endurance', tag: 'CORE STAT · LEVEL-UP ONLY',
+    desc: 'Endurance governs your stamina reserve and how quickly it recovers. It cannot be allocated during character creation — it only grows through level-ups. High END lets you carry heavier loads for longer without losing speed.',
+    sections: [
+      { title: 'WHAT IT DOES', rows: [
+        ['Max Stamina', '50 + END x 5', 'gold'],
+        ['Stamina Regen', '0.1 + END x 0.02 per turn', 'gold'],
+      ]},
+    ]
+  },
+  def: {
+    name: 'DEF — Defense', tag: 'DERIVED STAT · FROM CON',
+    desc: 'Defense reduces the raw physical damage of every hit you take. It is derived from CON and cannot be allocated directly.',
+    sections: [
+      { title: 'HOW IT WORKS', rows: [
+        ['Formula', 'incoming DMG - DEF', 'gold'],
+        ['Minimum damage', '0.1 (damage never zeroes)', 'good'],
+        ['Scales from', 'CON x 0.05', 'good'],
+      ]},
+      { title: 'EXAMPLE', rows: [
+        ['40 CON', '2.0 DEF', 'good'],
+        ['100 CON', '5.0 DEF', 'good'],
+        ['Hit for 8 with 5 DEF', 'deals 3 damage', 'gold'],
+      ]},
+    ]
+  },
+  regen: {
+    name: 'REGEN — Regeneration', tag: 'DERIVED STAT · FROM CON',
+    desc: 'Regeneration restores a small amount of HP at the end of every turn cycle, passively healing you over time. It is derived from CON and scales slowly — intended as a supplement to careful play rather than a substitute for it.',
+    sections: [
+      { title: 'HOW IT WORKS', rows: [
+        ['Formula', 'CON x 0.002', 'gold'],
+        ['Timing', 'once per turn cycle', 'good'],
+        ['Condition', 'only while HP > 0', 'good'],
+      ]},
+      { title: 'EXAMPLE', rows: [
+        ['40 CON', '0.08 HP/turn', 'good'],
+        ['100 CON', '0.2 HP/turn', 'gold'],
+      ]},
+    ]
+  },
+  apgain: {
+    name: 'AP Gain', tag: 'DERIVED STAT · FROM DEX',
+    desc: 'AP Gain determines how much action potential (AP) you accumulate each turn cycle. Every action costs AP — moving, attacking, and waiting each cost 1 AP by default, though weapons can change the attack cost. Leftover AP carries over to the next cycle, so a high AP Gain gradually rewards you with extra actions.',
+    sections: [
+      { title: 'HOW IT WORKS', rows: [
+        ['Base formula', '1 + DEX x 0.01', 'gold'],
+        ['Move cost', '1 AP', 'good'],
+        ['Attack cost', '1 AP (weapon-dependent)', 'good'],
+        ['Wait cost', '1 AP', 'good'],
+      ]},
+      { title: 'OVERWEIGHT PENALTY', rows: [
+        ['Effect', 'reduces AP Gain', 'good'],
+        ['Minimum', '0.4 AP Gain (floor)', 'gold'],
+      ]},
+    ]
+  },
+  stamina: {
+    name: 'Stamina', tag: 'RESOURCE · FROM END',
+    desc: 'Stamina is your physical energy reserve. It only drains when you are carrying more weight than your carry limit (20 kg + STR x 0.5). While overweight, Stamina drains each turn and your AP Gain is reduced. When you drop back under the limit, Stamina regens passively. Reserved for active skills in a future update.',
+    sections: [
+      { title: 'HOW IT WORKS', rows: [
+        ['Max Stamina', '50 + END x 5', 'gold'],
+        ['Regen rate', '0.1 + END x 0.02 per turn', 'good'],
+        ['Drain condition', 'carried weight > carry limit', 'good'],
+        ['Drain amount', '0.2 + 0.5 x kg over limit', 'gold'],
+      ]},
+      { title: 'OVERWEIGHT EFFECTS', rows: [
+        ['Stamina drain', 'scales with excess kg', 'good'],
+        ['AP Gain penalty', '-0.05 per kg over limit', 'gold'],
+        ['AP Gain minimum', '0.4 (cannot go lower)', 'good'],
+      ]},
+    ]
+  },
+};
+
+function showEncyclopedia(){
+  const menu = document.getElementById('enc-menu');
+  if(menu) menu.style.display='flex';
+  document.querySelectorAll('.enc-section').forEach(s=>s.classList.remove('active'));
+  showScreen('encyclopedia-screen');
+}
+function encOpenSection(id){
+  const menu = document.getElementById('enc-menu');
+  if(menu) menu.style.display='none';
+  document.querySelectorAll('.enc-section').forEach(s=>s.classList.remove('active'));
+  const sec=document.getElementById('enc-sec-'+id);
+  if(sec) sec.classList.add('active');
+}
+function encCloseSection(){
+  const menu = document.getElementById('enc-menu');
+  if(menu) menu.style.display='flex';
+  document.querySelectorAll('.enc-section').forEach(s=>s.classList.remove('active'));
+}
+function encBack(){
+  showScreen('title-screen');
+}
+function encShowDetail(id){
+  const data = ENC_STAT_DATA[id]; if(!data) return;
+  let html = `<div class="enc-det-title">${data.name}</div>
+<div class="enc-det-tag">${data.tag}</div>
+<div class="enc-det-desc">${data.desc}</div>`;
+  data.sections.forEach(sec => {
+    html += `<div class="enc-det-sub">${sec.title}</div>`;
+    sec.rows.forEach(([label, val, cls]) => {
+      html += `<div class="enc-det-row"><span class="el">${label}</span><span class="ev ${cls||''}">${val}</span></div>`;
+    });
+  });
+  document.getElementById('enc-det-inner').innerHTML = html;
+  document.getElementById('enc-detail-modal').classList.add('active');
+}
+function encCloseDetail(){
+  document.getElementById('enc-detail-modal').classList.remove('active');
+}
+
 </script>
 
 </body>
