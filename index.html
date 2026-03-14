@@ -226,7 +226,7 @@
   .stat-alloc-container{background:var(--panel);border:2px solid var(--border);padding:18px 22px;width:min(520px,92vw);}
   .points-left{text-align:center;font-size:22px;color:var(--gold2);margin-bottom:12px;}
   .points-left span{font-family:'Press Start 2P',monospace;font-size:18px;}
-  .alloc-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+  .alloc-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;}
   .alloc-name{width:90px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--text);}
   .alloc-effect{flex:1;font-size:14px;color:var(--dim);text-align:center;}
   .alloc-controls{display:flex;align-items:center;gap:8px;}
@@ -1620,16 +1620,14 @@ function closeClassDetail(){
 }
 
 // ==================== STAT ALLOC ====================
-let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0}; // END removed from allocatable stats
+let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0};
 const STAT_DEFS = [
   {key:'CON', label:'CON', effect:'Last longer in fights.'},
   {key:'STR', label:'STR', effect:'Hit harder and carry more weight.'},
   {key:'DEX', label:'DEX', effect:'Move faster and strike more accurately.'},
-  // END removed — not allocatable
 ];
 function showStatAlloc(){
   allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0}; renderAllocRows(); showScreen('stat-screen');
-  // Focus the name field so player can type immediately
   setTimeout(()=>{
     const el=document.getElementById('char-name-input');
     if(el){
@@ -1703,9 +1701,9 @@ const PRESETS = {
   },
   classic: {
     label:'CLASSIC', color:'#c8a84b',
-    desc:'Normal floors, normal enemies, standard rules. Enemies spawn over time. Curses apply.',
-    difficulty:'normal', floorSize:'md', enemySpawn:true, cursesEnabled:true,
-    tags:[{t:'NORMAL FLOORS',c:'#c8a84b'},{t:'NORMAL ENEMIES',c:'#c8a84b'},{t:'SPAWNING',c:'#c84040'},{t:'CURSES',c:'#c84040'}],
+    desc:'Normal floors, normal enemies, standard rules. Enemies spawn over time. No curses.',
+    difficulty:'normal', floorSize:'md', enemySpawn:true, cursesEnabled:false,
+    tags:[{t:'NORMAL FLOORS',c:'#c8a84b'},{t:'NORMAL ENEMIES',c:'#c8a84b'},{t:'SPAWNING',c:'#c84040'}],
   },
   harder: {
     label:'HARDER', color:'#e08030',
@@ -1855,18 +1853,19 @@ function updateSpawnBtn(){ _syncAdvControls(); }
 
 // ==================== CLASS & WEAPON DEFS ====================
 const CLASS_TEMPLATES = {
-  warrior: {icon:'⚔️', name:'Warrior', baseCON:40, baseSTR:10, baseDEX:3, baseEND:10, weaponType:'sword'},
-  rogue:   {icon:'🗡️', name:'Rogue',   baseCON:35, baseSTR:8, baseDEX:4, baseEND:8,  weaponType:'dagger'},
+  warrior: {icon:'⚔️', name:'Warrior', baseCON:30, baseSTR:10, baseDEX:4, baseEND:10, weaponType:'sword'},
+  rogue:   {icon:'🗡️', name:'Rogue',   baseCON:25, baseSTR:8, baseDEX:5, baseEND:8,  weaponType:'dagger'},
 };
 const CLASS_LEVEL_GAINS = {
-  warrior: {con:3, str:1.5, dex:0.5, end:1},
-  rogue:   {con:2, str:1,   dex:1.5, end:1},
+  warrior: {con:3, str:1.5, dex:0.5, end:1.5},
+  rogue:   {con:2, str:1,   dex:2, end:1},
 };
 const FISTS_DEF = {base:1, str:0.10, dex:0.10};
 function calcDmgFists(str,dex){ return D(FISTS_DEF.base).plus(D(str).times(FISTS_DEF.str)).plus(D(dex).times(FISTS_DEF.dex)); }
 const WEAPON_DEFS = {
-  sword:  {name:'Simple One-Handed Sword',  icon:'⚔️', base:5, str:0.20, dex:0.10, kg:1.2, category:'Melee Weapons', subcategory:'One-Handed Sword'},
-  dagger: {name:'Simple Dagger', icon:'🗡️', base:3, str:0.10, dex:0.15, kg:0.4, category:'Melee Weapons', subcategory:'Dagger'},
+  sword:      {name:'Simple One-Handed Sword', icon:'⚔️',  base:5,  str:0.20, dex:0.10, kg:1.2, category:'Melee Weapons', subcategory:'One-Handed Sword'},
+  dagger:     {name:'Simple Dagger',           icon:'🗡️', base:3,  str:0.10, dex:0.15, kg:0.4, category:'Melee Weapons', subcategory:'Dagger'},
+  heavysword: {name:'Heavy Sword [TEST]',       icon:'🗡️', base:12, str:0.40, dex:0.05, kg:3.5, attackCost:2, category:'Melee Weapons', subcategory:'Two-Handed Sword'},
 };
 // Base carry capacity + STR bonus (subject to tuning)
 function calcCarryWeight(str){ return D(20).plus(D(str).times('0.5')); }
@@ -1946,7 +1945,7 @@ function startGame(){
     stairsDown:null, stairsUp:null, bonfire:null,
     isBonfireFloor: false,
     floorCleared: false,
-    player: {x:0, y:0, apRate:calcAPRate(dex), ap:calcAPRate(dex)},
+    player: {x:0, y:0, apRate:calcAPRate(dex), ap:calcAPRate(dex), pendingAttack:null},
     enemies: [],
     fov: new Set(), seen: new Set(),
     // inventory does NOT include equipped items — they live only in equipment
@@ -1986,7 +1985,7 @@ function startGame(){
   document.getElementById('hero-name').textContent     = G.name;
 
   camX = 0; camY = 0;
-  turnPhase = 'player'; priorityTargetId = null; floatNums = []; slashParticles = []; playerHpFlash = 0;
+  turnPhase = 'player'; priorityTargetId = null; floatNums = []; slashParticles = []; playerHpFlash = 0; if(G&&G.player) G.player.pendingAttack=null;
   _queuedAction = null; _panelDirty = true; _clearedBanner = 0; _playerActedThisCycle = false;
   _floorNotifier = {text:'', life:0, maxLife:0}; _autoWalkOnArrival = null;
   heldKeys.clear(); stopMoveLoop();
@@ -2086,7 +2085,7 @@ function generateDungeon(){
   G.stairsDown = {x:lastC.x,  y:lastC.y};
   G.stairsUp   = (G.depth > 1 || G.zone === 'normal') ? {x:startC.x+1, y:startC.y} : null;
 
-  const baseRat = {con:25, str:5, dex:5};
+  const baseRat = {con:20, str:5, dex:5};
 
   const curseMult = _curseMultiplier(G.curseStacks||0);
 
@@ -2257,9 +2256,13 @@ function _enemyRoamStep(enemy){
 // ── Action-point helpers ──────────────────────────────────────
 // Cost constants — easy to tune or per-enemy-type in future
 const AP_COST_MOVE          = 1;
-const AP_COST_TELEGRAPH     = 1;
-const AP_COST_BITE          = 1;
-const AP_COST_PLAYER_ACTION = 1; // cost for any player action (move, attack, wait)
+const AP_COST_TELEGRAPH     = 0;
+const AP_COST_BITE          = 2;
+const AP_COST_PLAYER_ACTION = 1;
+const AP_COST_PLAYER_MOVE   = 1;
+const AP_COST_PLAYER_WAIT   = 1;
+// Returns AP cost to attack with equipped weapon (default 1, can be overridden by weapon.attackCost)
+function playerAttackCost(){ const w=G.equipment&&G.equipment.main; return (w&&w.attackCost)?w.attackCost:1; }
 
 function _ratDealBite(enemy){
   const tx = enemy.telegraphTile.x, ty = enemy.telegraphTile.y;
@@ -2415,8 +2418,9 @@ function _runPriorityQueue(snapX, snapY){
   while(iterations++ < MAX_ACTIONS){
     if(D(G.hp).lte(0)) break;
     let bestAP = -1;
-    // Player slot — player wins ties
-    if(G.player.ap >= AP_COST_PLAYER_ACTION) bestAP = G.player.ap;
+    // Player slot — player wins ties. If player has a pending attack, use its cost as threshold.
+    const playerThreshold = G.player.pendingAttack ? G.player.pendingAttack.cost : AP_COST_PLAYER_ACTION;
+    if(G.player.ap >= playerThreshold) bestAP = G.player.ap;
     let candidates = [];
     G.enemies.forEach(e => {
       if(D(e.hp).lte(0) || e.aiState === 'sleep') return;
@@ -2445,58 +2449,76 @@ function enemyTurn(){
   // This ensures enemies act between turns BEFORE the player is refilled.
   if(_playerActedThisCycle){
     _playerActedThisCycle = false;
-    if(G.player.ap < AP_COST_PLAYER_ACTION){
-      // AP exhausted — world ticks
-      G.turn++;
-      const lbl = document.getElementById('turn-label-left');
-      if(lbl) lbl.textContent = G.turn;
-      // HP regen — once per turn
-      if(G.regen && D(G.hp).lt(G.maxHP) && D(G.hp).gt(0)){
-        G.hp = D(G.hp).plus(G.regen);
-        if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
-      }
-      // Stamina + apRate — once per turn
-      (function _tickStamina(){
-        const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
-        const drain = calcStaminaDrain(carried, limit);
-        const regen = calcStaminaRegen(G.end||D(10));
-        if(drain.gt(0)){
-          G.stamina = D(G.stamina).minus(drain);
-          if(D(G.stamina).lt(0)) G.stamina = D(0);
-          const pen = calcOverweightAPRatePenalty(carried, limit);
-          G.player.apRate = Math.max(0.4, parseFloat((calcAPRate(G.dex) - pen).toFixed(4)));
+    const playerActionThreshold = G.player.pendingAttack ? G.player.pendingAttack.cost : AP_COST_PLAYER_ACTION;
+    if(G.player.ap < playerActionThreshold){
+      // Keep ticking until the player can act (or pending attack fires)
+      const MAX_TICKS = 50;
+      let ticks = 0;
+      while(ticks++ < MAX_TICKS){
+        if(D(G.hp).lte(0)) break;
+        // World ticks
+        G.turn++;
+        const lbl = document.getElementById('turn-label-left');
+        if(lbl) lbl.textContent = G.turn;
+        // HP regen — once per turn
+        if(G.regen && D(G.hp).lt(G.maxHP) && D(G.hp).gt(0)){
+          G.hp = D(G.hp).plus(G.regen);
+          if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
+        }
+        // Stamina + apRate — once per turn
+        (function _tickStamina(){
+          const carried = calcCarriedWeight(), limit = calcCarryWeight(G.str);
+          const drain = calcStaminaDrain(carried, limit);
+          const regen = calcStaminaRegen(G.end||D(10));
+          if(drain.gt(0)){
+            G.stamina = D(G.stamina).minus(drain);
+            if(D(G.stamina).lt(0)) G.stamina = D(0);
+            const pen = calcOverweightAPRatePenalty(carried, limit);
+            G.player.apRate = Math.max(0.4, parseFloat((calcAPRate(G.dex) - pen).toFixed(4)));
+          } else {
+            G.stamina = D(G.stamina).plus(regen);
+            if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
+            G.player.apRate = calcAPRate(G.dex);
+          }
+        })();
+        // Grant AP to enemies
+        G.enemies.forEach(e => {
+          if(D(e.hp).lte(0)) return;
+          if(!e.apRate) e.apRate = calcEnemyAPRate(e.dex);
+          if(e.ap === undefined) e.ap = 0;
+          if(e.aiState === 'sleep'){ e.ap = 0; return; }
+          e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
+        });
+        // Wake check
+        G.enemies.filter(e => D(e.hp).gt(0) && e.aiState === 'sleep').forEach(enemy => {
+          const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
+          const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
+          if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
+            enemy.aiState = 'chase'; enemy.wakePopLife = 45;
+            enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
+            enemy.ap = 0;
+          }
+        });
+        // Enemies act before player gets AP
+        _runPriorityQueue(snapX, snapY);
+        if(D(G.hp).lte(0)) break;
+        // Grant player AP
+        G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
+        // Check if pending attack fires now
+        if(_tryFirePendingAttack()){
+          _runPriorityQueue(snapX, snapY); // enemies react to the attack
+          // If player still can't act after the attack, keep ticking
+          if(G.player.ap >= AP_COST_PLAYER_ACTION) break;
+          // else fall through to next loop iteration to refill
         } else {
-          G.stamina = D(G.stamina).plus(regen);
-          if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
-          G.player.apRate = calcAPRate(G.dex);
+          // Check if player now has enough AP for normal action
+          const threshold = G.player.pendingAttack ? G.player.pendingAttack.cost : AP_COST_PLAYER_ACTION;
+          if(G.player.ap >= threshold) break;
         }
-      })();
-      // Grant AP to enemies (not player yet)
-      G.enemies.forEach(e => {
-        if(D(e.hp).lte(0)) return;
-        if(!e.apRate) e.apRate = calcEnemyAPRate(e.dex);
-        if(e.ap === undefined) e.ap = 0;
-        if(e.aiState === 'sleep'){ e.ap = 0; return; }
-        e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
-      });
-      // Wake check — only on tick, using final player position
-      G.enemies.filter(e => D(e.hp).gt(0) && e.aiState === 'sleep').forEach(enemy => {
-        const cheb = Math.max(Math.abs(snapX-enemy.x), Math.abs(snapY-enemy.y));
-        const inRange = _hasLOS(enemy.x, enemy.y, snapX, snapY, RAT_FOV_SLEEP);
-        if(!G.devNoWake && inRange && Math.random() < _sleepWakeChance(cheb)){
-          enemy.aiState = 'chase'; enemy.wakePopLife = 45;
-          enemy.lastSeenX = snapX; enemy.lastSeenY = snapY;
-          enemy.ap = 0; // will receive first AP grant next tick
-        }
-      });
-      // Run priority queue while player AP is still 0 — enemies go first
-      // Then grant player AP so the loop terminates and returns to player input
-      _runPriorityQueue(snapX, snapY);
-      // Now refill player AP
-      G.player.ap = parseFloat((G.player.ap + G.player.apRate).toFixed(6));
-      return; // priority queue already ran, skip the one below
+      }
+      return;
     }
-    // Player still has AP (>= 1) — no tick, fall through to priority queue
+    // Player still has AP — no tick, fall through to priority queue
   }
 
   // ── Priority queue for mid-turn enemy actions (player has AP remaining) ──
@@ -2688,9 +2710,17 @@ function getPriorityTarget(){
   return vis[0];
 }
 function attackPriorityTarget(){
+  if(G.player.pendingAttack) return; // locked during wind-up
   const t = getPriorityTarget();
   if (!t){ addLog('No target in range.', 'info'); return; }
-  doAttackEnemy(t); endTurn();
+  const cost = playerAttackCost();
+  if(G.player.ap >= cost){
+    doAttackEnemy(t); endTurn(cost);
+  } else {
+    G.player.pendingAttack = {tx: t.x, ty: t.y, cost};
+    addLog(`Winding up... (need ${cost} AP, have ${parseFloat(G.player.ap.toFixed(2))})`, 'info');
+    endTurn(0);
+  }
 }
 function setTarget(id){ priorityTargetId = id; }
 
@@ -2726,7 +2756,16 @@ function updateTargetPanel(){
     card.addEventListener('click', ev => {
       ev.stopPropagation();
       if (turnPhase !== 'player') return;
-      setTarget(e.id); doAttackEnemy(e); endTurn();
+      if(G.player.pendingAttack) return;
+      setTarget(e.id);
+      const cost = playerAttackCost();
+      if(G.player.ap >= cost){
+        doAttackEnemy(e); endTurn(cost);
+      } else {
+        G.player.pendingAttack = {tx: e.x, ty: e.y, cost};
+        addLog(`Winding up... (need ${cost} AP, have ${parseFloat(G.player.ap.toFixed(2))})`, 'info');
+        endTurn(0);
+      }
     });
     panel.appendChild(card);
   });
@@ -2829,6 +2868,24 @@ function renderCanvas(){
     ctx.stroke();
     ctx.globalAlpha = 1;
   });
+  // Draw player's pending attack commitment (orange X/border, same style as enemy telegraph)
+  if(G.player.pendingAttack){
+    const pa = G.player.pendingAttack;
+    if(G.fov.has(`${pa.tx},${pa.ty}`)){
+      const sx=pa.tx*TILE-camX, sy=pa.ty*TILE-camY;
+      const pulse = 0.65 + Math.sin(Date.now()*0.008)*0.35;
+      ctx.globalAlpha = pulse;
+      ctx.strokeStyle = '#ff8020';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sx+1, sy+1, TILE-2, TILE-2);
+      const pad = Math.floor(TILE*0.22);
+      ctx.beginPath();
+      ctx.moveTo(sx+pad, sy+pad); ctx.lineTo(sx+TILE-pad, sy+TILE-pad);
+      ctx.moveTo(sx+TILE-pad, sy+pad); ctx.lineTo(sx+pad, sy+TILE-pad);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
   G.enemies.filter(e=>e.hp>0).forEach(e=>{
     if (!G.fov.has(`${e.x},${e.y}`)) return;
     const viz = (SETTINGS.smoothEntities&&!freezeEnemies&&vizEnemies[e.id])?vizEnemies[e.id]:e;
@@ -3104,6 +3161,7 @@ function _onCanvasMouseDown(ev){
   if (ev.button!==0) return;
   if (document.getElementById('levelup-modal').classList.contains('active')) return;
   if (invIsOpen()) return;
+  if (G.player.pendingAttack) return; // locked during wind-up
   _mouseIsDown=true; _mouseIsHolding=false;
   cancelAutoWalk();
   const {tx,ty}=_canvasWorldPos(ev);
@@ -3113,7 +3171,18 @@ function _onCanvasMouseDown(ev){
   // Click on adjacent visible enemy → attack
   const clicked=enemyAt(tx,ty);
   if (clicked&&G.fov.has(`${tx},${ty}`)&&inAttackRange(clicked)){
-    queueOrRun(()=>{ setTarget(clicked.id); doAttackEnemy(clicked); endTurn(); });
+    if(G.player.pendingAttack) return;
+    queueOrRun(()=>{
+      setTarget(clicked.id);
+      const cost = playerAttackCost();
+      if(G.player.ap >= cost){
+        doAttackEnemy(clicked); endTurn(cost);
+      } else {
+        G.player.pendingAttack = {tx: clicked.x, ty: clicked.y, cost};
+        addLog(`Winding up... (need ${cost} AP, have ${parseFloat(G.player.ap.toFixed(2))})`, 'info');
+        endTurn(0);
+      }
+    });
     return;
   }
   // Start hold timer: if held long enough → switch to live-follow mode
@@ -3176,6 +3245,7 @@ function _setupMouseHandlers(){
 }
 
 function doSpaceAction(){
+  if(G.player.pendingAttack) return; // locked during wind-up
   tutMarkDone('wait');
   const {x,y}=G.player;
   // Pick up ground items first
@@ -3186,7 +3256,7 @@ function doSpaceAction(){
       G.inventory.push(gi.item);
       addLog(`You pick up ${gi.item.name}.`,'info');
       if (invIsOpen()) invRenderAll();
-      endTurn(); return;
+      endTurn(AP_COST_PLAYER_WAIT); return;
     }
   }
   if (G.stairsDown&&G.stairsDown.x===x&&G.stairsDown.y===y){ descend(); return; }
@@ -3199,7 +3269,7 @@ function doSpaceAction(){
   spawnFloat(G.player.x, G.player.y-0.4, '...', '#ffffff', 22, 0.45);
   floatNums[floatNums.length-1].dy = 0.02;
   tutMarkDone('wait');
-  endTurn();
+  endTurn(AP_COST_PLAYER_WAIT);
 }
 function useBonfire(){
     const healed = D(G.maxHP).minus(G.hp);
@@ -3209,17 +3279,33 @@ function useBonfire(){
   flashCanvas('gold'); triggerPlayerHpFlash();
   _autoSave();
   addLog('Progress saved.','info');
-  endTurn();
+  endTurn(AP_COST_PLAYER_WAIT);
 }
 
 function tryMove(dx, dy){
+  // If player has a pending attack committed, all movement/actions are blocked
+  if(G.player.pendingAttack) return false;
+
   const nx=G.player.x+dx, ny=G.player.y+dy;
   if (nx<0||ny<0||nx>=G.mapW||ny>=G.mapH) return false;
   if (G.tiles[ny][nx]===0) return false;
   if (G.bonfire&&G.bonfire.x===nx&&G.bonfire.y===ny) return false;
   const enemy=enemyAt(nx,ny);
-  if (enemy){ doAttackEnemy(enemy); endTurn(); return true; }
-  G.player.x=nx; G.player.y=ny; computeFOV(); endTurn();
+  if (enemy){
+    const cost = playerAttackCost();
+    if (G.player.ap >= cost){
+      // Enough AP — attack immediately
+      doAttackEnemy(enemy);
+      endTurn(cost);
+    } else {
+      // Not enough AP — commit attack, lock player until AP refills
+      G.player.pendingAttack = {tx: nx, ty: ny, cost};
+      addLog(`Winding up... (need ${cost} AP, have ${parseFloat(G.player.ap.toFixed(2))})`, 'info');
+      endTurn(0); // 0 cost: no AP deducted, but tick fires to advance time
+    }
+    return true;
+  }
+  G.player.x=nx; G.player.y=ny; computeFOV(); endTurn(AP_COST_PLAYER_MOVE);
   tutMarkDone('move');
   return true;
 }
@@ -3277,17 +3363,24 @@ const PLAYER_ANIM_MS=25, ENEMY_ANIM_MS=25;
 let _queuedAction=null;
 function queueOrRun(fn){ if (turnPhase==='player') fn(); else _queuedAction=fn; }
 
-function endTurn(){
-  // Guard: player must have enough AP to act
-  if(G.player.ap < AP_COST_PLAYER_ACTION) return;
+function endTurn(actionCost){
+  if(actionCost === undefined) actionCost = AP_COST_PLAYER_ACTION;
+
+  function _doEndTurn(cost){
+    if(cost > 0) G.player.ap = parseFloat((G.player.ap - cost).toFixed(6));
+    _playerActedThisCycle = true;
+    enemyTurn(); trySpawnEnemies();
+    updateHUD(); checkFloorCleared();
+  }
+
+  // If player can't afford the action, treat as a wait — tick time forward anyway
+  // This prevents the game freezing when AP is fractional after a 2-AP attack
+  const effectiveCost = (actionCost > 0 && G.player.ap < actionCost) ? 0 : actionCost;
 
   if (SETTINGS.smoothEntities){
     turnPhase='anim_player';
     setTimeout(()=>{
-      G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
-      _playerActedThisCycle = true;
-      enemyTurn(); trySpawnEnemies();
-      updateHUD(); checkFloorCleared();
+      _doEndTurn(effectiveCost);
       turnPhase='anim_enemy';
       setTimeout(()=>{
         turnPhase='player'; markPanelDirty();
@@ -3296,13 +3389,31 @@ function endTurn(){
       },ENEMY_ANIM_MS);
     },PLAYER_ANIM_MS);
   } else {
-    G.player.ap = parseFloat((G.player.ap - AP_COST_PLAYER_ACTION).toFixed(6));
-    _playerActedThisCycle = true;
-    enemyTurn(); trySpawnEnemies();
-    updateHUD(); checkFloorCleared();
+    _doEndTurn(effectiveCost);
     turnPhase='player'; markPanelDirty(); renderCanvas();
     if (G.pendingLevelUps>0) setTimeout(showLevelUpModal,80);
   }
+}
+
+// Fire the player's pending attack if they now have enough AP.
+// Called AFTER enemyTurn/AP-refill — if AP is now sufficient, execute and deduct.
+// Returns true if the attack fired (caller may need to re-run priority queue).
+function _tryFirePendingAttack(){
+  if(!G.player.pendingAttack) return false;
+  const pa = G.player.pendingAttack;
+  if(G.player.ap < pa.cost) return false;
+  G.player.pendingAttack = null;
+  const enemy = enemyAt(pa.tx, pa.ty);
+  if(enemy){
+    doAttackEnemy(enemy);
+  } else {
+    spawnSlash(pa.tx, pa.ty);
+    addLog('Your attack hits empty air!', 'info');
+  }
+  G.player.ap = parseFloat((G.player.ap - pa.cost).toFixed(6));
+  // NOTE: do NOT set _playerActedThisCycle here — the tick loop already ran this turn.
+  // The next player action will trigger the next tick normally.
+  return true;
 }
 
 const FLOOR_CACHE_MAX = 20;
@@ -3473,7 +3584,7 @@ function trySpawnEnemies(){
       }
     if (!candidates.length) break;
     const pos=candidates[randInt(0,candidates.length-1)];
-    G.enemies.push(makeRat(pos,{con:25,str:5,dex:5},diffMod.statMult * _curseMultiplier(G.curseStacks||0),1,true));
+    G.enemies.push(makeRat(pos, baseRat, diffMod.statMult * _curseMultiplier(G.curseStacks||0), 1, true));
     spawned++;
     remainingChance -= 1.0;
   }
@@ -3711,7 +3822,7 @@ function ascend(){
 
 function regenMap(dir='down'){
   stopEntityLoop();
-  turnPhase='player'; priorityTargetId=null; floatNums=[]; _queuedAction=null;
+  turnPhase='player'; priorityTargetId=null; floatNums=[]; _queuedAction=null; if(G&&G.player) G.player.pendingAttack=null;
   _panelDirty=true; _clearedBanner=0; _autoWalkOnArrival=null;
   heldKeys.clear(); stopMoveLoop();
 
@@ -3789,7 +3900,8 @@ function showLevelUpModal(){
   document.getElementById('levelup-modal').classList.add('active');
   document.getElementById('levelup-msg').textContent=`You reached Level ${Dfmt(G.level)}!`;
   document.getElementById('lu-points').textContent=luPointsRemaining;
-  document.getElementById('lu-base-stats').textContent='';
+  const lbs = document.getElementById('lu-base-stats');
+  if(lbs) lbs.textContent='';
   renderLURows();
 }
 function renderLURows(){
@@ -4729,6 +4841,8 @@ function _dtApplyField(id, v){
     case 'REGEN': G.regen=D(v); break;
     case 'Base DMG': G.baseDmg=D(v).lt('0.1')?D('0.1'):D(v); break;
     case 'FOV Radius': SETTINGS.fovRadius=Math.max(1,D(v).toNumber()); computeFOV(); break;
+    case 'Player AP Gain': G.player.apRate=Math.max(0.1, parseFloat(D(v).toFixed(4))); break;
+    case 'Player AP': G.player.ap=Math.max(0, parseFloat(D(v).toFixed(6))); break;
   }
   updateHUD(); renderCanvas();
   // Refresh any derived spinners that may have changed (DEF, REGEN, Base DMG, END)
@@ -4744,6 +4858,26 @@ function _dtToggleRow(label, flag, onToggle){
     <span class="dt-label">${label}</span>
     <button class="dt-toggle ${active?'on':'off'}" id="dttog-${flag}" onclick="_dtToggle('${flag}')">${active?'ON':'OFF'}</button>
   </div>`;
+}
+function _dtGiveHeavySword(){
+  if(!G||!G.equipment) return;
+  const w = {
+    id: ++G._eid,
+    name: WEAPON_DEFS.heavysword.name,
+    icon: WEAPON_DEFS.heavysword.icon,
+    type: 'weapon', weaponType: 'heavysword',
+    eslot: 'main', equipped: true,
+    attackCost: WEAPON_DEFS.heavysword.attackCost,
+    kg: WEAPON_DEFS.heavysword.kg, bonuses: {},
+    desc: 'A massive two-handed sword. Requires 2 AP to swing.',
+  };
+  // Put old weapon in inventory if any
+  if(G.equipment.main) G.inventory.push({...G.equipment.main, equipped:false});
+  G.equipment.main = w;
+  G.weaponType = 'heavysword';
+  G.baseDmg = calcDmg('heavysword', G.str, G.dex);
+  updateHUD(); renderCanvas();
+  addLog('Dev: Heavy Sword [TEST] equipped.', 'info');
 }
 function _dtToggle(flag){
   if(!G) return;
@@ -4761,6 +4895,12 @@ function _showDevToolsPanel(){
   const inner = document.getElementById('devtools-inner');
   inner.innerHTML = `
     <div class="dt-title">DEV TOOLS</div>
+
+    <div class="dt-section">AP SYSTEM</div>
+    ${_dtNumRow('Player AP Gain', ()=>parseFloat((G.player.apRate||1).toFixed(4)), null, false)}
+    ${_dtNumRow('Player AP', ()=>parseFloat((G.player.ap||0).toFixed(4)), null, false)}
+    <div class="dt-row"><span class="dt-label">Give Heavy Sword [TEST]</span>
+      <button class="dt-btn" style="width:auto;padding:0 10px;" onclick="_dtGiveHeavySword()">GIVE</button></div>
 
     <div class="dt-section">PROGRESSION</div>
     ${_dtNumRow('Level', ()=>Dfmt(G.level), null, false)}
@@ -4814,7 +4954,7 @@ function _buildSnap(){
     _eid:G._eid,mapW:G.mapW,mapH:G.mapH,tiles:G.tiles,rooms:G.rooms,
     stairsDown:G.stairsDown,stairsUp:G.stairsUp,bonfire:G.bonfire,
     isBonfireFloor:G.isBonfireFloor,floorCleared:G.floorCleared,
-    player:{...G.player},
+    player:{...G.player, pendingAttack: G.player.pendingAttack || null},
     enemies:G.enemies.map(e=>({...e,hp:Dser(e.hp),maxHP:Dser(e.maxHP),con:Dser(e.con),str:Dser(e.str),dex:Dser(e.dex),xp:Dser(e.xp)})),
     seen:[...G.seen],fov:[...G.fov],
     inventory:JSON.parse(JSON.stringify(G.inventory)),
@@ -4869,7 +5009,7 @@ function loadGameFromSlot(idx){
       _eid:s._eid||0,mapW:s.mapW,mapH:s.mapH,tiles:s.tiles,rooms:s.rooms,
       stairsDown:s.stairsDown,stairsUp:s.stairsUp,bonfire:s.bonfire,
       isBonfireFloor:s.isBonfireFloor||false,floorCleared:s.floorCleared||false,
-      player:{apRate:1, ap:0, ...s.player},
+      player:{apRate:1, ap:0, pendingAttack:null, ...s.player},
       enemies:s.enemies.map(e=>({apRate:1,ap:0,telegraphTile:null,...e,
         hp:Ddes(e.hp),maxHP:Ddes(e.maxHP),con:Ddes(e.con),str:Ddes(e.str),dex:Ddes(e.dex),xp:Ddes(e.xp||'1')})),
       seen:new Set(s.seen),fov:new Set(s.fov),
