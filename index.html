@@ -387,7 +387,7 @@
   .config-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--text);}
   .config-desc{font-size:16px;color:var(--dim);margin-top:3px;}
   .diff-btns{display:flex;gap:5px;flex-wrap:wrap;}
-  /* match size button dimensions so difficulty buttons aren’t so massive */
+  /* match size button dimensions so difficulty buttons aren't so massive */
   .diff-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:6px 8px;border:1px solid var(--border);background:var(--bg2);color:var(--dim);cursor:pointer;transition:all .15s;}
   .diff-btn:hover{border-color:var(--gold);color:var(--gold);}
   .diff-btn.active-extra-easy{border-color:#80c0ff;color:#80c0ff;background:rgba(128,192,255,.10);}
@@ -801,6 +801,30 @@
     <hr class="changelog-divider">
 
 ═══════════════════════════════════════════════════════════════ -->
+
+    <div class="changelog-entry">
+      <div class="changelog-title">v1.4.5 — Class & Rat Rebalancing</div>
+      <div class="changelog-date">2026-03-13</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Class Adjustments</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> New starting stats for classes:</div>
+      <ul class="changelog-ul">
+        <li><strong>Warrior</strong>: 40 CON, 10 STR, 3 DEX, 10 END</li>
+        <li><strong>Rogue</strong>: 35 CON, 8 STR, 4 DEX, 8 END</li>
+      </ul>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Level gains updated (per level):</div>
+      <ul class="changelog-ul">
+        <li><strong>Warrior</strong>: +3 CON, +1.5 STR, +0.5 DEX, +1 END</li>
+        <li><strong>Rogue</strong>: +2 CON, +1 STR, +1.5 DEX, +1 END</li>
+      </ul>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">Enemy Changes</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Dire Rat base stats: 25 CON, 5 STR, 5 Dex</div>
+      <div class="changelog-para"><span class="changelog-tag new">NEW</span> Rat AP gain now scales with DEX</div>
+      <hr class="changelog-divider">
+      <div class="changelog-sub">UI</div>
+      <div class="changelog-para"><span class="changelog-tag tweak">TWEAK</span> Level up screen no longer shows base stat gains</div>
+    </div>
 
     <div class="changelog-entry">
       <div class="changelog-title">v1.4.4 — AP System Tweaks and Additions</div>
@@ -1336,7 +1360,7 @@
     <div class="modal-title">LEVEL UP</div>
     <div class="modal-subtitle" id="levelup-msg">You reached Level 2!</div>
     <div style="margin-bottom:14px;font-size:14px;color:var(--dim);text-align:center;">
-      <span id="lu-base-stats" style="color:var(--text);">—</span><br>
+      <span id="lu-base-stats" style="color:var(--text);"></span><br>
       <span id="lu-points" style="color:var(--gold2);font-family:'Press Start 2P',monospace;">3</span> stat points to spend.
     </div>
     <div id="lu-alloc-rows"></div>
@@ -1571,14 +1595,14 @@ function selectClass(cls){
 const CLASS_DETAIL_INFO = {
   warrior: {
     fullDesc: 'A seasoned fighter who relies on brute strength and toughness. High HP and damage output.',
-    stats: {CON:30, STR:20, DEX:10, END:12},
-    perlvl: 'Per level: CON +5, STR +1, DEX +1, END +1',
+    stats: {CON:40, STR:10, DEX:3, END:10},
+    perlvl: 'Per level: CON +3, STR +1.5, DEX +0.5, END +1',
     weapon: 'sword',
   },
   rogue: {
     fullDesc: 'A nimble fighter who strikes fast and precisely. Lower HP but naturally quicker and more accurate.',
-    stats: {CON:20, STR:10, DEX:15, END:10},
-    perlvl: 'Per level: CON +3, STR +1, DEX +2, END +0.5',
+    stats: {CON:35, STR:8, DEX:4, END:8},
+    perlvl: 'Per level: CON +2, STR +1, DEX +1.5, END +1',
     weapon: 'dagger',
   },
 };
@@ -1611,15 +1635,15 @@ function closeClassDetail(){
 }
 
 // ==================== STAT ALLOC ====================
-let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0, END:0};
+let allocPoints = 5, allocValues = {CON:0, STR:0, DEX:0}; // END removed from allocatable stats
 const STAT_DEFS = [
   {key:'CON', label:'CON', effect:'Last longer in fights.'},
   {key:'STR', label:'STR', effect:'Hit harder and carry more weight.'},
   {key:'DEX', label:'DEX', effect:'Move faster and strike more accurately.'},
-  {key:'END', label:'END', effect:'Boost stamina, recovery, and weight penalty resistance.'},
+  // END removed — not allocatable
 ];
 function showStatAlloc(){
-  allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0,END:0}; renderAllocRows(); showScreen('stat-screen');
+  allocPoints = 5; allocValues = {CON:0,STR:0,DEX:0}; renderAllocRows(); showScreen('stat-screen');
   // Focus the name field so player can type immediately
   setTimeout(()=>{
     const el=document.getElementById('char-name-input');
@@ -1846,12 +1870,12 @@ function updateSpawnBtn(){ _syncAdvControls(); }
 
 // ==================== CLASS & WEAPON DEFS ====================
 const CLASS_TEMPLATES = {
-  warrior: {icon:'⚔️', name:'Warrior', baseCON:30, baseSTR:20, baseDEX:10, baseEND:15, weaponType:'sword'},
-  rogue:   {icon:'🗡️', name:'Rogue',   baseCON:20, baseSTR:10, baseDEX:15, baseEND:10, weaponType:'dagger'},
+  warrior: {icon:'⚔️', name:'Warrior', baseCON:40, baseSTR:10, baseDEX:3, baseEND:10, weaponType:'sword'},
+  rogue:   {icon:'🗡️', name:'Rogue',   baseCON:35, baseSTR:8, baseDEX:4, baseEND:8,  weaponType:'dagger'},
 };
 const CLASS_LEVEL_GAINS = {
-  warrior: {con:5, str:1, dex:1},
-  rogue:   {con:3, str:1, dex:2},
+  warrior: {con:3, str:1.5, dex:0.5, end:1},
+  rogue:   {con:2, str:1,   dex:1.5, end:1},
 };
 const FISTS_DEF = {base:1, str:0.10, dex:0.10};
 function calcDmgFists(str,dex){ return D(FISTS_DEF.base).plus(D(str).times(FISTS_DEF.str)).plus(D(dex).times(FISTS_DEF.dex)); }
@@ -1863,6 +1887,8 @@ const WEAPON_DEFS = {
 function calcCarryWeight(str){ return D(20).plus(D(str).times('0.5')); }
 // Base AP rate from DEX: 1 + dex * 0.01 (100 DEX = 2.0 rate)
 function calcAPRate(dex){ return parseFloat((1 + Dn(dex) * 0.01).toFixed(4)); }
+// Enemy AP rate from DEX: same formula, base 1
+function calcEnemyAPRate(dex){ return 1 + Dn(dex) * 0.01; }
 
 // Overweight reduces apRate. Returns how much to subtract from apRate (0 if under limit).
 // Gradual: -0.05 apRate per kg over, capped at -0.6 (so minimum apRate = 0.4)
@@ -1910,7 +1936,7 @@ function startGame(){
   const con  = D(tmpl.baseCON).plus(allocValues.CON || 0);
   const str  = D(tmpl.baseSTR).plus(allocValues.STR || 0);
   const dex  = D(tmpl.baseDEX).plus(allocValues.DEX || 0);
-  const end  = D(tmpl.baseEND).plus(allocValues.END || 0);
+  const end  = D(tmpl.baseEND); // END does NOT get starting alloc points
   const maxHP = con;
   const maxSta = calcMaxStamina(end);
 
@@ -1928,7 +1954,7 @@ function startGame(){
     enemySpawn: RUN_CONFIG.enemySpawn,
     cursesEnabled: RUN_CONFIG.cursesEnabled,
     pendingLevelUps: 0,
-    unspentPoints: allocPoints,
+    unspentPoints: allocPoints, // unspent points from allocation (if any)
     _eid: 0,
     mapW:42, mapH:32,
     tiles:[], rooms:[],
@@ -2075,7 +2101,7 @@ function generateDungeon(){
   G.stairsDown = {x:lastC.x,  y:lastC.y};
   G.stairsUp   = (G.depth > 1 || G.zone === 'normal') ? {x:startC.x+1, y:startC.y} : null;
 
-  const baseRat = {con:10, str:10, dex:5};
+  const baseRat = {con:25, str:5, dex:5};
 
   const curseMult = _curseMultiplier(G.curseStacks||0);
 
@@ -2122,7 +2148,7 @@ function makeRat(pos, base, statMult, xpReward=1, spawned=false){
     id:++G._eid, type:'dire rat', x:pos.x, y:pos.y,
     con, str, dex, hp, maxHP:D(hp), xp:D(xpReward), isFloorEnemy:!spawned,
     aiState,
-    apRate:1,
+    apRate: calcEnemyAPRate(dex), // base 1 + DEX*0.01
     ap:0,
     telegraphTile:null,
     lastSeenX:null,
@@ -2463,7 +2489,7 @@ function enemyTurn(){
       // Grant AP to enemies (not player yet)
       G.enemies.forEach(e => {
         if(D(e.hp).lte(0)) return;
-        if(!e.apRate) e.apRate = 1;
+        if(!e.apRate) e.apRate = calcEnemyAPRate(e.dex);
         if(e.ap === undefined) e.ap = 0;
         if(e.aiState === 'sleep'){ e.ap = 0; return; }
         e.ap = parseFloat((e.ap + e.apRate).toFixed(6));
@@ -3417,9 +3443,14 @@ function forceLevelUp(){
   G.xp=D(0); G.level=D(G.level).plus(1); G.xpNeeded=D(10)
   G.pendingLevelUps++;
   const gains=CLASS_LEVEL_GAINS[G.class];
-  G.con=D(G.con).plus(gains.con); G.str=D(G.str).plus(gains.str); G.dex=D(G.dex).plus(gains.dex);
+  G.con=D(G.con).plus(gains.con); G.str=D(G.str).plus(gains.str); G.dex=D(G.dex).plus(gains.dex); G.end=D(G.end).plus(gains.end||0);
   G.maxHP=D(G.maxHP).plus(gains.con);
   G.hp=D(G.hp).plus(gains.con); if(D(G.hp).gt(G.maxHP)) G.hp=D(G.maxHP);
+  const newMaxSta = calcMaxStamina(G.end);
+  const staDiff = D(newMaxSta).minus(G.maxStamina||D(50));
+  G.maxStamina = newMaxSta;
+  G.stamina = D(G.stamina||0).plus(staDiff);
+  if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
   G.def=calcDef(G.con); G.regen=calcRegen(G.con);
   G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
   addLog(`LEVEL UP! Upper floors cleared — you are now Level ${Dfmt(G.level)}!`,'level');
@@ -3457,7 +3488,7 @@ function trySpawnEnemies(){
       }
     if (!candidates.length) break;
     const pos=candidates[randInt(0,candidates.length-1)];
-    G.enemies.push(makeRat(pos,{con:10,str:10,dex:5},diffMod.statMult * _curseMultiplier(G.curseStacks||0),1,true));
+    G.enemies.push(makeRat(pos,{con:25,str:5,dex:5},diffMod.statMult * _curseMultiplier(G.curseStacks||0),1,true));
     spawned++;
     remainingChance -= 1.0;
   }
@@ -3745,9 +3776,14 @@ function gainXP(amount){
     G.pendingLevelUps++;
 
     const gains=CLASS_LEVEL_GAINS[G.class];
-    G.con = D(G.con).plus(gains.con); G.str = D(G.str).plus(gains.str); G.dex = D(G.dex).plus(gains.dex);
+    G.con = D(G.con).plus(gains.con); G.str = D(G.str).plus(gains.str); G.dex = D(G.dex).plus(gains.dex); G.end = D(G.end).plus(gains.end||0);
     G.maxHP = D(G.maxHP).plus(gains.con);
     G.hp = D(G.hp).plus(gains.con); if(D(G.hp).gt(G.maxHP)) G.hp = D(G.maxHP);
+    const newMaxSta = calcMaxStamina(G.end);
+    const staDiff = D(newMaxSta).minus(G.maxStamina||D(50));
+    G.maxStamina = newMaxSta;
+    G.stamina = D(G.stamina||0).plus(staDiff);
+    if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
     G.def=calcDef(G.con); G.regen=calcRegen(G.con);
     G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
 
@@ -3768,8 +3804,7 @@ function showLevelUpModal(){
   document.getElementById('levelup-modal').classList.add('active');
   document.getElementById('levelup-msg').textContent=`You reached Level ${Dfmt(G.level)}!`;
   document.getElementById('lu-points').textContent=luPointsRemaining;
-  const gains=CLASS_LEVEL_GAINS[G.class];
-  document.getElementById('lu-base-stats').textContent=`CON+${gains.con}, STR+${gains.str}, DEX+${gains.dex}`;
+  document.getElementById('lu-base-stats').textContent='';
   renderLURows();
 }
 function renderLURows(){
@@ -4134,7 +4169,7 @@ function invCarriedKg(){ return calcCarriedWeight(); }
 let invSelId   = null;
 let invFilter  = 'all';
 let invTabCur  = 'inv';
-let invIcpAlloc = {CON:0,STR:0,DEX:0};
+let invIcpAlloc = {CON:0,STR:0,DEX:0,END:0};
 
 function invIsOpen(){ return document.getElementById('inv-overlay').classList.contains('open'); }
 
@@ -4459,11 +4494,11 @@ const ICP_ALLOC_DEFS=[
   {key:'CON',desc:'Last longer in fights.'},
   {key:'STR',desc:'Hit harder and carry more weight.'},
   {key:'DEX',desc:'Move faster and strike more accurately.'},
-  {key:'END',desc:'Boost stamina, recovery, and weight penalty resistance.'},
+  // END removed from allocatable stats in character tab
 ];
 function invRenderCharPage(){
   if (!G.maxHP) return;
-  invIcpAlloc={CON:0,STR:0,DEX:0,END:0};
+  invIcpAlloc={CON:0,STR:0,DEX:0}; // END not allocatable
   const mid = calcDmg(G.weaponType, G.str, G.dex);
   const wDef = G.weaponType ? WEAPON_DEFS[G.weaponType] : null;
   const baseDmgVal = wDef ? D(wDef.base) : D(FISTS_DEF.base);
@@ -4518,7 +4553,8 @@ function invRenderCharPage(){
   document.getElementById('icp-cfm').disabled=true;
   const cont=document.getElementById('icp-alrows'); cont.innerHTML='';
   ICP_ALLOC_DEFS.forEach(d=>{
-    const base=d.key==='CON'?G.con:d.key==='STR'?G.str:d.key==='DEX'?G.dex:(G.end||D(10));
+    const base=d.key==='CON'?G.con:d.key==='STR'?G.str:d.key==='DEX'?G.dex:null;
+    if (!base) return; // Skip END
     const row=document.createElement('div'); row.className='icp-alrow';
     row.innerHTML=`<span class="icp-alkey">${d.key}</span>
       <span class="icp-aldesc">${d.desc}</span>
@@ -4536,7 +4572,7 @@ function invChAlloc(key,delta){
   if (delta>0&&spent>=(G.unspentPoints||0)) return;
   if (delta<0&&(invIcpAlloc[key]||0)<=0) return;
   invIcpAlloc[key]=(invIcpAlloc[key]||0)+delta;
-  const base=key==='CON'?G.con:key==='STR'?G.str:key==='DEX'?G.dex:(G.end||D(10));
+  const base=key==='CON'?G.con:key==='STR'?G.str:G.dex;
   document.getElementById('ica-'+key).textContent=Dfmt(D(base).plus(invIcpAlloc[key]));
   document.getElementById('icad-'+key).textContent=invIcpAlloc[key]>0?`+${invIcpAlloc[key]}`:'';
   const ns=Object.values(invIcpAlloc).reduce((a,b)=>a+b,0);
@@ -4549,18 +4585,11 @@ function invApplyCharAlloc(){
   if (invIcpAlloc.CON){G.con=D(G.con).plus(invIcpAlloc.CON);G.maxHP=D(G.maxHP).plus(invIcpAlloc.CON);G.hp=D(G.hp).plus(invIcpAlloc.CON);if(D(G.hp).gt(G.maxHP))G.hp=D(G.maxHP);}
   if (invIcpAlloc.STR) G.str=D(G.str).plus(invIcpAlloc.STR);
   if (invIcpAlloc.DEX) G.dex=D(G.dex).plus(invIcpAlloc.DEX);
-  if (invIcpAlloc.END){
-    G.end=D(G.end||10).plus(invIcpAlloc.END);
-    const newMaxSta = calcMaxStamina(G.end);
-    const staDiff = D(newMaxSta).minus(G.maxStamina||D(50));
-    G.maxStamina = newMaxSta;
-    G.stamina = D(G.stamina||0).plus(staDiff);
-    if(D(G.stamina).gt(G.maxStamina)) G.stamina = D(G.maxStamina);
-  }
+  // END is not allocatable
   G.def=calcDef(G.con); G.regen=calcRegen(G.con);
   G.baseDmg=calcDmg(G.weaponType,G.str,G.dex);
   G.unspentPoints-=spent;
-  addLog(`Applied ${spent} pt${spent>1?'s':''}. CON:${Dfmt(G.con)} STR:${Dfmt(G.str)} DEX:${Dfmt(G.dex)} END:${Dfmt(G.end||D(10))}`,'level');
+  addLog(`Applied ${spent} pt${spent>1?'s':''}. CON:${Dfmt(G.con)} STR:${Dfmt(G.str)} DEX:${Dfmt(G.dex)}`,'level');
   updateHUD(); invRenderCharPage();
 }
 
@@ -4695,11 +4724,13 @@ function _dtApplyField(id, v){
       const prev=D(G.level);
       if(D(v).gt(prev)){
         const diff=D(v).minus(prev);
-        const gains=CLASS_LEVEL_GAINS[G.class]||{con:0,str:0,dex:0};
+        const gains=CLASS_LEVEL_GAINS[G.class]||{con:0,str:0,dex:0,end:0};
         G.con=D(G.con).plus(D(gains.con).times(diff));
         G.str=D(G.str).plus(D(gains.str).times(diff));
         G.dex=D(G.dex).plus(D(gains.dex).times(diff));
+        G.end=D(G.end).plus(D(gains.end).times(diff));
         G.maxHP=D(G.maxHP).plus(D(gains.con).times(diff));
+        G.maxStamina = calcMaxStamina(G.end);
         G.unspentPoints=(G.unspentPoints||0)+D(3).times(diff).toNumber();
       }
       G.level=D(v); G.xp=D(0);
@@ -4879,6 +4910,10 @@ function loadGameFromSlot(idx){
         e.maxHP = D(e.maxHP).times(cm);
       });
     }
+    // Recalculate AP rates after curse (dex may have changed)
+    G.enemies.forEach(e => {
+      e.apRate = calcEnemyAPRate(e.dex);
+    });
     _activeSaveSlot = idx;
     camX=0;camY=0;turnPhase='player';priorityTargetId=null;floatNums=[];playerHpFlash=0;
     _queuedAction=null;_panelDirty=true;_clearedBanner=0;_playerActedThisCycle=false;
