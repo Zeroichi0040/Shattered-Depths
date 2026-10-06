@@ -1,0 +1,1329 @@
+/* =========================================================================
+   Shattered Depths — game.js
+   v0.3.0
+   ========================================================================= */
+
+/* ------------------------------ Constants ------------------------------ */
+const DUNGEON_WIDTH  = 10;
+const DUNGEON_HEIGHT = 10;
+
+const PLAYER_AP_RATE = 2.0;
+const RAT_AP_RATE    = 1.0;
+
+const RAT_SPAWN_COUNT = 2;   // Number of rats to spawn per floor. Tunable.
+
+// Max rats in one battle. Tunable, up to the 9 slots of the battle field.
+// Raise it together with RAT_SPAWN_COUNT to test the full slot field.
+const BATTLE_MAX_PARTICIPANTS = 2;
+
+const PLAYER_MAX_HP  = 10;
+const RAT_MAX_HP     = 3;
+
+const PLAYER_ATTACK  = 1;
+const RAT_ATTACK     = 1;
+
+const AI_ACTION_DELAY_MS = 200;
+
+/* -------------------------- Internal constants ------------------------- */
+const CELL_SIZE     = 48;   // 3x the 16px sprites
+const WALL          = 1;
+const FLOOR         = 0;
+const BSP_MIN_LEAF  = 3;
+const BSP_MAX_DEPTH = 4;
+
+const DIRS = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+
+/* ------------------------------- State --------------------------------- */
+const game = {
+  runId: 0,
+  active: false,
+  over: false,
+  awaitingInput: false,
+  grid: null,
+  player: null,
+  enemies: [],
+  schedule: [],
+  scheduleIndex: 0,
+  battle: null,        // null, or the open battle (see Battle window section)
+};
+
+/* ------------------------------- DOM ----------------------------------- */
+const el = {
+  screenMenu:      document.getElementById('screen-menu'),
+  screenPlay:      document.getElementById('screen-play'),
+  screenChangelog: document.getElementById('screen-changelog'),
+  grid:            document.getElementById('grid'),
+  debug:           document.getElementById('debug'),
+  playerHp:        document.getElementById('player-hp'),
+  toast:           document.getElementById('toast'),
+  modal:           document.getElementById('modal'),
+  overlay:         document.getElementById('overlay'),
+  overlayText:     document.getElementById('overlay-text'),
+  battle:          document.getElementById('battle'),
+  battleField:     document.getElementById('battle-field'),
+  battleLog:       document.getElementById('battle-log'),
+  battleMenu:      document.getElementById('battle-menu'),
+  battleHint:      document.getElementById('battle-hint'),
+  battleMin:       document.getElementById('battle-min'),
+};
+
+/* =========================================================================
+   Utility
+   ========================================================================= */
+function randInt(n) { return Math.floor(Math.random() * n); }
+function inBounds(x, y) {
+  return x >= 0 && y >= 0 && x < DUNGEON_WIDTH && y < DUNGEON_HEIGHT;
+}
+function manhattan(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
+
+function enemyAt(x, y) {
+  return game.enemies.find(e => e.hp > 0 && e.x === x && e.y === y) || null;
+}
+
+/* =========================================================================
+   Dungeon generation (BSP)
+   ========================================================================= */
+function generateDungeon() {
+  const grid = [];
+  for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+    grid.push(new Array(DUNGEON_WIDTH).fill(WALL));
+  }
+
+  // Interior region — the outer ring stays solid wall.
+  const root = { x: 1, y: 1, w: DUNGEON_WIDTH - 2, h: DUNGEON_HEIGHT - 2 };
+  const leaves = splitRegion(root, 0);
+
+  const rooms = leaves.map(leaf => carveRoom(grid, leaf));
+
+  // Connect rooms in BSP order with L-shaped corridors (guarantees connectivity).
+  for (let i = 1; i < rooms.length; i++) {
+    carveCorridor(grid, roomCenter(rooms[i - 1]), roomCenter(rooms[i]));
+  }
+
+  return grid;
+}
+
+function splitRegion(region, depth) {
+  const canSplitH = region.w >= BSP_MIN_LEAF * 2;
+  const canSplitV = region.h >= BSP_MIN_LEAF * 2;
+
+  if (depth >= BSP_MAX_DEPTH || (!canSplitH && !canSplitV)) return [region];
+
+  let splitHorizontally;
+  if (canSplitH && canSplitV) splitHorizontally = Math.random() < 0.5;
+  else splitHorizontally = canSplitH;
+
+  if (splitHorizontally) {
+    const cut = BSP_MIN_LEAF + randInt(region.w - BSP_MIN_LEAF * 2 + 1);
+    return [
+      ...splitRegion({ x: region.x, y: region.y, w: cut, h: region.h }, depth + 1),
+      ...splitRegion({ x: region.x + cut, y: region.y, w: region.w - cut, h: region.h }, depth + 1),
+    ];
+  } else {
+    const cut = BSP_MIN_LEAF + randInt(region.h - BSP_MIN_LEAF * 2 + 1);
+    return [
+      ...splitRegion({ x: region.x, y: region.y, w: region.w, h: cut }, depth + 1),
+      ...splitRegion({ x: region.x, y: region.y + cut, w: region.w, h: region.h - cut }, depth + 1),
+    ];
+  }
+}
+
+function carveRoom(grid, leaf) {
+  const x = leaf.x + 1;
+  const y = leaf.y + 1;
+  const w = Math.max(1, leaf.w - 2);
+  const h = Math.max(1, leaf.h - 2);
+
+  for (let j = y; j < y + h; j++) {
+    for (let i = x; i < x + w; i++) {
+      if (inBounds(i, j)) grid[j][i] = FLOOR;
+    }
+  }
+  return { x, y, w, h };
+}
+
+function roomCenter(room) {
+  return {
+    x: room.x + Math.floor((room.w - 1) / 2),
+    y: room.y + Math.floor((room.h - 1) / 2),
+  };
+}
+
+function carveCorridor(grid, a, b) {
+  let x = a.x, y = a.y;
+
+  const horizontalFirst = Math.random() < 0.5;
+  const stepX = () => {
+    while (x !== b.x) {
+      x += Math.sign(b.x - x);
+      if (inBounds(x, y)) grid[y][x] = FLOOR;
+    }
+  };
+  const stepY = () => {
+    while (y !== b.y) {
+      y += Math.sign(b.y - y);
+      if (inBounds(x, y)) grid[y][x] = FLOOR;
+    }
+  };
+
+  if (horizontalFirst) { stepX(); stepY(); } else { stepY(); stepX(); }
+
+  if (inBounds(a.x, a.y)) grid[a.y][a.x] = FLOOR;
+  if (inBounds(b.x, b.y)) grid[b.y][b.x] = FLOOR;
+}
+
+/* =========================================================================
+   Actors
+   ========================================================================= */
+function makePlayer(x, y) {
+  return {
+    isPlayer: true,
+    label: 'P',
+    tieOrder: 999,          // ties with enemies: enemies are processed first
+    x, y,
+    hp: PLAYER_MAX_HP,
+    maxHp: PLAYER_MAX_HP,
+    apRate: PLAYER_AP_RATE,
+    currentAp: 0,
+  };
+}
+
+function makeRat(x, y, tieOrder) {
+  return {
+    isPlayer: false,
+    label: 'E' + (tieOrder + 1),   // E1, E2, E3 ... by spawn order
+    tieOrder,                       // spawn order among enemies
+    x, y,
+    hp: RAT_MAX_HP,
+    maxHp: RAT_MAX_HP,
+    apRate: RAT_AP_RATE,
+    currentAp: 0,
+    inBattle: false,                // true while a battle participant (still drawn on the board)
+    slot: null,                     // battle slot index while in a battle
+  };
+}
+
+/* =========================================================================
+   AP schedule
+   ========================================================================= */
+/**
+ * Build the locked turn schedule for this turn.
+ *
+ *  - sort actors ascending by n_a (number of actions this turn)
+ *  - place each actor's actions using ceil(k * R / n) over the free-slot list
+ *
+ * Tie-break note: with the ceil-proportional placement, the actor processed
+ * FIRST is pushed toward the LAST free slot. For the canonical cases to come
+ * out right (e.g. P:1 / E:1  ->  "P E"), the player must therefore be
+ * processed LAST when action counts are equal — i.e. enemies come first in
+ * the sorted list, then the player.
+ *
+ * With two or more equal-n enemies, the same reversal means enemies must be
+ * processed in REVERSE spawn order so the resulting schedule reads
+ * [player, E1, E2, ...].
+ *
+ * This is deliberately the opposite of the literal spec prose
+ * ("Player first, then enemies, in spawn order"), which would produce the
+ * reversed sequence. The code semantics below match all 9 canonical test
+ * cases; the spec prose is what's wrong.
+ */
+function buildSchedule(actors) {
+  const entries = actors
+    .map(a => ({ actor: a, n: Math.floor(a.currentAp) }))
+    .filter(e => e.n > 0);
+
+  entries.sort((a, b) => {
+    if (a.n !== b.n) return a.n - b.n;
+    // Ceil-placement reverses the processing order. To get a schedule of
+    // [player, E1, E2, ...] the processing order must be
+    // [..., E2, E1, player] — i.e. player last, enemies in REVERSE spawn order.
+    if (a.actor.isPlayer) return 1;
+    if (b.actor.isPlayer) return -1;
+    return b.actor.tieOrder - a.actor.tieOrder;
+  });
+
+  const T = entries.reduce((sum, e) => sum + e.n, 0);
+  const free = [];
+  for (let i = 1; i <= T; i++) free.push(i);
+
+  const slots = new Array(T).fill(null);
+
+  for (const entry of entries) {
+    const n = entry.n;
+    for (let k = 1; k <= n; k++) {
+      const R = free.length;
+      const pos = Math.ceil((k * R) / n);
+      const slotNumber = free[pos - 1];
+      slots[slotNumber - 1] = entry.actor;
+      free.splice(pos - 1, 1);
+    }
+  }
+
+  return slots;
+}
+
+/* =========================================================================
+   Turn flow
+   ========================================================================= */
+function startNewTurn() {
+  if (!game.active || game.over) return;
+
+  const actors = [game.player, ...game.enemies].filter(a => a.hp > 0);
+
+  // 1. Gain AP.
+  for (const a of actors) a.currentAp += a.apRate;
+
+  // 2/3. Compute n_a and lock the schedule for the turn.
+  game.schedule = buildSchedule(actors);
+  game.scheduleIndex = 0;
+
+  render();
+
+  if (game.schedule.length === 0) {
+    // Nothing to do this turn (shouldn't happen with the default rates).
+    setTimeout(() => { if (game.active && !game.over) startNewTurn(); },
+               AI_ACTION_DELAY_MS);
+    return;
+  }
+
+  advance();
+}
+
+function advance() {
+  if (!game.active || game.over) return;
+
+  // Turn over? Only NOW do we resolve win / lose, so a mid-turn kill does
+  // not abort the remaining slots of the locked schedule.
+  if (game.scheduleIndex >= game.schedule.length) {
+    checkGameEnd();
+    if (game.over) return;
+    startNewTurn();
+    return;
+  }
+
+  const actor = game.schedule[game.scheduleIndex];
+
+  // Dead actors and actors that cannot afford an action are skipped.
+  if (!actor || actor.hp <= 0 || actor.currentAp < 1) {
+    game.scheduleIndex++;
+    advance();
+    return;
+  }
+
+  if (actor.isPlayer) {
+    game.awaitingInput = true;
+    render();
+    return; // wait for WASD / SPACE
+  }
+
+  // Enemy action.
+  game.awaitingInput = false;
+  render();
+
+  const runId = game.runId;
+  setTimeout(() => {
+    if (runId !== game.runId) return;          // run was restarted
+    if (!game.active || game.over) return;
+    if (actor.hp <= 0 || actor.currentAp < 1) {
+      game.scheduleIndex++;
+      advance();
+      return;
+    }
+
+    ratAction(actor);
+    actor.currentAp -= 1;
+    game.scheduleIndex++;
+
+    // If the rat killed the player, end immediately — no point resolving
+    // the rest of the schedule for a dead protagonist.
+    if (game.player.hp <= 0) {
+      checkGameEnd();
+      render();
+      return;
+    }
+
+    render();
+
+    if (game.active && !game.over) advance();
+  }, AI_ACTION_DELAY_MS);
+}
+
+/* ---------------------------- Player action ---------------------------- */
+function playerAction(kind, dx, dy, target) {
+  if (!game.active || game.over || !game.awaitingInput) return;
+
+  const actor = game.schedule[game.scheduleIndex];
+  if (!actor || !actor.isPlayer) return;
+
+  game.awaitingInput = false;
+
+  if (kind === 'move')        playerMove(dx, dy);
+  else if (kind === 'attack') battleAttack(target);
+  else if (kind === 'flee')   battleFlee();
+  // 'wait' does nothing.
+
+  if (game.battle) resetBattleMenu();   // each battle action starts at the main menu
+
+  actor.currentAp -= 1;
+  game.scheduleIndex++;
+
+  render();
+
+  // NOTE: do NOT call checkGameEnd() here. The player's action may have
+  // killed the last enemy, but the remaining slots of the locked schedule
+  // must still resolve (dead actors are skipped inside advance()). Win /
+  // lose is checked at the end of the turn inside advance().
+  if (game.active) advance();
+}
+
+function playerMove(dx, dy) {
+  const p = game.player;
+  const nx = p.x + dx;
+  const ny = p.y + dy;
+
+  // Bumping into a wall or the edge still costs the action.
+  if (!inBounds(nx, ny)) return;
+  if (game.grid[ny][nx] === WALL) return;
+
+  // Bumping a rat opens a battle. The bump costs the action but deals no damage.
+  const target = enemyAt(nx, ny);
+  if (target) {
+    openBattle(target, `You bump into ${target.label}!`);
+    return;
+  }
+
+  p.x = nx;
+  p.y = ny;
+}
+
+/* ------------------------------ Rat AI --------------------------------- */
+function ratAction(rat) {
+  const p = game.player;
+
+  // 0. Already in the battle: this slot is a bite.
+  if (rat.inBattle) {
+    battleBite(rat);
+    return;
+  }
+
+  // 1. Adjacent orthogonally? Bump into the player. This opens a battle, or
+  //    joins the open one. It never deals damage by itself.
+  if (manhattan(rat, p) === 1) {
+    if (!game.battle) openBattle(rat, `${rat.label} lunges at you!`);
+    else joinBattle(rat);
+    return;
+  }
+
+  // 2. Step one tile along the shortest orthogonal path.
+  const dist = computeDistances(p.x, p.y);
+
+  let best = Infinity;
+  let options = [];
+
+  for (const [dx, dy] of DIRS) {
+    const nx = rat.x + dx;
+    const ny = rat.y + dy;
+
+    if (!inBounds(nx, ny)) continue;
+    if (game.grid[ny][nx] === WALL) continue;
+    if (nx === p.x && ny === p.y) continue;   // occupied by the player
+    if (enemyAt(nx, ny)) continue;            // occupied by another enemy
+
+    const d = dist[ny][nx];
+    if (d === Infinity) continue;
+
+    if (d < best) {
+      best = d;
+      options = [{ x: nx, y: ny }];
+    } else if (d === best) {
+      options.push({ x: nx, y: ny });
+    }
+  }
+
+  if (options.length > 0) {
+    const step = options[randInt(options.length)]; // random among equally short paths
+    rat.x = step.x;
+    rat.y = step.y;
+    return;
+  }
+
+  // 3. No path — wander to any valid adjacent tile.
+  const wander = [];
+  for (const [dx, dy] of DIRS) {
+    const nx = rat.x + dx;
+    const ny = rat.y + dy;
+
+    if (!inBounds(nx, ny)) continue;
+    if (game.grid[ny][nx] === WALL) continue;
+    if (nx === p.x && ny === p.y) continue;
+    if (enemyAt(nx, ny)) continue;
+
+    wander.push({ x: nx, y: ny });
+  }
+
+  if (wander.length > 0) {
+    const step = wander[randInt(wander.length)];
+    rat.x = step.x;
+    rat.y = step.y;
+  }
+  // else: wait (no valid move).
+}
+
+function computeDistances(sx, sy) {
+  const dist = [];
+  for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+    dist.push(new Array(DUNGEON_WIDTH).fill(Infinity));
+  }
+
+  const queue = [[sx, sy]];
+  dist[sy][sx] = 0;
+
+  while (queue.length > 0) {
+    const [x, y] = queue.shift();
+    for (const [dx, dy] of DIRS) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (!inBounds(nx, ny)) continue;
+      if (game.grid[ny][nx] === WALL) continue;
+      if (dist[ny][nx] !== Infinity) continue;
+      dist[ny][nx] = dist[y][x] + 1;
+      queue.push([nx, ny]);
+    }
+  }
+
+  return dist;
+}
+
+/* =========================================================================
+   Battle window
+   =========================================================================
+   A mode layered on top of the AP schedule, not a separate system. The
+   schedule keeps running underneath: every battle action (attack, flee, a
+   rat's bite) is just a normal slot. Participants stay on the dungeon
+   board; everyone else keeps playing the dungeon.
+
+   game.battle = {
+     participants: [rat, ...],   // rats in the fight (rat.slot = field slot)
+     minimized:    false,        // peek mode: window hidden, any input restores it
+     menu:         'main',       // 'main' | 'fight' | 'target'
+     cursor:       0,            // highlighted option in main / fight
+     targetIndex:  0,            // highlighted target in 'target'
+     log:          [],           // last few lines shown in the window
+   }
+   ========================================================================= */
+
+/* The field: 4 top slots and 5 bottom slots, staggered. x is the slot's
+   centre as a percentage of the field width. Array order IS the fill order. */
+const BATTLE_SLOTS = [
+  { row: 'bottom', x: 50 },   // 1  bottom, middle
+  { row: 'bottom', x: 70 },   // 2  bottom, right of middle
+  { row: 'bottom', x: 30 },   // 3  bottom, left of middle
+  { row: 'bottom', x: 90 },   // 4  bottom, outer right
+  { row: 'bottom', x: 10 },   // 5  bottom, outer left
+  { row: 'top',    x: 40 },   // 6  top, inner-left
+  { row: 'top',    x: 60 },   // 7  top, inner-right
+  { row: 'top',    x: 20 },   // 8  top, outer left
+  { row: 'top',    x: 80 },   // 9  top, outer right
+];
+
+/* Keys the game uses for input. Any of them (or a click) restores a
+   minimized battle window. */
+const BATTLE_INPUT_KEYS = ['w', 'a', 's', 'd', ' ', 'escape'];
+
+const BATTLE_MENUS = {
+  main:  ['Fight', 'Flee'],
+  fight: ['Basic Attack', 'Back'],
+};
+
+function battleCap() {
+  return Math.max(1, Math.min(BATTLE_MAX_PARTICIPANTS, BATTLE_SLOTS.length));
+}
+
+function battleLog(msg) {
+  if (!game.battle) return;
+  game.battle.log.push(msg);
+  if (game.battle.log.length > 3) game.battle.log.shift();
+}
+
+function setBattleMinimized(minimized) {
+  if (!game.battle) return;
+  game.battle.minimized = minimized;
+  renderBattle();
+}
+
+function resetBattleMenu() {
+  const b = game.battle;
+  b.menu = 'main';
+  b.cursor = 0;
+  b.targetIndex = 0;
+}
+
+function livingParticipants() {
+  return game.battle.participants.filter(r => r.hp > 0).sort((a, b) => a.slot - b.slot);
+}
+
+/* ------------------------------ Lifecycle ------------------------------ */
+function openBattle(rat, message) {
+  game.battle = {
+    participants: [],
+    minimized: false,
+    menu: 'main',
+    cursor: 0,
+    targetIndex: 0,
+    log: [],
+  };
+  addParticipant(rat);
+  battleLog(message);
+}
+
+function addParticipant(rat) {
+  const b = game.battle;
+  const used = new Set(b.participants.map(r => r.slot));
+  let slot = 0;
+  while (used.has(slot)) slot++;      // next free slot in fill order
+
+  rat.slot = slot;
+  rat.inBattle = true;
+  b.participants.push(rat);
+}
+
+/* A rat spends its action bumping the player's tile to join. It does not bite
+   on the same action. At the cap the bump does nothing. */
+function joinBattle(rat) {
+  const b = game.battle;
+  if (!b || b.participants.length >= battleCap()) return;
+  addParticipant(rat);
+  battleLog(`${rat.label} joins the battle!`);
+}
+
+function closeBattle() {
+  const b = game.battle;
+  if (!b) return;
+  for (const r of b.participants) {
+    r.inBattle = false;
+    r.slot = null;
+  }
+  game.battle = null;
+}
+
+/* ------------------------------- Actions -------------------------------- */
+function battleAttack(target) {
+  const b = game.battle;
+  if (!b || !target || target.hp <= 0 || !b.participants.includes(target)) return;
+
+  target.hp -= PLAYER_ATTACK;
+  battleLog(`You hit ${target.label} for ${PLAYER_ATTACK}.`);
+
+  if (target.hp <= 0) {
+    target.hp = 0;
+    target.inBattle = false;
+    target.slot = null;
+    game.enemies = game.enemies.filter(e => e !== target);
+    b.participants = b.participants.filter(r => r !== target);
+    battleLog(`${target.label} is defeated.`);
+  }
+
+  // Mid-battle victory closes the window. The rest of the schedule still
+  // resolves in the dungeon; win / lose is only checked at turn end.
+  if (b.participants.length === 0) {
+    closeBattle();
+    showToast('Victory!');
+  }
+}
+
+/* Flee always succeeds, costs the action, and does not move the player. */
+function battleFlee() {
+  if (!game.battle) return;
+  closeBattle();
+  showToast('You fled!');
+}
+
+/* A participant's schedule slot is a bite. */
+function battleBite(rat) {
+  game.player.hp -= RAT_ATTACK;
+  battleLog(`${rat.label} bites you for ${RAT_ATTACK}.`);
+}
+
+/* -------------------------------- Input --------------------------------- */
+function canBattleInput() {
+  const b = game.battle;
+  return !!b && !b.minimized && game.awaitingInput && !game.over;
+}
+
+function battleStep(dir) {
+  const b = game.battle;
+  if (b.menu === 'target') {
+    const n = livingParticipants().length;
+    if (n > 0) b.targetIndex = (b.targetIndex + dir + n) % n;
+  } else {
+    const n = BATTLE_MENUS[b.menu].length;
+    b.cursor = (b.cursor + dir + n) % n;
+  }
+  applyBattleHighlight();
+}
+
+function battleConfirm() {
+  const b = game.battle;
+
+  if (b.menu === 'main') {
+    if (b.cursor === 0) {
+      b.menu = 'fight';
+      b.cursor = 0;
+      renderBattle();
+    } else {
+      playerAction('flee');
+    }
+  } else if (b.menu === 'fight') {
+    if (b.cursor === 1) {                            // Back
+      battleBack();
+      return;
+    }
+    const targets = livingParticipants();
+    if (targets.length === 1) {
+      playerAction('attack', 0, 0, targets[0]);      // one rat: no targeting step
+    } else if (targets.length > 1) {
+      b.menu = 'target';
+      b.targetIndex = 0;
+      renderBattle();
+    }
+  } else if (b.menu === 'target') {
+    const target = livingParticipants()[b.targetIndex];
+    if (target) playerAction('attack', 0, 0, target);
+  }
+}
+
+/* Esc backs out one menu level. It never spends AP. */
+function battleBack() {
+  const b = game.battle;
+  if (b.menu === 'target')     { b.menu = 'fight'; b.cursor = 0; }
+  else if (b.menu === 'fight') { b.menu = 'main';  b.cursor = 0; }
+  else return;
+  renderBattle();
+}
+
+function battleKey(e, key) {
+  if (!canBattleInput()) return;
+
+  let handled = true;
+  if (key === 'w' || key === 'a')      battleStep(-1);
+  else if (key === 's' || key === 'd') battleStep(1);
+  else if (e.key === ' ')              battleConfirm();
+  else if (e.key === 'Escape')         battleBack();
+  else handled = false;
+
+  if (handled) e.preventDefault();
+}
+
+/* ------------------------------ Rendering ------------------------------- */
+const battleView = { sig: '' };
+
+function buildBattleField() {
+  el.battleField.replaceChildren();
+  BATTLE_SLOTS.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = `battle-slot row-${s.row}`;
+    d.dataset.slot = String(i);
+    d.style.left = s.x + '%';
+    el.battleField.appendChild(d);
+  });
+}
+
+function renderBattle() {
+  const b = game.battle;
+
+  if (!b) {
+    el.battle.classList.add('hidden');
+    battleView.sig = '';
+    return;
+  }
+
+  el.battle.classList.toggle('hidden', b.minimized);
+
+  // Only rebuild the window when something visible changed, so a click is
+  // never swallowed by a rebuild mid-press while rats are taking turns.
+  const sig = JSON.stringify([
+    b.menu, game.awaitingInput, b.log,
+    b.participants.map(r => [r.label, r.hp, r.slot]),
+  ]);
+
+  if (sig !== battleView.sig) {
+    battleView.sig = sig;
+
+    // Field.
+    const slotEls = el.battleField.children;
+    for (let i = 0; i < BATTLE_SLOTS.length; i++) {
+      const r = b.participants.find(x => x.slot === i && x.hp > 0);
+      slotEls[i].classList.toggle('filled', !!r);
+      if (r) slotEls[i].replaceChildren(makeSprite('rat', r));
+      else slotEls[i].replaceChildren();
+    }
+
+    // Log.
+    el.battleLog.textContent = b.log.join('\n');
+
+    // Menu.
+    el.battleMenu.replaceChildren();
+    el.battleMenu.classList.toggle('disabled', !game.awaitingInput);
+
+    if (b.menu === 'target') {
+      const prompt = document.createElement('span');
+      prompt.className = 'battle-prompt';
+      prompt.textContent = 'Choose a target';
+      el.battleMenu.appendChild(prompt);
+    } else {
+      BATTLE_MENUS[b.menu].forEach((label, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'battle-opt';
+        btn.dataset.i = String(i);
+        btn.textContent = label;
+        el.battleMenu.appendChild(btn);
+      });
+    }
+
+    // Hint.
+    if (!game.awaitingInput)        el.battleHint.textContent = 'Waiting for your turn...';
+    else if (b.menu === 'target')   el.battleHint.textContent = 'WASD: cycle target · Space / click: confirm · Esc: back';
+    else if (b.menu === 'fight')    el.battleHint.textContent = '';
+    else                            el.battleHint.textContent = '';
+  }
+
+  applyBattleHighlight();
+}
+
+function applyBattleHighlight() {
+  const b = game.battle;
+  if (!b) return;
+
+  const active = game.awaitingInput;
+
+  el.battleMenu.querySelectorAll('.battle-opt').forEach((btn, i) => {
+    btn.classList.toggle('selected', active && i === b.cursor);
+  });
+
+  const target = (active && b.menu === 'target') ? livingParticipants()[b.targetIndex] : null;
+  for (const s of el.battleField.children) {
+    s.classList.toggle('targeted', !!target && Number(s.dataset.slot) === target.slot);
+  }
+}
+
+/* One-time setup: build the field and bind the mouse. */
+function initBattleUI() {
+  buildBattleField();
+
+  // Menu: hover highlights, click selects.
+  el.battleMenu.addEventListener('mouseover', (e) => {
+    const btn = e.target.closest('.battle-opt');
+    if (!btn || !canBattleInput()) return;
+    game.battle.cursor = Number(btn.dataset.i);
+    applyBattleHighlight();
+  });
+  el.battleMenu.addEventListener('click', (e) => {
+    const btn = e.target.closest('.battle-opt');
+    if (!btn || !canBattleInput()) return;
+    game.battle.cursor = Number(btn.dataset.i);
+    battleConfirm();
+  });
+
+  // Field: in the targeting step, hover highlights a rat and click picks it.
+  const slotTarget = (e) => {
+    if (!canBattleInput() || game.battle.menu !== 'target') return -1;
+    const slotEl = e.target.closest('.battle-slot');
+    if (!slotEl) return -1;
+    return livingParticipants().findIndex(r => r.slot === Number(slotEl.dataset.slot));
+  };
+  el.battleField.addEventListener('mouseover', (e) => {
+    const idx = slotTarget(e);
+    if (idx < 0) return;
+    game.battle.targetIndex = idx;
+    applyBattleHighlight();
+  });
+  el.battleField.addEventListener('click', (e) => {
+    const idx = slotTarget(e);
+    if (idx < 0) return;
+    game.battle.targetIndex = idx;
+    battleConfirm();
+  });
+
+  // Minimize is mouse-only for now (the shortcut key is undecided).
+  el.battleMin.addEventListener('click', () => setBattleMinimized(true));
+
+  // While minimized, any click brings the window back and does nothing else.
+  // Capture phase, so the click never reaches whatever is underneath.
+  document.addEventListener('click', (e) => {
+    if (el.screenPlay.classList.contains('hidden')) return;
+    if (!game.battle || !game.battle.minimized) return;
+    e.stopPropagation();
+    e.preventDefault();
+    setBattleMinimized(false);
+  }, true);
+}
+
+/* =========================================================================
+   Win / lose
+   ========================================================================= */
+function checkGameEnd() {
+  if (game.over) return;
+
+  if (game.player.hp <= 0) {
+    game.player.hp = 0;
+    game.over = true;
+    game.awaitingInput = false;
+    closeBattle();
+    showOverlay('You died. Press R to restart.');
+    return;
+  }
+
+  if (game.enemies.length === 0) {
+    game.over = true;
+    game.awaitingInput = false;
+    showOverlay('Cleared. Press R to restart.');
+  }
+}
+
+function showOverlay(text) {
+  el.overlayText.textContent = text;
+  el.overlay.classList.remove('hidden');
+}
+
+function hideOverlay() {
+  el.overlay.classList.add('hidden');
+}
+
+/* =========================================================================
+   Rendering
+   ========================================================================= */
+function render() {
+  if (!game.player) return;
+  renderGrid();
+  renderSidebar();
+  renderDebug();
+  renderBattle();
+}
+
+/* The board is built once per run, because tiles never change. Each render
+   then only redraws the entity layer (player, rats) on top of it. */
+const board = { grid: null, cells: [] };
+
+const EMOJI_FALLBACK = { player: '👤', rat: '🐀' };
+
+function buildBoard() {
+  el.grid.innerHTML = '';
+  el.grid.style.gridTemplateColumns = `repeat(${DUNGEON_WIDTH}, ${CELL_SIZE}px)`;
+  el.grid.style.gridTemplateRows    = `repeat(${DUNGEON_HEIGHT}, ${CELL_SIZE}px)`;
+
+  board.cells = [];
+  for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+    const row = [];
+    for (let x = 0; x < DUNGEON_WIDTH; x++) {
+      const isWall = game.grid[y][x] === WALL;
+
+      const cell = document.createElement('div');
+      cell.className = isWall ? 'cell wall' : 'cell';
+
+      // If a tile is missing, the CSS background colors still apply.
+      const url = Assets.tileURL(isWall ? 'wall' : 'floor', x, y);
+      if (url) cell.style.backgroundImage = `url(${url})`;
+
+      el.grid.appendChild(cell);
+      row.push(cell);
+    }
+    board.cells.push(row);
+  }
+  board.grid = game.grid;
+}
+
+function renderGrid() {
+  if (board.grid !== game.grid) buildBoard();
+
+  const p = game.player;
+
+  for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+    for (let x = 0; x < DUNGEON_WIDTH; x++) {
+      if (game.grid[y][x] === WALL) continue;
+
+      const cell = board.cells[y][x];
+      let sprite = null;
+
+      if (p.hp > 0 && p.x === x && p.y === y) {
+        sprite = makeSprite('player', null);
+      } else {
+        const enemy = enemyAt(x, y);
+        if (enemy) sprite = makeSprite('rat', enemy);
+      }
+
+      if (sprite) cell.replaceChildren(sprite);
+      else if (cell.firstChild) cell.replaceChildren();
+    }
+  }
+}
+
+function makeSprite(role, enemy) {
+  const wrap = document.createElement('div');
+  wrap.className = 'entity';
+
+  const url = Assets.spriteURL(role, 0);
+  if (url) {
+    const img = document.createElement('img');
+    img.className = 'sprite-img';
+    img.src = url;
+    img.alt = '';
+    img.draggable = false;
+    wrap.appendChild(img);
+  } else {
+    // Sprite missing: fall back to the old emoji so the game stays playable.
+    const emoji = document.createElement('span');
+    emoji.className = 'sprite';
+    emoji.textContent = EMOJI_FALLBACK[role] || '?';
+    wrap.appendChild(emoji);
+  }
+
+  if (enemy) {
+    const bar = document.createElement('div');
+    bar.className = 'hp-bar';
+
+    const fill = document.createElement('div');
+    fill.className = 'hp-fill';
+    fill.style.width = Math.max(0, (enemy.hp / enemy.maxHp) * 100) + '%';
+
+    bar.appendChild(fill);
+    wrap.appendChild(bar);
+  }
+
+  return wrap;
+}
+
+function renderSidebar() {
+  const p = game.player;
+  el.playerHp.textContent = `HP: ${Math.max(0, p.hp)} / ${p.maxHp}`;
+}
+
+function renderDebug() {
+  const parts = [];
+  if (game.player) parts.push(`${game.player.label}: ${game.player.currentAp.toFixed(1)}`);
+
+  for (const e of game.enemies) {
+    if (e.hp <= 0) continue;
+    parts.push(`${e.label}${e.inBattle ? '*' : ''}: ${e.currentAp.toFixed(1)}`);   // * = in battle
+  }
+
+  const scheduleText = game.schedule.length === 0
+    ? '—'
+    : game.schedule.map((actor, i) =>
+        i === game.scheduleIndex
+          ? `<b>${actor.label}</b>`
+          : actor.label
+      ).join(' → ');
+
+  el.debug.innerHTML = `${parts.join(' | ')}<br>Schedule: ${scheduleText}`;
+}
+
+/* =========================================================================
+   Screens / menu
+   ========================================================================= */
+function showScreen(name) {
+  el.screenMenu.classList.toggle('hidden', name !== 'menu');
+  el.screenPlay.classList.toggle('hidden', name !== 'play');
+  el.screenChangelog.classList.toggle('hidden', name !== 'changelog');
+}
+
+/* ---------------------------- Changelog -------------------------------- */
+function renderChangelog() {
+  const list = document.getElementById('changelog-list');
+  list.innerHTML = '';
+
+  for (const entry of CHANGELOG) {
+    const article = document.createElement('article');
+    article.className = 'changelog-entry';
+
+    // ---- header row: version / date / title / + toggle ----
+    const header = document.createElement('div');
+    header.className = 'changelog-header';
+
+    const heading = document.createElement('div');
+    heading.className = 'changelog-heading';
+
+    const version = document.createElement('span');
+    version.className = 'changelog-version';
+    version.textContent = `v${entry.version}`;
+    heading.appendChild(version);
+
+    const date = document.createElement('span');
+    date.className = 'changelog-date';
+    date.textContent = entry.date;
+    heading.appendChild(date);
+
+    const title = document.createElement('span');
+    title.className = 'changelog-title';
+    title.textContent = entry.title;
+    heading.appendChild(title);
+
+    header.appendChild(heading);
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'changelog-toggle';
+    toggle.textContent = '+';
+    toggle.setAttribute('aria-label', 'Toggle details');
+    toggle.setAttribute('aria-expanded', 'false');
+    header.appendChild(toggle);
+
+    article.appendChild(header);
+
+    // ---- summary (always visible) ----
+    const summary = document.createElement('ul');
+    summary.className = 'changelog-summary';
+
+    for (const item of entry.summary) {
+      const li = document.createElement('li');
+
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = item.tag;
+      li.appendChild(tag);
+
+      const text = document.createElement('span');
+      text.textContent = item.text;
+      li.appendChild(text);
+
+      summary.appendChild(li);
+    }
+    article.appendChild(summary);
+
+    // ---- details panel (hidden until "+") ----
+    // Contains: technical overview, then (if present) design notes.
+    const panel = document.createElement('div');
+    panel.className = 'changelog-details hidden';
+
+    // --- section 1: technical overview ---
+    const techHeading = document.createElement('div');
+    techHeading.className = 'changelog-details-heading';
+    techHeading.textContent = 'More technical information';
+    panel.appendChild(techHeading);
+
+    const techList = document.createElement('ul');
+    for (const line of entry.tech) {
+      const li = document.createElement('li');
+      li.textContent = line;
+      techList.appendChild(li);
+    }
+    panel.appendChild(techList);
+
+    // --- section 2: design notes (optional) ---
+    if (Array.isArray(entry.dev) && entry.dev.length > 0) {
+      const divider = document.createElement('div');
+      divider.className = 'changelog-design-divider';
+      divider.textContent = 'Design notes';
+      panel.appendChild(divider);
+
+      const dev = document.createElement('div');
+      dev.className = 'changelog-dev';
+
+      let openList = null;
+      for (const item of entry.dev) {
+        if (typeof item === 'string') {
+          if (!openList) {
+            openList = document.createElement('ul');
+            dev.appendChild(openList);
+          }
+          const li = document.createElement('li');
+          li.textContent = item;
+          openList.appendChild(li);
+        } else {
+          openList = null;
+
+          const h = document.createElement('div');
+          h.className = 'changelog-dev-heading';
+          h.textContent = item.heading;
+          dev.appendChild(h);
+
+          const ul = document.createElement('ul');
+          for (const line of item.items) {
+            const li = document.createElement('li');
+            li.textContent = line;
+            ul.appendChild(li);
+          }
+          dev.appendChild(ul);
+        }
+      }
+
+      panel.appendChild(dev);
+    }
+
+    article.appendChild(panel);
+
+    // ---- "+" toggle behaviour ----
+    toggle.addEventListener('click', () => {
+      const nowHidden = panel.classList.toggle('hidden');
+      toggle.textContent = nowHidden ? '+' : '−';
+      toggle.setAttribute('aria-expanded', String(!nowHidden));
+    });
+
+    list.appendChild(article);
+  }
+}
+
+let toastTimeout = null;
+function showToast(message) {
+  el.toast.textContent = message;
+  el.toast.classList.remove('show');
+  void el.toast.offsetWidth;   // force reflow so the animation restarts
+  el.toast.classList.add('show');
+
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.toast.classList.remove('show'), 1300);
+}
+
+/* =========================================================================
+   New run
+   ========================================================================= */
+function startNewRun() {
+  game.runId++;
+  game.active = true;
+  game.over = false;
+  game.awaitingInput = false;
+  game.battle = null;
+  game.schedule = [];
+  game.scheduleIndex = 0;
+
+  game.grid = generateDungeon();
+
+  // Gather floor tiles.
+  const floors = [];
+  for (let y = 0; y < DUNGEON_HEIGHT; y++) {
+    for (let x = 0; x < DUNGEON_WIDTH; x++) {
+      if (game.grid[y][x] === FLOOR) floors.push({ x, y });
+    }
+  }
+
+  // Player spawn.
+  const playerSpot = floors[randInt(floors.length)];
+  game.player = makePlayer(playerSpot.x, playerSpot.y);
+
+  // Prefer floor tiles at least 4 Manhattan steps from the player so no rat
+  // attacks on turn 1. Relax to "not on the player" if the dungeon is tight.
+  let pool = floors.filter(t => manhattan(t, playerSpot) >= 4);
+  if (pool.length < RAT_SPAWN_COUNT) {
+    pool = floors.filter(t => !(t.x === playerSpot.x && t.y === playerSpot.y));
+  }
+
+  // Pick RAT_SPAWN_COUNT distinct tiles. If the map can't fit that many,
+  // spawn as many as we can.
+  const ratSpots = [];
+  while (ratSpots.length < RAT_SPAWN_COUNT && pool.length > 0) {
+    const idx = randInt(pool.length);
+    ratSpots.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+
+  game.enemies = ratSpots.map((spot, i) => makeRat(spot.x, spot.y, i));
+
+  hideOverlay();
+  el.grid.innerHTML = '';
+  board.grid = null;          // force the board to be rebuilt
+  render();
+  startNewTurn();
+}
+
+/* =========================================================================
+   Input
+   ========================================================================= */
+document.addEventListener('keydown', (e) => {
+  if (el.screenPlay.classList.contains('hidden')) return;
+
+  // Restart after death / clear.
+  if (e.key === 'r' || e.key === 'R') {
+    if (game.over) {
+      e.preventDefault();
+      startNewRun();
+    }
+    return;
+  }
+
+  // A minimized battle comes back on any game input. That input only
+  // restores the window; it does nothing else.
+  if (game.battle && game.battle.minimized) {
+    if (!e.repeat && BATTLE_INPUT_KEYS.includes(e.key.toLowerCase())) {
+      e.preventDefault();
+      setBattleMinimized(false);
+    }
+    return;
+  }
+
+  if (game.over || !game.awaitingInput || e.repeat) return;
+
+  const key = e.key.toLowerCase();
+
+  // Battle input takes priority over dungeon input while a battle is open.
+  if (game.battle) {
+    battleKey(e, key);
+    return;
+  }
+
+  let handled = true;
+
+  if (key === 'w')      playerAction('move', 0, -1);
+  else if (key === 's') playerAction('move', 0, 1);
+  else if (key === 'a') playerAction('move', -1, 0);
+  else if (key === 'd') playerAction('move', 1, 0);
+  else if (e.key === ' ') playerAction('wait');
+  else handled = false;
+
+  if (handled) e.preventDefault();
+});
+
+/* =========================================================================
+   Wiring
+   ========================================================================= */
+document.querySelectorAll('.menu-item[data-action]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+
+    if (action === 'play') {
+      showScreen('play');
+      startNewRun();
+    } else if (action === 'changelogs') {
+      showScreen('changelog');
+      renderChangelog();
+    } else if (action === 'quit') {
+      el.modal.classList.remove('hidden');
+    } else {
+      showToast('Coming soon');
+    }
+  });
+});
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  el.modal.classList.add('hidden');
+});
+
+document.getElementById('menu-btn').addEventListener('click', () => {
+  game.active = false;
+  game.awaitingInput = false;
+  showScreen('menu');
+});
+
+document.getElementById('changelog-back').addEventListener('click', () => {
+  showScreen('menu');
+});
+
+/* ------------------------------ Boot ----------------------------------- */
+
+/* The sidebar portrait uses the player sprite too (emoji if it is missing). */
+function applyPortrait() {
+  const slot = document.getElementById('player-portrait');
+  const url = Assets.spriteURL('player', 0);
+  if (!slot || !url) return;
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = '';
+  slot.textContent = '';
+  slot.appendChild(img);
+}
+
+const assetProblems = Assets.init();
+if (assetProblems.length) console.warn('assets.js problems:\n' + assetProblems.join('\n'));
+applyPortrait();
+initBattleUI();
+showScreen('menu');
