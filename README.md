@@ -6,7 +6,7 @@ A small turn-based dungeon crawler that runs in the browser written in HTML, CSS
 
 ## Play it
 
-**Live:** https://your-deployment-url-here
+**Live:** https://zeroichi0040.github.io/Shattered-Depths/
 
 ---
 
