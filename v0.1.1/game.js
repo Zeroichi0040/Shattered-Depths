@@ -18,7 +18,7 @@ const RAT_MAX_HP     = 3;
 const PLAYER_ATTACK  = 1;
 const RAT_ATTACK     = 1;
 
-const AI_ACTION_DELAY_MS = 300;
+const AI_ACTION_DELAY_MS = 50;
 
 /* -------------------------- Internal constants ------------------------- */
 const CELL_SIZE     = 40;
