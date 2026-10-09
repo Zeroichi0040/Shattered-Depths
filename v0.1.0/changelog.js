@@ -23,6 +23,12 @@
        ],
      }
 
+   WRITING GUIDELINES
+   ------------------
+   - Describe the DELTA only: what changed, why, and any gotcha.
+   - Don't re-document unchanged behavior or the changelog itself.
+   - Long-form reference material belongs in the Encyclopedia, not here.
+
    Suggested tag vocabulary: New, Change, Tweak, Fix, Removed, Improved.
    Keep each bullet short — one idea per line.
    ========================================================================= */
@@ -33,21 +39,21 @@ const CHANGELOG = [
     date: '2026-10-07',
     title: 'Initial prototype',
     summary: [
-      { tag: 'New', text: 'A turn-based dungeon crawler on a single procedurally generated 10×10 floor.' },
+      { tag: 'New', text: 'A turn-based dungeon crawler on a single procedurally generated floor.' },
       { tag: 'New', text: 'Move with WASD. Attack by bumping into an adjacent enemy.' },
-      { tag: 'New', text: 'Action Point (AP) system — faster actors take more actions per turn.' },
-      { tag: 'New', text: 'A single rat enemy that hunts the player and attacks when adjacent.' },
-      { tag: 'New', text: 'Space to wait (spend 1 AP). R to restart after death or clear.' },
+      { tag: 'New', text: 'Action Points based Movement and Combat' },
+      { tag: 'New', text: 'A single rat enemy that hunts you down and bites when it gets close.' },
+      { tag: 'New', text: 'Space to wait. R to restart after you die or clear the floor.' },
       { tag: 'New', text: 'Main menu with Play, Upgrades, Encyclopedia, Settings, Changelogs, and Quit.' },
       { tag: 'New', text: 'Changelog screen (this one) documenting each release.' },
     ],
     tech: [
-      'Pure HTML / CSS / JS. No build step, no dependencies, no external assets.',
-      'Files: index.html, style.css, game.js, changelog.js.',
-      'BSP dungeon generation — recursive region splitting plus L-shaped corridor carving between room centers.',
-      'AP scheduling: the slower actor is placed at ceil(k * R / n) over a shrinking free-slot list. Tie-break sort order is enemies-first, player-last, which is what makes the canonical "P E" for 1:1 come out right.',
-      'Rat AI: BFS distance map from the player, recomputed each AI action. Moves one orthogonal step toward the player; attacks when adjacent.',
-      'Turn schedule is locked at turn start. Dead actors\' remaining slots are skipped; win / lose is only evaluated at turn end.',
+      'Pure HTML / CSS / JavaScript. No build step, no libraries, no external assets.',
+      'Dungeon layout is generated with BSP (binary space partitioning).',
+      'Turn order comes from an Action Point system: each actor gains AP every turn and gets floor(AP) actions at 1 AP each. Leftover fractions carry over.',
+      'Actions are interleaved across the turn with pos = ceil(k × R / n), so a faster actor is spread out rather than front-loaded.',
+      'The turn schedule is locked at turn start. A dead actor\'s remaining slots are skipped, and win / lose is only checked at turn end.',
+      'Rat pathfinding uses BFS, so a rat always steps along a shortest path to you.',
     ],
   },
 ];
