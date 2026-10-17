@@ -60,21 +60,19 @@ const CHANGELOG = [
     date: '2026-10-17',
     title: 'Pixel art',
     summary: [
-      { tag: 'New',    text: 'Pixel-art sprites for you and the rats, replacing the emoji.' },
+      { tag: 'New',    text: 'Pixel-art sprites for the player and the rats, replacing the emoji.' },
       { tag: 'New',    text: 'A stone floor and brick walls, with small variations from tile to tile.' },
       { tag: 'Change', text: 'Board cells are a little bigger (40px to 48px) so the art reads clearly.' },
       { tag: 'Change', text: 'Rat health bars are now drawn over the top of the cell.' },
     ],
     tech: [
-      'All art is drawn by code in the new assets.js. No image files are used.',
+      'All art is drawn by code, no image files are used.',
       'Sprites are 16x16 character grids shown at 3x. Floor and wall tiles are painted procedurally from a fixed seed, so they look the same on every load.',
       'If a sprite fails to load, the game falls back to the old emoji.',
-      'Gameplay logic is untouched; only rendering changed. The stairs and bonfire sprites are defined but not used yet.',
     ],
     dev: [
       { heading: 'Swapping art', items: [
         'ACTIVE_SPRITES in assets.js maps each role (player, rat, ...) to a sprite name, so trying a variant is a one-line change.',
-        'preview.html shows every tile and sprite at game scale and reports malformed grids (wrong row length, character missing from the legend).',
       ]},
       { heading: 'Rendering', items: [
         'The board is now built once per run, and each render only redraws the player and rats on top. Rebuilding 100 image cells on every action would re-decode the tiles each time.',
