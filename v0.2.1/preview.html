@@ -58,6 +58,10 @@
 <h2>Sample scene (game scale, 48px cells)</h2>
 <div id="scene" class="scene"></div>
 
+<h2>Connected stairs (art preview)</h2>
+<p class="note">Stairs Down descends to the next floor; Stairs Up returns to the floor above. These are the two ends of the same connection. Artwork only: stairs are not in the main game yet.</p>
+<div id="stairs" class="row"></div>
+
 <h2>Tiles</h2>
 <p class="note">Each kind has a few seeded variants. The game picks one per map position.</p>
 <div id="tiles" class="row"></div>
@@ -108,7 +112,7 @@
   /* ---- sample scene ---- */
   const MAP = [
     '##########',
-    '#........#',
+    '#.<......#',
     '#.##..r..#',
     '#.#......#',
     '#...##...#',
@@ -130,7 +134,8 @@
       let role = null;
       if (ch === 'P') role = 'player';
       if (ch === 'r') role = 'rat';
-      if (ch === '>') role = 'stairs';
+      if (ch === '>') role = 'stairs_down';
+      if (ch === '<') role = 'stairs_up';
       if (ch === 'B') role = 'bonfire';
 
       if (role) {
@@ -151,6 +156,26 @@
       i.src = Assets.spriteURL(i.dataset.anim, tick);
     });
   }, 400);
+
+  /* ---- paired stair endpoints ---- */
+  const stairsBox = document.getElementById('stairs');
+  [
+    { role: 'stairs_down', label: 'Stairs Down', detail: 'Floor 1 → Floor 2' },
+    { role: 'stairs_up', label: 'Stairs Up', detail: 'Floor 2 → Floor 1' },
+  ].forEach(stair => {
+    const card = el('div', 'card');
+    card.appendChild(el('div', 'name', stair.label));
+    const sizes = el('div', 'sizes');
+    [16, 48, 128].forEach(px => {
+      const wrap = el('div');
+      wrap.appendChild(stack(px, Assets.tileURL('floor', 1, 1), Assets.spriteURL(stair.role, 0)));
+      wrap.appendChild(el('div', 'cap', px + 'px'));
+      sizes.appendChild(wrap);
+    });
+    card.appendChild(sizes);
+    card.appendChild(el('div', 'cap', stair.detail));
+    stairsBox.appendChild(card);
+  });
 
   /* ---- tiles ---- */
   const tilesBox = document.getElementById('tiles');
