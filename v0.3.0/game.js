@@ -7,14 +7,10 @@
 const DUNGEON_WIDTH  = 10;
 const DUNGEON_HEIGHT = 10;
 
-const PLAYER_AP_RATE = 2.0;
+const PLAYER_AP_RATE = 1.0;
 const RAT_AP_RATE    = 1.0;
 
 const RAT_SPAWN_COUNT = 2;   // Number of rats to spawn per floor. Tunable.
-
-// Max rats in one battle. Tunable, up to the 9 slots of the battle field.
-// Raise it together with RAT_SPAWN_COUNT to test the full slot field.
-const BATTLE_MAX_PARTICIPANTS = 2;
 
 const PLAYER_MAX_HP  = 10;
 const RAT_MAX_HP     = 3;
@@ -535,8 +531,9 @@ const BATTLE_MENUS = {
   fight: ['Basic Attack', 'Back'],
 };
 
+/* A battle holds as many rats as the field has slots. */
 function battleCap() {
-  return Math.max(1, Math.min(BATTLE_MAX_PARTICIPANTS, BATTLE_SLOTS.length));
+  return BATTLE_SLOTS.length;
 }
 
 function battleLog(msg) {

@@ -57,42 +57,41 @@
 const CHANGELOG = [
   {
     version: '0.3.0',
-    date: '2026-10-24',
+    date: '2026-10-25',
     title: 'Battle window',
     summary: [
-      { tag: 'New',    text: 'Touching a rat now opens a battle window over the dungeon.' },
-      { tag: 'New',    text: 'Battle menu: Fight or Flee. Fight has Basic Attack and Back, and with two rats in the fight you pick a target.' },
-      { tag: 'New',    text: 'Rats that are not in the fight yet can join by bumping into you. Up to 2 rats per battle.' },
-      { tag: 'New',    text: 'Click the - at the top right of the window to peek at the dungeon. Any key press or click brings it back.' },
+      { tag: 'New',    text: 'Battle window added.' },
       { tag: 'Change', text: 'Bumping a rat, or a rat striking you, no longer deals damage. It opens a battle instead.' },
-      { tag: 'Change', text: 'The Back button on this screen is now at the top of the page.' },
+      { tag: 'Change', text: 'The Back button on the changelog screen is now at the top of the page.' },
       { tag: 'Removed', text: 'The control hints under How to Play in the sidebar.' },
-      { tag: 'Change', text: 'Esc backs out of a battle menu. In battle, Space confirms instead of waiting.' },
     ],
     tech: [
-      'New constant BATTLE_MAX_PARTICIPANTS (top of game.js) caps rats per battle. Default is 2. Raise it with RAT_SPAWN_COUNT to test the full 9-slot field.',
       'Battle state lives in game.battle. The AP schedule is unchanged: battle actions are ordinary schedule slots.',
-      'Battle input: WASD navigate or cycle targets, Space or click confirm, Esc back. It takes priority over dungeon input.',
-      'The window is a fixed-size HTML / CSS card (440x340) centered on the screen, so it does not scale with the dungeon size. The background is a placeholder.',
-      'Rats in a battle keep their tile and stay drawn on the board. The debug line marks them with *. The window shows no player sprite or HP; the sidebar has the stats.',
+      'The window is a fixed-size HTML / CSS card with a placeholder background.',
     ],
     dev: [
-      { heading: 'Slot field', items: [
-        '4 top slots and 5 bottom slots, staggered. Fill order: bottom middle, bottom right, bottom left, bottom outer right, bottom outer left, then top inner-left, inner-right, outer left, outer right.',
-        'A joining rat takes the first free slot in that order, and keeps it until it dies or the battle closes.',
+      { heading: 'Battle rules', items: [
+        'A battle opens with the contacted rat, costs the slot, and deals no damage. Other rats join by spending a slot bumping you.',
+        'Rats bite in their own schedule slots. Flee costs an action.',
+        'Minimizing is a peek only: rat turns keep running, and any input restores the window.',
       ]},
-      { heading: 'Contact and joining', items: [
-        'A battle opens with exactly the contacted rat. Opening costs the slot and deals no damage, whether the player or the rat made contact.',
-        'A rat joins by spending its slot bumping the player, with no bite on the same action. At the cap the bump does nothing. Adjacency alone never joins.',
-      ]},
-      { heading: 'Battle turns', items: [
-        'There is no separate bite-back step. A participant bites in its own schedule slots, so with one player action and one rat the order reads You, Rat.',
-        'Flee costs an action and never moves the player. Rats stay on the board throughout, so a rat you fled from is still next to you. A mid-battle victory closes the window and the remaining slots resolve in the dungeon.',
-      ]},
-      { heading: 'Minimize', items: [
-        'Minimized is a peek only: the window hides with nothing left behind, battle input pauses, and rat turns keep running.',
-        'Any game input restores it (WASD, Space, Esc or a mouse click). That input only restores the window and does nothing else.',
-      ]},
+    ],
+  },
+  {
+    version: '0.2.1',
+    date: '2026-10-24',
+    title: 'Sprite Redesign',
+    summary: [
+      { tag: 'Tweak', text: 'Rats have slimmer body.' },
+      { tag: 'Tweak', text: 'Better player sprite.' },
+      { tag: 'Tweak', text: 'Better stair tiles.' },
+      { tag: 'New', text: 'Stair Up tile added'}
+    ],
+    tech: [
+      'Redrawn the rat pixel grid with a shallower body, keeping the existing 16x16 size and color palette.',
+      'Redrawn the player pixel grid with a more distinct head and body.',
+      'Redrawn the stair tiles with a more defined shape and color contrast.',
+      'Added a new "Stair Up" tile to the assets, allowing for upward movement in the dungeon.',
     ],
   },
   {

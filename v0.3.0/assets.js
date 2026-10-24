@@ -1,6 +1,6 @@
 /* =========================================================================
    Shattered Depths — assets.js
-   v0.3.0 (draft)
+   v0.2.1 (draft)
 
    All art is code. No image files.
 
@@ -35,7 +35,9 @@ const SPRITE_SIZE = 16;
 const ACTIVE_SPRITES = {
   player:  'player',
   rat:     'rat',
-  stairs:  'stairs_down',
+  stairs:  'stairs_down',   // compatibility alias
+  stairs_down: 'stairs_down',
+  stairs_up:   'stairs_up',
   bonfire: 'bonfire',
 };
 
@@ -64,30 +66,31 @@ const SPRITES = {
   player: {
     legend: {
       K: '#1a1a2e',   // outline / eyes
-      H: '#3d6fb6',   // hood
-      h: '#2c5189',   // hood shade
+      H: '#2b2b2b',   // hair
       S: '#f0c08a',   // skin
-      T: '#c9a03a',   // tunic
-      t: '#9a7626',   // tunic shade
-      B: '#6b4423',   // belt / boots
+      T: '#c69a63',   // shirt — light brown leather
+      t: '#a67a45',   // shirt shade / ragged hem
+      P: '#7a4f28',   // pants — darker brown leather
+      p: '#5a3719',   // pants shade
+      B: '#3a2414',   // boots
     },
     rows: [
-      '................',
       '.....KKKKKK.....',
       '....KHHHHHHK....',
-      '...KHHHHHHHhK...',
-      '...KHHSSSSHhK...',
-      '...KHSSSSSShK...',
-      '...KHSKSSKShK...',
+      '...KHHHHHHHHK...',
+      '...KHHHHHHHHK...',
+      '...KHSSSSSSHK...',
+      '...KSSKSSKSSK...',
       '....KSSSSSSK....',
-      '....KKTTTTKK....',
-      '...KTTTTTTTtK...',
-      '..KSKTTTTTTtKSK.',
-      '..KSKBBBBBBBKSK.',
-      '...KKTTTTTTtKK..',
-      '....KTTKKTTtK...',
-      '....KBBKKBBBK...',
-      '....KKKK.KKKK...',
+      '.KKKKTTTTTTKKKK.',
+      'KTTTTTTTTTTTTTTK',
+      'KTTTTTTTTTTTTTTK',
+      'KSSKTTTTTTTTKSSK',
+      'KSSKKTTTTTTKKSSK',
+      '.KK.KpPPPPpK.KK.',
+      '....KPPKKPPK....',
+      '....KPPKKPPK....',
+      '....KBBKKBBK....',
     ],
   },
 
@@ -106,15 +109,15 @@ const SPRITES = {
       '................',
       '..KKK...........',
       '.KPPPK..........',
-      '.KPPGKKKKKK.....',
-      'KGGGGGGGGGKK..PP',
-      'KRGGGGGGGGGGK.P.',
+      '.KPPGK..........',
+      '..KGGKKKKKK...PP',
+      '.KRGGGGGGGGKK.P.',
       'PGGGGGGGGGGGGKP.',
-      'KWKGGGGGGGGGGKP.',
-      '.KKgGGGGGGGGgKK.',
-      '..KgggGGGGggK...',
-      '...KKKKKKKKK....',
-      '..KPK.KPK.KPK...',
+      'KWKggGGGGGGggKP.',
+      '..KKKKKKKKKKK...',
+      '...KPK...KPK....',
+      '................',
+      '................',
       '................',
       '................',
     ],
@@ -122,30 +125,60 @@ const SPRITES = {
 
   stairs_down: {
     legend: {
-      K: '#12121a',   // frame
-      A: '#b5b5c5', a: '#8a8a9a',   // step 1: top, riser
-      B: '#9a9aaa', b: '#72727f',   // step 2
-      C: '#80808e', c: '#5c5c68',   // step 3
-      D: '#666672', d: '#46464f',   // step 4
-      E: '#4c4c56', e: '#32323a',   // step 5
-      F: '#34343c', f: '#1e1e24',   // step 6 (deepest)
+      K: '#252624',   // charcoal outline
+      D: '#353633',   // dark stone / stairwell shadow
+      S: '#484a44',   // masonry shade
+      M: '#62655c',   // stone frame
+      G: '#85877f',   // tread face
+      H: '#a0a299',   // worn top edge
+      L: '#72756c',   // tread shade
     },
     rows: [
       '................',
       '.KKKKKKKKKKKKKK.',
-      '.KAAAAAAAAAAAAK.',
-      '.KaaaaaaaaaaaaK.',
-      '.KBBBBBBBBBBBBK.',
-      '.KbbbbbbbbbbbbK.',
-      '.KCCCCCCCCCCCCK.',
-      '.KccccccccccccK.',
       '.KDDDDDDDDDDDDK.',
-      '.KddddddddddddK.',
-      '.KEEEEEEEEEEEEK.',
-      '.KeeeeeeeeeeeeK.',
-      '.KFFFFFFFFFFFFK.',
-      '.KffffffffffffK.',
+      '.KKKKDDDDDDDDDK.',
+      '.KHGGKDDDDDDDDK.',
+      '.KGGGKDDDDDDDDK.',
+      '.KGGGKKKKDDDDDK.',
+      '.KGGGKHGGKDDDDK.',
+      '.KLLLKGGGKDDDDK.',
+      '.KDDDKGGGKKKKDK.',
+      '.KDSDKGGGKHGGKK.',
+      '.KDDDKLLLKGGGKK.',
+      '.KDDSSDDDKGGGKK.',
+      '.KSDDDDDDKGGGKK.',
       '.KKKKKKKKKKKKKK.',
+      '................',
+    ],
+  },
+
+  stairs_up: {
+    legend: {
+      K: '#252624',   // charcoal outline
+      D: '#353633',   // dark stone / stairwell shadow
+      S: '#484a44',   // masonry shade
+      M: '#62655c',   // stone frame
+      G: '#85877f',   // tread face
+      H: '#a0a299',   // worn top edge
+      L: '#72756c',   // tread shade
+    },
+    rows: [
+      '................',
+      '.KKKK...........',
+      '.KHGGK..........',
+      '.KGGGK..........',
+      '.KGGGKKKK.......',
+      '.KGGGKHGGK......',
+      '.KLLLKGGGK......',
+      '.KDDDKGGGKKKK...',
+      '.KDSDKGGGKHGGK..',
+      '.KDDDKLLLKGGGK..',
+      '.KDDSSDDDKGGGK..',
+      '.KSDDDDDDKGGGK..',
+      '.KDDDDSSDKLLLK..',
+      '.KDSDDDDDDDSDK..',
+      '.KKKKKKKKKKKKK..',
       '................',
     ],
   },
