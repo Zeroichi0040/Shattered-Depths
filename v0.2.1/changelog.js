@@ -58,12 +58,18 @@ const CHANGELOG = [
   {
     version: '0.2.1',
     date: '2026-10-24',
-    title: 'Slimmer rats',
+    title: 'Sprite Redesign',
     summary: [
-      { tag: 'Tweak', text: 'Rats now have a slimmer body and two visible feet.' },
+      { tag: 'Tweak', text: 'Rats have slimmer body.' },
+      { tag: 'Tweak', text: 'Better player sprite.' },
+      { tag: 'Tweak', text: 'Better stair tiles.' },
+      { tag: 'New', text: 'Stair Up tile added'}
     ],
     tech: [
       'Redrawn the rat pixel grid with a shallower body, keeping the existing 16x16 size and color palette.',
+      'Redrawn the player pixel grid with a more distinct head and body.',
+      'Redrawn the stair tiles with a more defined shape and color contrast.',
+      'Added a new "Stair Up" tile to the assets, allowing for upward movement in the dungeon.',
     ],
   },
   {
