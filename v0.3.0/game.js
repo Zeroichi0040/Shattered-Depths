@@ -22,7 +22,7 @@ const RAT_MAX_HP     = 3;
 const PLAYER_ATTACK  = 1;
 const RAT_ATTACK     = 1;
 
-const AI_ACTION_DELAY_MS = 50;
+const AI_ACTION_DELAY_MS = 200;
 
 /* -------------------------- Internal constants ------------------------- */
 const CELL_SIZE     = 48;   // 3x the 16px sprites

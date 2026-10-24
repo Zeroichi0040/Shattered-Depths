@@ -1,6 +1,6 @@
 /* =========================================================================
    Shattered Depths — assets.js
-   v0.2.0 (draft)
+   v0.2.1 (draft)
 
    All art is code. No image files.
 
