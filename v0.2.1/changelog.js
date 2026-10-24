@@ -1,6 +1,6 @@
 /* =========================================================================
    Shattered Depths — changelog.js
-   v0.2.0
+   v0.2.1
 
    HOW TO ADD A NEW ENTRY
    ----------------------
@@ -55,6 +55,17 @@
    ========================================================================= */
 
 const CHANGELOG = [
+  {
+    version: '0.2.1',
+    date: '2026-10-24',
+    title: 'Slimmer rats',
+    summary: [
+      { tag: 'Tweak', text: 'Rats now have a slimmer body and two visible feet.' },
+    ],
+    tech: [
+      'Redrawn the rat pixel grid with a shallower body, keeping the existing 16x16 size and color palette.',
+    ],
+  },
   {
     version: '0.2.0',
     date: '2026-10-17',
