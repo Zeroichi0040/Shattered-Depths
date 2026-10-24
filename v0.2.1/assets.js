@@ -35,7 +35,9 @@ const SPRITE_SIZE = 16;
 const ACTIVE_SPRITES = {
   player:  'player',
   rat:     'rat',
-  stairs:  'stairs_down',
+  stairs:  'stairs_down',   // compatibility alias
+  stairs_down: 'stairs_down',
+  stairs_up:   'stairs_up',
   bonfire: 'bonfire',
 };
 
@@ -123,30 +125,60 @@ const SPRITES = {
 
   stairs_down: {
     legend: {
-      K: '#12121a',   // frame
-      A: '#b5b5c5', a: '#8a8a9a',   // step 1: top, riser
-      B: '#9a9aaa', b: '#72727f',   // step 2
-      C: '#80808e', c: '#5c5c68',   // step 3
-      D: '#666672', d: '#46464f',   // step 4
-      E: '#4c4c56', e: '#32323a',   // step 5
-      F: '#34343c', f: '#1e1e24',   // step 6 (deepest)
+      K: '#252624',   // charcoal outline
+      D: '#353633',   // dark stone / stairwell shadow
+      S: '#484a44',   // masonry shade
+      M: '#62655c',   // stone frame
+      G: '#85877f',   // tread face
+      H: '#a0a299',   // worn top edge
+      L: '#72756c',   // tread shade
     },
     rows: [
       '................',
-      '.KKKKKKKKKKKKKK.',
-      '.KAAAAAAAAAAAAK.',
-      '.KaaaaaaaaaaaaK.',
-      '.KBBBBBBBBBBBBK.',
-      '.KbbbbbbbbbbbbK.',
-      '.KCCCCCCCCCCCCK.',
-      '.KccccccccccccK.',
-      '.KDDDDDDDDDDDDK.',
-      '.KddddddddddddK.',
-      '.KEEEEEEEEEEEEK.',
-      '.KeeeeeeeeeeeeK.',
-      '.KFFFFFFFFFFFFK.',
-      '.KffffffffffffK.',
-      '.KKKKKKKKKKKKKK.',
+      '.MMMMMMMMMMMMMM.',
+      '.MHMMMMMMMMMMHM.',
+      '.MMKKKKKKKKKKMM.',
+      '.MMKHGGGGGGKMMM.',
+      '.MMKLLLGGGGKMMM.',
+      '.MMKDDKHGGGKMMM.',
+      '.MMKDDKLLLGKMMM.',
+      '.MMKDDDDKHGKMMM.',
+      '.MMKDDDDKLLKMMM.',
+      '.MMKDDDDDDKKMMM.',
+      '.MMKDSDDDDDKMMM.',
+      '.MMKKKKKKKKKKMM.',
+      '.MHMMMMMMMMMMHM.',
+      '.MMMMMMMMMMMMMM.',
+      '................',
+    ],
+  },
+
+  stairs_up: {
+    legend: {
+      K: '#252624',   // charcoal outline
+      D: '#353633',   // dark stone / stairwell shadow
+      S: '#484a44',   // masonry shade
+      M: '#62655c',   // stone frame
+      G: '#85877f',   // tread face
+      H: '#a0a299',   // worn top edge
+      L: '#72756c',   // tread shade
+    },
+    rows: [
+      '.KKKK...........',
+      '.KHGGK..........',
+      '.KGGGK..........',
+      '.KGGGKKKK.......',
+      '.KGGGKHGGK......',
+      '.KGGGKGGGK......',
+      '.KLLLKGGGKKKK...',
+      '.KDDDKGGGKHGGK..',
+      '.KDSDKLLLKGGGK..',
+      '.KDDDKDDDKGGGK..',
+      '.KDDSSDDDKGGGK..',
+      '.KSDDDDDDKLLLK..',
+      '.KDDDDSSDKDDDK..',
+      '.KDSDDDDDDDSDK..',
+      '.KKKKKKKKKKKKK..',
       '................',
     ],
   },
