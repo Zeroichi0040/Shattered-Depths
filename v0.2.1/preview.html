@@ -62,10 +62,6 @@
 <p class="note">Stairs Down descends to the next floor; Stairs Up returns to the floor above. These are the two ends of the same connection. Artwork only: stairs are not in the main game yet.</p>
 <div id="stairs" class="row"></div>
 
-<h2>Stairs Down — choose a variant</h2>
-<p class="note">Twelve alternatives using the Stairs Up palette. Each numbered card pairs its candidate with the unchanged Stairs Up for comparison. Numbers are selection IDs; the active sprite has not changed.</p>
-<div id="stair-variants" class="row"></div>
-
 <h2>Tiles</h2>
 <p class="note">Each kind has a few seeded variants. The game picks one per map position.</p>
 <div id="tiles" class="row"></div>
@@ -164,7 +160,7 @@
   /* ---- paired stair endpoints ---- */
   const stairsBox = document.getElementById('stairs');
   [
-    { role: 'stairs_down', label: 'Stairs Down · Well + Cutaway', detail: 'Floor 1 → Floor 2 · combined design' },
+    { role: 'stairs_down', label: 'Stairs Down', detail: 'Floor 1 → Floor 2' },
     { role: 'stairs_up', label: 'Stairs Up', detail: 'Floor 2 → Floor 1' },
   ].forEach(stair => {
     const card = el('div', 'card');
@@ -179,32 +175,6 @@
     card.appendChild(sizes);
     card.appendChild(el('div', 'cap', stair.detail));
     stairsBox.appendChild(card);
-  });
-
-  /* ---- numbered down-stair candidates ---- */
-  const stairVariants = [
-    'Recessed flight', 'Straight shaft', 'Right wall', 'Left wall',
-    'Deep opening', 'Turning landing', 'Diagonal cutaway', 'Mirrored cutaway',
-    'Rimmed cutaway', 'Mirrored rim', 'Diagonal well', 'Mirrored well',
-  ];
-  const variantsBox = document.getElementById('stair-variants');
-  stairVariants.forEach((label, index) => {
-    const id = String(index + 1).padStart(2, '0');
-    const name = 'stairs_down_' + id;
-    const card = el('div', 'card');
-    card.dataset.variant = id;
-    card.appendChild(el('div', 'name', id + ' · ' + label));
-    const pair = el('div', 'sizes');
-    [name, 'stairs_up'].forEach(role => {
-      const column = el('div');
-      column.appendChild(el('div', 'cap', role === name ? 'Down ' + id : 'Up (reference)'));
-      column.appendChild(stack(128, Assets.tileURL('floor', 1, 1), Assets.spriteURL(role, 0)));
-      column.appendChild(stack(48, Assets.tileURL('floor', 1, 1), Assets.spriteURL(role, 0)));
-      column.appendChild(stack(16, Assets.tileURL('floor', 1, 1), Assets.spriteURL(role, 0)));
-      pair.appendChild(column);
-    });
-    card.appendChild(pair);
-    variantsBox.appendChild(card);
   });
 
   /* ---- tiles ---- */
@@ -245,7 +215,7 @@
 
   /* ---- sprites ---- */
   const spritesBox = document.getElementById('sprites');
-  Assets.spriteNames().filter(name => !/^stairs_down_\d+$/.test(name)).forEach(name => {
+  Assets.spriteNames().forEach(name => {
     const card = el('div', 'card');
     const roles = Assets.rolesOf(name);
     const title = el('div', 'name', name);
