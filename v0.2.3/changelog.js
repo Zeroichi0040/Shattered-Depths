@@ -1,6 +1,6 @@
 /* =========================================================================
    Shattered Depths — changelog.js
-   v0.3.0
+   v0.2.2
 
    HOW TO ADD A NEW ENTRY
    ----------------------
@@ -56,31 +56,43 @@
 
 const CHANGELOG = [
   {
-    version: '0.3.0',
-    date: '2026-10-25',
-    title: 'Battle window',
+    version: '0.2.3',
+    date: '2026-10-30',
+    title: 'Hold to move',
     summary: [
-      { tag: 'New',    text: 'Battle window added.' },
-      { tag: 'Change', text: 'Bumping a rat, or a rat striking you, no longer deals damage. It opens a battle instead.' },
-      { tag: 'Change', text: 'The Back button on the changelog screen is now at the top of the page.' },
+      { tag: 'New', text: 'Hold WASD keys to move continuously.' },
+    ],
+    tech: [
+      'WASD inputs are tracked using a `heldKeys` set. Pressing a key still triggers an immediate step, preserving normal tap movement.',
+      '`scheduleHeldMove()` runs during `advance()` when the player\'s turn becomes available, queuing another step after `HOLD_REPEAT_MS` (110ms) if the key remains held.',
+      'Held inputs are cleared on key release, window blur, new runs, game end, menu return, and player actions to prevent stale or unintended movement.',
+    ],
+    dev: [
+      {
+        heading: 'Implementation Notes',
+        items: [
+          'Movement repeats are tied to the player\'s turn, preventing extra actions during enemy turns.',
+          'Window blur clears held inputs because switching focus may prevent `keyup` events from firing.',
+          'With two keys held, the first pressed wins; releasing it falls through to the other without a re-press.',
+        ]},
+    ],
+  },
+  {
+    version: '0.2.2',
+    date: '2026-10-30',
+    title: 'Interface cleanup',
+    summary: [
+      { tag: 'Change',  text: 'The Back button on the changelog screen is now at the top of the page.' },
       { tag: 'Removed', text: 'The control hints under How to Play in the sidebar.' },
     ],
     tech: [
-      'Battle state lives in game.battle. The AP schedule is unchanged: battle actions are ordinary schedule slots.',
-      'The window is a fixed-size HTML / CSS card with a placeholder background.',
-    ],
-    dev: [
-      { heading: 'Battle rules', items: [
-        'A battle opens with the contacted rat, costs the slot, and deals no damage. Other rats join by spending a slot bumping you.',
-        'Rats bite in their own schedule slots. Flee costs an action.',
-        'Minimizing is a peek only: rat turns keep running, and any input restores the window.',
-      ]},
+      'Control hints were removed because of clutter.',
     ],
   },
   {
     version: '0.2.1',
     date: '2026-10-24',
-    title: 'Sprite Redesign',
+    title: 'Sprite redesign',
     summary: [
       { tag: 'Tweak', text: 'Rats have slimmer body.' },
       { tag: 'Tweak', text: 'Better player sprite.' },

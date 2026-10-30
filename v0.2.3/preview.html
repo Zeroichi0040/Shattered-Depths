@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shattered Depths - asset preview</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 24px 60px;
+    background: #ffffff;
+    color: #000000;
+    font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 32px 0 10px; padding-top: 14px; border-top: 1px solid #000; }
+  p.note { margin: 0 0 10px; font-size: 13px; opacity: 0.75; }
+
+  img, canvas { image-rendering: pixelated; display: block; }
+
+  .errors {
+    margin: 16px 0 0;
+    padding: 10px 14px;
+    border: 1px solid #c00;
+    color: #c00;
+    white-space: pre-wrap;
+  }
+  .ok { margin: 16px 0 0; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .card { border: 1px solid #000; padding: 8px 10px 10px; }
+  .card .name { font-weight: 700; margin-bottom: 6px; }
+  .card .role { font-weight: 400; opacity: 0.7; }
+  .sizes { display: flex; gap: 12px; align-items: flex-end; }
+  .sizes .cap { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+
+  /* A sprite shown the way the game shows it: on a floor tile. */
+  .stack { position: relative; }
+  .stack img { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .scene {
+    display: grid;
+    grid-template-columns: repeat(10, 48px);
+    width: max-content;
+    border: 2px solid #000;
+  }
+  .scene .cell { width: 48px; height: 48px; position: relative; }
+  .scene .cell img { position: absolute; inset: 0; width: 48px; height: 48px; }
+</style>
+</head>
+<body>
+
+<h1>Shattered Depths - asset preview</h1>
+<p class="note">Everything below is drawn from assets.js. Sprites sit on a floor tile, as they will in the game.</p>
+<div id="status"></div>
+
+<h2>Sample scene (game scale, 48px cells)</h2>
+<div id="scene" class="scene"></div>
+
+<h2>Connected stairs (art preview)</h2>
+<p class="note">Stairs Down descends to the next floor; Stairs Up returns to the floor above. These are the two ends of the same connection. Artwork only: stairs are not in the main game yet.</p>
+<div id="stairs" class="row"></div>
+
+<h2>Tiles</h2>
+<p class="note">Each kind has a few seeded variants. The game picks one per map position.</p>
+<div id="tiles" class="row"></div>
+
+<h2>Sprites</h2>
+<p class="note">Shown at 16px (native), 48px (game) and 128px (zoom). The role in brackets is the one currently using that sprite.</p>
+<div id="sprites" class="row"></div>
+
+<script src="assets.js"></script>
+<script>
+(function () {
+  const errors = Assets.init();
+
+  /* ---- status ---- */
+  const status = document.getElementById('status');
+  if (errors.length) {
+    status.className = 'errors';
+    status.textContent = 'Problems found in assets.js:\n- ' + errors.join('\n- ');
+  } else {
+    status.className = 'ok';
+    status.textContent = 'No problems found. ' + Assets.spriteNames().length + ' sprites, ' +
+                         Assets.tileKinds().length + ' tile kinds.';
+  }
+
+  /* ---- helpers ---- */
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  }
+  function img(url, px) {
+    const i = document.createElement('img');
+    i.src = url;
+    i.width = px;
+    i.height = px;
+    return i;
+  }
+  function stack(px, floorURL, spriteURL) {
+    const s = el('div', 'stack');
+    s.style.width = px + 'px';
+    s.style.height = px + 'px';
+    s.appendChild(img(floorURL, px));
+    if (spriteURL) s.appendChild(img(spriteURL, px));
+    return s;
+  }
+
+  /* ---- sample scene ---- */
+  const MAP = [
+    '##########',
+    '#........#',
+    '#.<......#',
+    '#...>....#',
+    '#........#',
+    '#....P...#',
+    '#..B.....#',
+    '#.....r..#',
+    '#........#',
+    '##########',
+  ];
+  const bonfireImgs = [];
+  const scene = document.getElementById('scene');
+
+  MAP.forEach((line, y) => {
+    [...line].forEach((ch, x) => {
+      const cell = el('div', 'cell');
+      const isWall = ch === '#';
+      cell.appendChild(img(Assets.tileURL(isWall ? 'wall' : 'floor', x, y), 48));
+
+      let role = null;
+      if (ch === 'P') role = 'player';
+      if (ch === 'r') role = 'rat';
+      if (ch === '>') role = 'stairs_down';
+      if (ch === '<') role = 'stairs_up';
+      if (ch === 'B') role = 'bonfire';
+
+      if (role) {
+        const s = img(Assets.spriteURL(role, 0), 48);
+        cell.appendChild(s);
+        if (role === 'bonfire') bonfireImgs.push(s);
+      }
+      scene.appendChild(cell);
+    });
+  });
+
+  /* Flip animated sprites every 400ms so frames can be judged in motion. */
+  let tick = 0;
+  setInterval(() => {
+    tick++;
+    bonfireImgs.forEach(i => { i.src = Assets.spriteURL('bonfire', tick); });
+    document.querySelectorAll('[data-anim]').forEach(i => {
+      i.src = Assets.spriteURL(i.dataset.anim, tick);
+    });
+  }, 400);
+
+  /* ---- paired stair endpoints ---- */
+  const stairsBox = document.getElementById('stairs');
+  [
+    { role: 'stairs_down', label: 'Stairs Down', detail: 'Floor 1 → Floor 2' },
+    { role: 'stairs_up', label: 'Stairs Up', detail: 'Floor 2 → Floor 1' },
+  ].forEach(stair => {
+    const card = el('div', 'card');
+    card.appendChild(el('div', 'name', stair.label));
+    const sizes = el('div', 'sizes');
+    [16, 48, 128].forEach(px => {
+      const wrap = el('div');
+      wrap.appendChild(stack(px, Assets.tileURL('floor', 1, 1), Assets.spriteURL(stair.role, 0)));
+      wrap.appendChild(el('div', 'cap', px + 'px'));
+      sizes.appendChild(wrap);
+    });
+    card.appendChild(sizes);
+    card.appendChild(el('div', 'cap', stair.detail));
+    stairsBox.appendChild(card);
+  });
+
+  /* ---- tiles ---- */
+  const tilesBox = document.getElementById('tiles');
+  Assets.tileKinds().forEach(kind => {
+    const card = el('div', 'card');
+    card.appendChild(el('div', 'name', kind));
+    const strip = el('div', 'sizes');
+    for (let v = 0; v < Assets.tileVariants; v++) {
+      // Search map positions until we land on variant v.
+      let found = null;
+      for (let y = 0; y < 8 && !found; y++) {
+        for (let x = 0; x < 8 && !found; x++) {
+          const url = Assets.tileURL(kind, x, y);
+          if (!strip.querySelector('[data-url="' + url + '"]')) found = url;
+        }
+      }
+      if (!found) continue;
+      const i = img(found, 64);
+      i.dataset.url = found;
+      strip.appendChild(i);
+    }
+    card.appendChild(strip);
+
+    // Four tiles side by side, to judge whether they tile cleanly.
+    const tiled = el('div', 'sizes');
+    tiled.style.marginTop = '10px';
+    const grid = el('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(6, 32px)';
+    for (let y = 0; y < 3; y++) {
+      for (let x = 0; x < 6; x++) grid.appendChild(img(Assets.tileURL(kind, x, y), 32));
+    }
+    tiled.appendChild(grid);
+    card.appendChild(tiled);
+    tilesBox.appendChild(card);
+  });
+
+  /* ---- sprites ---- */
+  const spritesBox = document.getElementById('sprites');
+  Assets.spriteNames().forEach(name => {
+    const card = el('div', 'card');
+    const roles = Assets.rolesOf(name);
+    const title = el('div', 'name', name);
+    if (roles.length) title.appendChild(el('span', 'role', '  [' + roles.join(', ') + ']'));
+    card.appendChild(title);
+
+    const frames = Assets.frameCount(name);
+    for (let f = 0; f < frames; f++) {
+      const url = Assets.spriteURL(name, f);
+      const floor = Assets.tileURL('floor', 1, 1);
+      const sizes = el('div', 'sizes');
+      sizes.style.marginBottom = '6px';
+
+      [16, 48, 128].forEach(px => {
+        const wrap = el('div');
+        wrap.appendChild(stack(px, floor, url));
+        wrap.appendChild(el('div', 'cap', px + 'px' + (frames > 1 ? '  frame ' + f : '')));
+        sizes.appendChild(wrap);
+      });
+      card.appendChild(sizes);
+    }
+    spritesBox.appendChild(card);
+  });
+})();
+</script>
+</body>
+</html>

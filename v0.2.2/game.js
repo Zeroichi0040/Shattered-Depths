@@ -1,6 +1,6 @@
 /* =========================================================================
    Shattered Depths — game.js
-   v0.3.0
+   v0.2.0
    ========================================================================= */
 
 /* ------------------------------ Constants ------------------------------ */
@@ -18,7 +18,7 @@ const RAT_MAX_HP     = 3;
 const PLAYER_ATTACK  = 1;
 const RAT_ATTACK     = 1;
 
-const AI_ACTION_DELAY_MS = 200;
+const AI_ACTION_DELAY_MS = 50;  // Delay between each enemy action in the schedule, for visual clarity.
 
 /* -------------------------- Internal constants ------------------------- */
 const CELL_SIZE     = 48;   // 3x the 16px sprites
@@ -40,7 +40,6 @@ const game = {
   enemies: [],
   schedule: [],
   scheduleIndex: 0,
-  battle: null,        // null, or the open battle (see Battle window section)
 };
 
 /* ------------------------------- DOM ----------------------------------- */
@@ -55,12 +54,6 @@ const el = {
   modal:           document.getElementById('modal'),
   overlay:         document.getElementById('overlay'),
   overlayText:     document.getElementById('overlay-text'),
-  battle:          document.getElementById('battle'),
-  battleField:     document.getElementById('battle-field'),
-  battleLog:       document.getElementById('battle-log'),
-  battleMenu:      document.getElementById('battle-menu'),
-  battleHint:      document.getElementById('battle-hint'),
-  battleMin:       document.getElementById('battle-min'),
 };
 
 /* =========================================================================
@@ -194,8 +187,6 @@ function makeRat(x, y, tieOrder) {
     maxHp: RAT_MAX_HP,
     apRate: RAT_AP_RATE,
     currentAp: 0,
-    inBattle: false,                // true while a battle participant (still drawn on the board)
-    slot: null,                     // battle slot index while in a battle
   };
 }
 
@@ -345,7 +336,7 @@ function advance() {
 }
 
 /* ---------------------------- Player action ---------------------------- */
-function playerAction(kind, dx, dy, target) {
+function playerAction(kind, dx, dy) {
   if (!game.active || game.over || !game.awaitingInput) return;
 
   const actor = game.schedule[game.scheduleIndex];
@@ -353,12 +344,8 @@ function playerAction(kind, dx, dy, target) {
 
   game.awaitingInput = false;
 
-  if (kind === 'move')        playerMove(dx, dy);
-  else if (kind === 'attack') battleAttack(target);
-  else if (kind === 'flee')   battleFlee();
+  if (kind === 'move') playerMove(dx, dy);
   // 'wait' does nothing.
-
-  if (game.battle) resetBattleMenu();   // each battle action starts at the main menu
 
   actor.currentAp -= 1;
   game.scheduleIndex++;
@@ -381,10 +368,13 @@ function playerMove(dx, dy) {
   if (!inBounds(nx, ny)) return;
   if (game.grid[ny][nx] === WALL) return;
 
-  // Bumping a rat opens a battle. The bump costs the action but deals no damage.
   const target = enemyAt(nx, ny);
   if (target) {
-    openBattle(target, `You bump into ${target.label}!`);
+    target.hp -= PLAYER_ATTACK;
+    if (target.hp <= 0) {
+      target.hp = 0;
+      game.enemies = game.enemies.filter(e => e !== target);
+    }
     return;
   }
 
@@ -396,17 +386,9 @@ function playerMove(dx, dy) {
 function ratAction(rat) {
   const p = game.player;
 
-  // 0. Already in the battle: this slot is a bite.
-  if (rat.inBattle) {
-    battleBite(rat);
-    return;
-  }
-
-  // 1. Adjacent orthogonally? Bump into the player. This opens a battle, or
-  //    joins the open one. It never deals damage by itself.
+  // 1. Adjacent orthogonally? Attack.
   if (manhattan(rat, p) === 1) {
-    if (!game.battle) openBattle(rat, `${rat.label} lunges at you!`);
-    else joinBattle(rat);
+    p.hp -= RAT_ATTACK;
     return;
   }
 
@@ -491,372 +473,6 @@ function computeDistances(sx, sy) {
 }
 
 /* =========================================================================
-   Battle window
-   =========================================================================
-   A mode layered on top of the AP schedule, not a separate system. The
-   schedule keeps running underneath: every battle action (attack, flee, a
-   rat's bite) is just a normal slot. Participants stay on the dungeon
-   board; everyone else keeps playing the dungeon.
-
-   game.battle = {
-     participants: [rat, ...],   // rats in the fight (rat.slot = field slot)
-     minimized:    false,        // peek mode: window hidden, any input restores it
-     menu:         'main',       // 'main' | 'fight' | 'target'
-     cursor:       0,            // highlighted option in main / fight
-     targetIndex:  0,            // highlighted target in 'target'
-     log:          [],           // last few lines shown in the window
-   }
-   ========================================================================= */
-
-/* The field: 4 top slots and 5 bottom slots, staggered. x is the slot's
-   centre as a percentage of the field width. Array order IS the fill order. */
-const BATTLE_SLOTS = [
-  { row: 'bottom', x: 50 },   // 1  bottom, middle
-  { row: 'bottom', x: 70 },   // 2  bottom, right of middle
-  { row: 'bottom', x: 30 },   // 3  bottom, left of middle
-  { row: 'bottom', x: 90 },   // 4  bottom, outer right
-  { row: 'bottom', x: 10 },   // 5  bottom, outer left
-  { row: 'top',    x: 40 },   // 6  top, inner-left
-  { row: 'top',    x: 60 },   // 7  top, inner-right
-  { row: 'top',    x: 20 },   // 8  top, outer left
-  { row: 'top',    x: 80 },   // 9  top, outer right
-];
-
-/* Keys the game uses for input. Any of them (or a click) restores a
-   minimized battle window. */
-const BATTLE_INPUT_KEYS = ['w', 'a', 's', 'd', ' ', 'escape'];
-
-const BATTLE_MENUS = {
-  main:  ['Fight', 'Flee'],
-  fight: ['Basic Attack', 'Back'],
-};
-
-/* A battle holds as many rats as the field has slots. */
-function battleCap() {
-  return BATTLE_SLOTS.length;
-}
-
-function battleLog(msg) {
-  if (!game.battle) return;
-  game.battle.log.push(msg);
-  if (game.battle.log.length > 3) game.battle.log.shift();
-}
-
-function setBattleMinimized(minimized) {
-  if (!game.battle) return;
-  game.battle.minimized = minimized;
-  renderBattle();
-}
-
-function resetBattleMenu() {
-  const b = game.battle;
-  b.menu = 'main';
-  b.cursor = 0;
-  b.targetIndex = 0;
-}
-
-function livingParticipants() {
-  return game.battle.participants.filter(r => r.hp > 0).sort((a, b) => a.slot - b.slot);
-}
-
-/* ------------------------------ Lifecycle ------------------------------ */
-function openBattle(rat, message) {
-  game.battle = {
-    participants: [],
-    minimized: false,
-    menu: 'main',
-    cursor: 0,
-    targetIndex: 0,
-    log: [],
-  };
-  addParticipant(rat);
-  battleLog(message);
-}
-
-function addParticipant(rat) {
-  const b = game.battle;
-  const used = new Set(b.participants.map(r => r.slot));
-  let slot = 0;
-  while (used.has(slot)) slot++;      // next free slot in fill order
-
-  rat.slot = slot;
-  rat.inBattle = true;
-  b.participants.push(rat);
-}
-
-/* A rat spends its action bumping the player's tile to join. It does not bite
-   on the same action. At the cap the bump does nothing. */
-function joinBattle(rat) {
-  const b = game.battle;
-  if (!b || b.participants.length >= battleCap()) return;
-  addParticipant(rat);
-  battleLog(`${rat.label} joins the battle!`);
-}
-
-function closeBattle() {
-  const b = game.battle;
-  if (!b) return;
-  for (const r of b.participants) {
-    r.inBattle = false;
-    r.slot = null;
-  }
-  game.battle = null;
-}
-
-/* ------------------------------- Actions -------------------------------- */
-function battleAttack(target) {
-  const b = game.battle;
-  if (!b || !target || target.hp <= 0 || !b.participants.includes(target)) return;
-
-  target.hp -= PLAYER_ATTACK;
-  battleLog(`You hit ${target.label} for ${PLAYER_ATTACK}.`);
-
-  if (target.hp <= 0) {
-    target.hp = 0;
-    target.inBattle = false;
-    target.slot = null;
-    game.enemies = game.enemies.filter(e => e !== target);
-    b.participants = b.participants.filter(r => r !== target);
-    battleLog(`${target.label} is defeated.`);
-  }
-
-  // Mid-battle victory closes the window. The rest of the schedule still
-  // resolves in the dungeon; win / lose is only checked at turn end.
-  if (b.participants.length === 0) {
-    closeBattle();
-    showToast('Victory!');
-  }
-}
-
-/* Flee always succeeds, costs the action, and does not move the player. */
-function battleFlee() {
-  if (!game.battle) return;
-  closeBattle();
-  showToast('You fled!');
-}
-
-/* A participant's schedule slot is a bite. */
-function battleBite(rat) {
-  game.player.hp -= RAT_ATTACK;
-  battleLog(`${rat.label} bites you for ${RAT_ATTACK}.`);
-}
-
-/* -------------------------------- Input --------------------------------- */
-function canBattleInput() {
-  const b = game.battle;
-  return !!b && !b.minimized && game.awaitingInput && !game.over;
-}
-
-function battleStep(dir) {
-  const b = game.battle;
-  if (b.menu === 'target') {
-    const n = livingParticipants().length;
-    if (n > 0) b.targetIndex = (b.targetIndex + dir + n) % n;
-  } else {
-    const n = BATTLE_MENUS[b.menu].length;
-    b.cursor = (b.cursor + dir + n) % n;
-  }
-  applyBattleHighlight();
-}
-
-function battleConfirm() {
-  const b = game.battle;
-
-  if (b.menu === 'main') {
-    if (b.cursor === 0) {
-      b.menu = 'fight';
-      b.cursor = 0;
-      renderBattle();
-    } else {
-      playerAction('flee');
-    }
-  } else if (b.menu === 'fight') {
-    if (b.cursor === 1) {                            // Back
-      battleBack();
-      return;
-    }
-    const targets = livingParticipants();
-    if (targets.length === 1) {
-      playerAction('attack', 0, 0, targets[0]);      // one rat: no targeting step
-    } else if (targets.length > 1) {
-      b.menu = 'target';
-      b.targetIndex = 0;
-      renderBattle();
-    }
-  } else if (b.menu === 'target') {
-    const target = livingParticipants()[b.targetIndex];
-    if (target) playerAction('attack', 0, 0, target);
-  }
-}
-
-/* Esc backs out one menu level. It never spends AP. */
-function battleBack() {
-  const b = game.battle;
-  if (b.menu === 'target')     { b.menu = 'fight'; b.cursor = 0; }
-  else if (b.menu === 'fight') { b.menu = 'main';  b.cursor = 0; }
-  else return;
-  renderBattle();
-}
-
-function battleKey(e, key) {
-  if (!canBattleInput()) return;
-
-  let handled = true;
-  if (key === 'w' || key === 'a')      battleStep(-1);
-  else if (key === 's' || key === 'd') battleStep(1);
-  else if (e.key === ' ')              battleConfirm();
-  else if (e.key === 'Escape')         battleBack();
-  else handled = false;
-
-  if (handled) e.preventDefault();
-}
-
-/* ------------------------------ Rendering ------------------------------- */
-const battleView = { sig: '' };
-
-function buildBattleField() {
-  el.battleField.replaceChildren();
-  BATTLE_SLOTS.forEach((s, i) => {
-    const d = document.createElement('div');
-    d.className = `battle-slot row-${s.row}`;
-    d.dataset.slot = String(i);
-    d.style.left = s.x + '%';
-    el.battleField.appendChild(d);
-  });
-}
-
-function renderBattle() {
-  const b = game.battle;
-
-  if (!b) {
-    el.battle.classList.add('hidden');
-    battleView.sig = '';
-    return;
-  }
-
-  el.battle.classList.toggle('hidden', b.minimized);
-
-  // Only rebuild the window when something visible changed, so a click is
-  // never swallowed by a rebuild mid-press while rats are taking turns.
-  const sig = JSON.stringify([
-    b.menu, game.awaitingInput, b.log,
-    b.participants.map(r => [r.label, r.hp, r.slot]),
-  ]);
-
-  if (sig !== battleView.sig) {
-    battleView.sig = sig;
-
-    // Field.
-    const slotEls = el.battleField.children;
-    for (let i = 0; i < BATTLE_SLOTS.length; i++) {
-      const r = b.participants.find(x => x.slot === i && x.hp > 0);
-      slotEls[i].classList.toggle('filled', !!r);
-      if (r) slotEls[i].replaceChildren(makeSprite('rat', r));
-      else slotEls[i].replaceChildren();
-    }
-
-    // Log.
-    el.battleLog.textContent = b.log.join('\n');
-
-    // Menu.
-    el.battleMenu.replaceChildren();
-    el.battleMenu.classList.toggle('disabled', !game.awaitingInput);
-
-    if (b.menu === 'target') {
-      const prompt = document.createElement('span');
-      prompt.className = 'battle-prompt';
-      prompt.textContent = 'Choose a target';
-      el.battleMenu.appendChild(prompt);
-    } else {
-      BATTLE_MENUS[b.menu].forEach((label, i) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'battle-opt';
-        btn.dataset.i = String(i);
-        btn.textContent = label;
-        el.battleMenu.appendChild(btn);
-      });
-    }
-
-    // Hint.
-    if (!game.awaitingInput)        el.battleHint.textContent = 'Waiting for your turn...';
-    else if (b.menu === 'target')   el.battleHint.textContent = 'WASD: cycle target · Space / click: confirm · Esc: back';
-    else if (b.menu === 'fight')    el.battleHint.textContent = '';
-    else                            el.battleHint.textContent = '';
-  }
-
-  applyBattleHighlight();
-}
-
-function applyBattleHighlight() {
-  const b = game.battle;
-  if (!b) return;
-
-  const active = game.awaitingInput;
-
-  el.battleMenu.querySelectorAll('.battle-opt').forEach((btn, i) => {
-    btn.classList.toggle('selected', active && i === b.cursor);
-  });
-
-  const target = (active && b.menu === 'target') ? livingParticipants()[b.targetIndex] : null;
-  for (const s of el.battleField.children) {
-    s.classList.toggle('targeted', !!target && Number(s.dataset.slot) === target.slot);
-  }
-}
-
-/* One-time setup: build the field and bind the mouse. */
-function initBattleUI() {
-  buildBattleField();
-
-  // Menu: hover highlights, click selects.
-  el.battleMenu.addEventListener('mouseover', (e) => {
-    const btn = e.target.closest('.battle-opt');
-    if (!btn || !canBattleInput()) return;
-    game.battle.cursor = Number(btn.dataset.i);
-    applyBattleHighlight();
-  });
-  el.battleMenu.addEventListener('click', (e) => {
-    const btn = e.target.closest('.battle-opt');
-    if (!btn || !canBattleInput()) return;
-    game.battle.cursor = Number(btn.dataset.i);
-    battleConfirm();
-  });
-
-  // Field: in the targeting step, hover highlights a rat and click picks it.
-  const slotTarget = (e) => {
-    if (!canBattleInput() || game.battle.menu !== 'target') return -1;
-    const slotEl = e.target.closest('.battle-slot');
-    if (!slotEl) return -1;
-    return livingParticipants().findIndex(r => r.slot === Number(slotEl.dataset.slot));
-  };
-  el.battleField.addEventListener('mouseover', (e) => {
-    const idx = slotTarget(e);
-    if (idx < 0) return;
-    game.battle.targetIndex = idx;
-    applyBattleHighlight();
-  });
-  el.battleField.addEventListener('click', (e) => {
-    const idx = slotTarget(e);
-    if (idx < 0) return;
-    game.battle.targetIndex = idx;
-    battleConfirm();
-  });
-
-  // Minimize is mouse-only for now (the shortcut key is undecided).
-  el.battleMin.addEventListener('click', () => setBattleMinimized(true));
-
-  // While minimized, any click brings the window back and does nothing else.
-  // Capture phase, so the click never reaches whatever is underneath.
-  document.addEventListener('click', (e) => {
-    if (el.screenPlay.classList.contains('hidden')) return;
-    if (!game.battle || !game.battle.minimized) return;
-    e.stopPropagation();
-    e.preventDefault();
-    setBattleMinimized(false);
-  }, true);
-}
-
-/* =========================================================================
    Win / lose
    ========================================================================= */
 function checkGameEnd() {
@@ -866,7 +482,6 @@ function checkGameEnd() {
     game.player.hp = 0;
     game.over = true;
     game.awaitingInput = false;
-    closeBattle();
     showOverlay('You died. Press R to restart.');
     return;
   }
@@ -895,7 +510,6 @@ function render() {
   renderGrid();
   renderSidebar();
   renderDebug();
-  renderBattle();
 }
 
 /* The board is built once per run, because tiles never change. Each render
@@ -1001,7 +615,7 @@ function renderDebug() {
 
   for (const e of game.enemies) {
     if (e.hp <= 0) continue;
-    parts.push(`${e.label}${e.inBattle ? '*' : ''}: ${e.currentAp.toFixed(1)}`);   // * = in battle
+    parts.push(`${e.label}: ${e.currentAp.toFixed(1)}`);
   }
 
   const scheduleText = game.schedule.length === 0
@@ -1179,7 +793,6 @@ function startNewRun() {
   game.active = true;
   game.over = false;
   game.awaitingInput = false;
-  game.battle = null;
   game.schedule = [];
   game.scheduleIndex = 0;
 
@@ -1237,26 +850,9 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  // A minimized battle comes back on any game input. That input only
-  // restores the window; it does nothing else.
-  if (game.battle && game.battle.minimized) {
-    if (!e.repeat && BATTLE_INPUT_KEYS.includes(e.key.toLowerCase())) {
-      e.preventDefault();
-      setBattleMinimized(false);
-    }
-    return;
-  }
-
   if (game.over || !game.awaitingInput || e.repeat) return;
 
   const key = e.key.toLowerCase();
-
-  // Battle input takes priority over dungeon input while a battle is open.
-  if (game.battle) {
-    battleKey(e, key);
-    return;
-  }
-
   let handled = true;
 
   if (key === 'w')      playerAction('move', 0, -1);
@@ -1322,5 +918,4 @@ function applyPortrait() {
 const assetProblems = Assets.init();
 if (assetProblems.length) console.warn('assets.js problems:\n' + assetProblems.join('\n'));
 applyPortrait();
-initBattleUI();
 showScreen('menu');
